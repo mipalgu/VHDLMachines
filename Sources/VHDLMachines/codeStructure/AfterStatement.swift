@@ -67,8 +67,6 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     /// start of a states execution.
     public enum Period: RawRepresentable, Equatable, Hashable, Codable, Sendable {
 
-        // swiftlint:disable identifier_name
-
         /// Picoseconds.
         case ps
 
@@ -83,8 +81,6 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
 
         /// Seconds.
         case s
-
-        // swiftlint:enable identifier_name
 
         /// The number of ringlets since the start of a states execution.
         case ringlet

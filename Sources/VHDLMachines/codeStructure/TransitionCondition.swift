@@ -72,12 +72,8 @@ public indirect enum TransitionCondition: RawRepresentable, Equatable, Codable, 
     /// An `and` operation containing an `after` statement..
     case and(lhs: TransitionCondition, rhs: TransitionCondition)
 
-    // swiftlint:disable identifier_name
-
     /// An `or` operation containing an `after` statement..
     case or(lhs: TransitionCondition, rhs: TransitionCondition)
-
-    // swiftlint:enable identifier_name
 
     /// A `nand` operation containing an `after` statement..
     case nand(lhs: TransitionCondition, rhs: TransitionCondition)
