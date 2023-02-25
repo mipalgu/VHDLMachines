@@ -6,7 +6,6 @@
 //
 
 import Foundation
-@testable import Machines
 @testable import VHDLMachines
 import XCTest
 
