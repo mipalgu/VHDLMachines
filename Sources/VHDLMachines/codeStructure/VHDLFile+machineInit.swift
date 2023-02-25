@@ -77,4 +77,27 @@ public extension VHDLFile {
         )
     }
 
+    init?(kripkeFor machine: Machine) {
+        guard let name = VariableName(rawValue: "\(machine.name.rawValue)_KripkeStates") else {
+            return nil
+        }
+        let readRecords: [HeadStatement] = machine.states.compactMap {
+            guard let record = Record(readKripke: $0, machine: machine) else {
+                return nil
+            }
+            return HeadStatement.definition(value: .type(value: .record(value: record)))
+        }
+        let writeRecords: [HeadStatement] = machine.states.compactMap {
+            guard let record = Record(writeKripke: $0, machine: machine) else {
+                return nil
+            }
+            return HeadStatement.definition(value: .type(value: .record(value: record)))
+        }
+        guard readRecords.count == machine.states.count, writeRecords.count == machine.states.count else {
+            return nil
+        }
+        let package = VHDLPackage(name: name, statements: readRecords + writeRecords)
+        self.init(architectures: [], entities: [], includes: [], packages: [package])
+    }
+
 }
