@@ -34,7 +34,19 @@ public struct VHDLCompiler {
         }
         let fileWrapper = FileWrapper(regularFileWithContents: data)
         fileWrapper.preferredFilename = fileName
-        let folderWrapper = FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
+        guard
+            let file2 = VHDLFile(kripkeFor: machine),
+            let data2 = file2.rawValue.data(using: .utf8),
+            let package = file2.packages.first
+        else {
+            return false
+        }
+        let fileWrapper2 = FileWrapper(regularFileWithContents: data2)
+        let filename2 = package.name.rawValue + ".vhd"
+        fileWrapper2.preferredFilename = filename2
+        let folderWrapper = FileWrapper(
+            directoryWithFileWrappers: [fileName: fileWrapper, filename2: fileWrapper2]
+        )
         if helper.directoryExists(machine.path.path) {
             guard helper.deleteItem(atPath: machine.path) else {
                 return false
