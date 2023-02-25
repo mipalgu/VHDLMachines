@@ -54,6 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import Foundation
 import VHDLParsing
 
 /// Add init for default machine format.
@@ -83,6 +84,9 @@ extension CaseStatement {
     }
 
     init?(readSnapshot machine: Machine) {
+        guard !machine.states.isEmpty else {
+            return nil
+        }
         let signals = Set(machine.externalSignals.map { $0.name })
         guard machine.states.allSatisfy({
             $0.externalVariables.allSatisfy { name in
@@ -105,6 +109,21 @@ extension CaseStatement {
         }
         guard snapshots.count == statesWithReadSignals.count else {
             return nil
+        }
+        guard let bitsRequired = BitLiteral.bitsRequired(for: machine.states.count - 1) else {
+            self.init(
+                condition: .reference(variable: .variable(name: .currentState)),
+                cases: snapshots + [.othersNull]
+            )
+            return
+        }
+        let supportedStates = Int(exp2(Double(bitsRequired)).rounded())
+        guard supportedStates > snapshots.count else {
+            self.init(
+                condition: .reference(variable: .variable(name: .currentState)),
+                cases: snapshots
+            )
+            return
         }
         self.init(
             condition: .reference(variable: .variable(name: .currentState)),
