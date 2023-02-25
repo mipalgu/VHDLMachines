@@ -93,9 +93,6 @@ public extension VHDLFile {
             }
             return HeadStatement.definition(value: .type(value: .record(value: record)))
         }
-        guard readRecords.count == machine.states.count, writeRecords.count == machine.states.count else {
-            return nil
-        }
         let package = VHDLPackage(name: name, statements: readRecords + writeRecords)
         self.init(architectures: [], entities: [], includes: [], packages: [package])
     }

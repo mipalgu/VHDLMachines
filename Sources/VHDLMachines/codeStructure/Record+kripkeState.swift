@@ -97,6 +97,9 @@ extension Record {
             let suspendedState = machine.suspendedState,
             machine.states[suspendedState] == state
         else {
+            guard !allDeclarations.isEmpty else {
+                return nil
+            }
             self.init(name: name, types: allDeclarations)
             return
         }
@@ -112,13 +115,16 @@ extension Record {
                 ))))
             )
         ]
+        guard !allDeclarations.isEmpty else {
+            return nil
+        }
         self.init(name: name, types: allDeclarations)
     }
 
     public init?(writeKripke state: State, machine: Machine) {
         guard
             let name = VariableName(
-                rawValue: "\(machine.name.rawValue)_\(VariableName.name(for: state).rawValue)_Read"
+                rawValue: "\(machine.name.rawValue)_\(VariableName.name(for: state).rawValue)_Write"
             ),
             let stateIndex = machine.states.firstIndex(of: state)
         else {
@@ -149,6 +155,9 @@ extension Record {
             let suspendedState = machine.suspendedState,
             machine.states[suspendedState] == state
         else {
+            guard !allDeclarations.isEmpty else {
+                return nil
+            }
             self.init(name: name, types: allDeclarations)
             return
         }
@@ -165,13 +174,20 @@ extension Record {
             )
         ]
         guard machine.isParameterised else {
+            guard !allDeclarations.isEmpty else {
+                return nil
+            }
             self.init(name: name, types: allDeclarations)
             return
         }
         let returnables = machine.returnableSignals.map {
             RecordTypeDeclaration(name: $0.name, type: .signal(type: $0.type))
         }
-        self.init(name: name, types: allDeclarations + returnables)
+        allDeclarations += returnables
+        guard !allDeclarations.isEmpty else {
+            return nil
+        }
+        self.init(name: name, types: allDeclarations)
     }
 
 }
