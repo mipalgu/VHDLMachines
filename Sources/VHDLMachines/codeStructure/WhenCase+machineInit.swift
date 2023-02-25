@@ -96,15 +96,43 @@ extension WhenCase {
         }
         let stateSnapshots = Set(state.externalVariables)
         let signals = machine.externalSignals.filter { stateSnapshots.contains($0.name) }
-        guard
-            signals.count == state.externalVariables.count, signals.allSatisfy({ $0.mode != .output })
-        else {
+        guard signals.count == state.externalVariables.count else {
             return nil
         }
-        let snapshots = signals.map {
+        let readableSignals = signals.filter { $0.mode != .output }
+        guard !readableSignals.isEmpty else {
+            return nil
+        }
+        let snapshots = readableSignals.map {
             SynchronousBlock.statement(statement: .assignment(
                 name: .variable(name: $0.name),
                 value: .reference(variable: .variable(name: .name(for: $0)))
+            ))
+        }
+        let condition = WhenCondition.expression(
+            expression: .reference(variable: .variable(name: .name(for: state)))
+        )
+        guard snapshots.count != 1 else {
+            self.init(condition: condition, code: snapshots[0])
+            return
+        }
+        self.init(condition: condition, code: .blocks(blocks: snapshots))
+    }
+
+    init?(writeSnapshot state: State, machine: Machine) {
+        guard !state.externalVariables.isEmpty else {
+            return nil
+        }
+        let stateSnapshots = Set(state.externalVariables)
+        let signals = machine.externalSignals.filter { stateSnapshots.contains($0.name) }
+        guard signals.count == state.externalVariables.count else {
+            return nil
+        }
+        let writableSignals = signals.filter { $0.mode != .input }
+        let snapshots = writableSignals.map {
+            SynchronousBlock.statement(statement: .assignment(
+                name: .variable(name: .name(for: $0)),
+                value: .reference(variable: .variable(name: $0.name))
             ))
         }
         let condition = WhenCondition.expression(
@@ -715,13 +743,7 @@ extension WhenCase {
     /// Create the `writeSnapshot` case for a machine.
     /// - Parameter machine: The machine to create the case for.
     private init?(writeSnapshotMachine machine: Machine) {
-        let snapshots = machine.externalSignals.filter { $0.mode != .input }.map {
-            SynchronousBlock.statement(statement: .assignment(
-                name: .variable(name: .name(for: $0)),
-                value: .reference(variable: .variable(name: $0.name))
-            ))
-        }
-        var blocks = snapshots + [
+        var blocks: [SynchronousBlock] = [
             .statement(statement: .assignment(
                 name: .variable(name: .internalState),
                 value: .reference(variable: .variable(name: .readSnapshot))
@@ -735,6 +757,9 @@ extension WhenCase {
                 value: .reference(variable: .variable(name: .targetState))
             ))
         ]
+        if let snapshotsCase = CaseStatement(writeSnapshot: machine) {
+            blocks = [.caseStatement(block: snapshotsCase)] + blocks
+        }
         let condition = WhenCondition.expression(
             expression: .reference(variable: .variable(name: .writeSnapshot))
         )

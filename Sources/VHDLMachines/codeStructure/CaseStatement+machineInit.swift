@@ -131,4 +131,52 @@ extension CaseStatement {
         )
     }
 
+    init?(writeSnapshot machine: Machine) {
+        guard !machine.states.isEmpty else {
+            return nil
+        }
+        let signals = Set(machine.externalSignals.map { $0.name })
+        guard machine.states.allSatisfy({
+            $0.externalVariables.allSatisfy { name in
+                signals.contains(name)
+            }
+        }) else {
+            return nil
+        }
+        let writeSignals = Set(machine.externalSignals.filter { $0.mode != .input }.map { $0.name })
+        let statesWithWriteSignals = machine.states.filter {
+            $0.externalVariables.contains { name in
+                writeSignals.contains(name)
+            }
+        }
+        guard !statesWithWriteSignals.isEmpty else {
+            return nil
+        }
+        let snapshots = statesWithWriteSignals.compactMap {
+            WhenCase(writeSnapshot: $0, machine: machine)
+        }
+        guard snapshots.count == statesWithWriteSignals.count else {
+            return nil
+        }
+        guard let bitsRequired = BitLiteral.bitsRequired(for: machine.states.count - 1) else {
+            self.init(
+                condition: .reference(variable: .variable(name: .currentState)),
+                cases: snapshots + [.othersNull]
+            )
+            return
+        }
+        let supportedStates = Int(exp2(Double(bitsRequired)).rounded())
+        guard supportedStates > snapshots.count else {
+            self.init(
+                condition: .reference(variable: .variable(name: .currentState)),
+                cases: snapshots
+            )
+            return
+        }
+        self.init(
+            condition: .reference(variable: .variable(name: .currentState)),
+            cases: snapshots + [.othersNull]
+        )
+    }
+
 }

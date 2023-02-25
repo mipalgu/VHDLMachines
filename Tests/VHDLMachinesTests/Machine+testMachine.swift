@@ -161,7 +161,7 @@ extension Machine {
                 State.defaultState(name: VariableName.suspendedState),
                 {
                     var state = State.defaultState(name: VariableName.state0)
-                    state.externalVariables = [.x]
+                    state.externalVariables = [.x, .xx]
                     return state
                 }()
             ],

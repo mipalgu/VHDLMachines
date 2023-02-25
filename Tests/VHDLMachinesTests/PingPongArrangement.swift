@@ -337,7 +337,12 @@ struct PingPongArrangement {
                             internalState <= NoOnEntry;
                         end if;
                     when WriteSnapshot =>
-                        EXTERNAL_ping <= ping;
+                        case currentState is
+                            when STATE_Ping =>
+                                EXTERNAL_ping <= ping;
+                            when others =>
+                                null;
+                        end case;
                         internalState <= ReadSnapshot;
                         previousRinglet <= currentState;
                         currentState <= targetState;

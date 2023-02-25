@@ -272,7 +272,12 @@ final class WhenCaseTests: XCTestCase {
     /// The writeSnapshot code.
     let writeSnapshotCode = """
     when WriteSnapshot =>
-        EXTERNAL_xx <= xx;
+        case currentState is
+            when STATE_State0 =>
+                EXTERNAL_xx <= xx;
+            when others =>
+                null;
+        end case;
         internalState <= ReadSnapshot;
         previousRinglet <= currentState;
         currentState <= targetState;
@@ -465,7 +470,12 @@ final class WhenCaseTests: XCTestCase {
             writeSnapshot?.rawValue,
             """
             when WriteSnapshot =>
-                EXTERNAL_xx <= xx;
+                case currentState is
+                    when STATE_State0 =>
+                        EXTERNAL_xx <= xx;
+                    when others =>
+                        null;
+                end case;
                 internalState <= ReadSnapshot;
                 previousRinglet <= currentState;
                 currentState <= targetState;
