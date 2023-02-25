@@ -126,7 +126,7 @@ struct PingPongArrangement {
             name: VariableName(rawValue: "Ping")!,
             actions: pingActions,
             signals: [],
-            externalVariables: [VariableName(rawValue: "ping")!, VariableName(rawValue: "pong")!]
+            externalVariables: [VariableName(rawValue: "ping")!]
         )
     }
 
@@ -136,7 +136,7 @@ struct PingPongArrangement {
             name: VariableName(rawValue: "Pong")!,
             actions: pongActions,
             signals: [],
-            externalVariables: [VariableName(rawValue: "ping")!, VariableName(rawValue: "pong")!]
+            externalVariables: [VariableName(rawValue: "pong")!]
         )
     }
 
@@ -325,7 +325,12 @@ struct PingPongArrangement {
                         end case;
                         internalState <= WriteSnapshot;
                     when ReadSnapshot =>
-                        pong <= EXTERNAL_pong;
+                        case currentState is
+                            when STATE_Check =>
+                                pong <= EXTERNAL_pong;
+                            when others =>
+                                null;
+                        end case;
                         if (previousRinglet /= currentState) then
                             internalState <= OnEntry;
                         else

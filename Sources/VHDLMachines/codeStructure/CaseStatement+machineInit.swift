@@ -82,4 +82,34 @@ extension CaseStatement {
         )
     }
 
+    init?(readSnapshot machine: Machine) {
+        let signals = Set(machine.externalSignals.map { $0.name })
+        guard machine.states.allSatisfy({
+            $0.externalVariables.allSatisfy { name in
+                signals.contains(name)
+            }
+        }) else {
+            return nil
+        }
+        let readSignals = Set(machine.externalSignals.filter { $0.mode != .output }.map { $0.name })
+        let statesWithReadSignals = machine.states.filter {
+            $0.externalVariables.contains { name in
+                readSignals.contains(name)
+            }
+        }
+        guard !statesWithReadSignals.isEmpty else {
+            return nil
+        }
+        let snapshots = statesWithReadSignals.compactMap {
+            WhenCase(readSnapshot: $0, machine: machine)
+        }
+        guard snapshots.count == statesWithReadSignals.count else {
+            return nil
+        }
+        self.init(
+            condition: .reference(variable: .variable(name: .currentState)),
+            cases: snapshots + [.othersNull]
+        )
+    }
+
 }

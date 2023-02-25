@@ -349,7 +349,12 @@ class VHDLMachinesCompilerTests: XCTestCase {
                             xx <= "00";
                             internalState <= CheckTransition;
                         when ReadSnapshot =>
-                            x <= EXTERNAL_x;
+                            case currentState is
+                                when STATE_State0 =>
+                                    x <= EXTERNAL_x;
+                                when others =>
+                                    null;
+                            end case;
                             if (command = COMMAND_RESTART) then
                                 parX <= PARAMETER_parX;
                                 parXs <= PARAMETER_parXs;

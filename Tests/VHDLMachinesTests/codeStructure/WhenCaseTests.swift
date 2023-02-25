@@ -106,7 +106,12 @@ final class WhenCaseTests: XCTestCase {
     /// The expected `readSnapshot` code for the test machine.
     let readSnapshotExpected = """
     when ReadSnapshot =>
-        x <= EXTERNAL_x;
+        case currentState is
+            when STATE_State0 =>
+                x <= EXTERNAL_x;
+            when others =>
+                null;
+        end case;
         if (command = COMMAND_RESTART) then
             parX <= PARAMETER_parX;
             parXs <= PARAMETER_parXs;
@@ -354,7 +359,12 @@ final class WhenCaseTests: XCTestCase {
             readSnapshot?.rawValue,
             """
             when ReadSnapshot =>
-                x <= EXTERNAL_x;
+                case currentState is
+                    when STATE_State0 =>
+                        x <= EXTERNAL_x;
+                    when others =>
+                        null;
+                end case;
                 if (previousRinglet /= currentState) then
                     internalState <= OnEntry;
                 else
@@ -377,7 +387,12 @@ final class WhenCaseTests: XCTestCase {
             readSnapshot?.rawValue,
             """
             when ReadSnapshot =>
-                x <= EXTERNAL_x;
+                case currentState is
+                    when STATE_State0 =>
+                        x <= EXTERNAL_x;
+                    when others =>
+                        null;
+                end case;
                 if ((command = COMMAND_RESTART) and (currentState /= STATE_Initial)) then
                     currentState <= STATE_Initial;
                     suspended <= '0';

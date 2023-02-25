@@ -90,6 +90,33 @@ extension WhenCase {
         }
     }
 
+    init?(readSnapshot state: State, machine: Machine) {
+        guard !state.externalVariables.isEmpty else {
+            return nil
+        }
+        let stateSnapshots = Set(state.externalVariables)
+        let signals = machine.externalSignals.filter { stateSnapshots.contains($0.name) }
+        guard
+            signals.count == state.externalVariables.count, signals.allSatisfy({ $0.mode != .output })
+        else {
+            return nil
+        }
+        let snapshots = signals.map {
+            SynchronousBlock.statement(statement: .assignment(
+                name: .variable(name: $0.name),
+                value: .reference(variable: .variable(name: .name(for: $0)))
+            ))
+        }
+        let condition = WhenCondition.expression(
+            expression: .reference(variable: .variable(name: .name(for: state)))
+        )
+        guard snapshots.count != 1 else {
+            self.init(condition: condition, code: snapshots[0])
+            return
+        }
+        self.init(condition: condition, code: .blocks(blocks: snapshots))
+    }
+
     /// Create the when case for a single state.
     /// - Parameters:
     ///   - state: The state to create the when case for.
@@ -396,13 +423,11 @@ extension WhenCase {
             expression: .reference(variable: .variable(name: .readSnapshot))
         )
         let initialState = machine.states[machine.initialState]
-        let snapshots = machine.externalSignals.filter { $0.mode != .output }.map {
-            SynchronousBlock.statement(
-                statement: .assignment(
-                    name: .variable(name: $0.name),
-                    value: .reference(variable: .variable(name: .name(for: $0)))
-                )
-            )
+        let snapshots: SynchronousBlock?
+        if let snapshotCase = CaseStatement(readSnapshot: machine) {
+            snapshots = SynchronousBlock.caseStatement(block: snapshotCase)
+        } else {
+            snapshots = nil
         }
         // OnEntry semantics. Only perform OnEntry when previousRinglet != currentState.
         let onEntryBlock = IfBlock.ifElse(
@@ -425,13 +450,22 @@ extension WhenCase {
             suspendedIndex >= 0,
             suspendedIndex < machine.states.count
         else {
-            self.init(
-                condition: whenCondition,
-                code: .blocks(blocks: snapshots + [.ifStatement(block: onEntryBlock)])
-            )
+            if let snapshots {
+                self.init(
+                    condition: whenCondition,
+                    code: .blocks(blocks: [snapshots] + [.ifStatement(block: onEntryBlock)])
+                )
+                return
+            }
+            self.init(condition: whenCondition, code: .ifStatement(block: onEntryBlock))
             return
         }
-        var blocks: [SynchronousBlock] = snapshots
+        var blocks: [SynchronousBlock]
+        if let snapshots {
+            blocks = [snapshots]
+        } else {
+            blocks = []
+        }
         let suspendedState = machine.states[suspendedIndex]
         /// Parameterised snapshot semantics.
         if machine.isParameterised {

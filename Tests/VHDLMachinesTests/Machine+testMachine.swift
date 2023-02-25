@@ -159,7 +159,11 @@ extension Machine {
             states: [
                 State.defaultState(name: VariableName.initial),
                 State.defaultState(name: VariableName.suspendedState),
-                State.defaultState(name: VariableName.state0)
+                {
+                    var state = State.defaultState(name: VariableName.state0)
+                    state.externalVariables = [.x]
+                    return state
+                }()
             ],
             transitions: [
                 VHDLMachines.Transition(
