@@ -207,7 +207,27 @@ final class ArrangementTests: XCTestCase {
             parents: [VariableName(rawValue: "Machine")!],
             path: url
         )
+        #if os(macOS)
+        guard let arrangement else {
+            XCTFail("Failed to get arrangement.")
+            return
+        }
+        XCTAssertEqual(arrangement.clocks, expected.clocks)
+        XCTAssertEqual(arrangement.externalSignals, expected.externalSignals)
+        XCTAssertEqual(arrangement.machines.count, expected.machines.count)
+        arrangement.machines.keys.forEach {
+            guard let m0 = arrangement.machines[$0], let m1 = expected.machines[$0] else {
+                XCTFail("Failed to get machine.")
+                return
+            }
+            XCTAssertEqual(m0.absoluteString, m1.absoluteString)
+        }
+        XCTAssertEqual(arrangement.parents, expected.parents)
+        XCTAssertEqual(arrangement.path.absoluteString, expected.path.absoluteString)
+        XCTAssertEqual(arrangement.signals, expected.signals)
+        #else
         XCTAssertEqual(arrangement, expected)
+        #endif
     }
 
     // swiftlint:enable force_unwrapping
