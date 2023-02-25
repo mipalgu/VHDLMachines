@@ -22,7 +22,7 @@ public struct State: Codable, Equatable, Hashable, Sendable {
 
     /// The name of the external variables accessed in the state. These variables are defined
     /// in the arrangement.
-    public var externalVariables: [String]
+    public var externalVariables: [VariableName]
 
     /// Initialises a state with the given properties.
     /// - Parameters:
@@ -40,7 +40,7 @@ public struct State: Codable, Equatable, Hashable, Sendable {
         name: VariableName,
         actions: [ActionName: SynchronousBlock],
         signals: [LocalSignal],
-        externalVariables: [String]
+        externalVariables: [VariableName]
     ) {
         self.name = name
         self.actions = actions

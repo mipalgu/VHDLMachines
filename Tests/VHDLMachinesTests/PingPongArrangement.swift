@@ -126,7 +126,7 @@ struct PingPongArrangement {
             name: VariableName(rawValue: "Ping")!,
             actions: pingActions,
             signals: [],
-            externalVariables: ["ping", "pong"]
+            externalVariables: [VariableName(rawValue: "ping")!, VariableName(rawValue: "pong")!]
         )
     }
 
@@ -136,7 +136,7 @@ struct PingPongArrangement {
             name: VariableName(rawValue: "Pong")!,
             actions: pongActions,
             signals: [],
-            externalVariables: ["ping", "pong"]
+            externalVariables: [VariableName(rawValue: "ping")!, VariableName(rawValue: "pong")!]
         )
     }
 
@@ -207,7 +207,9 @@ struct PingPongArrangement {
             isParameterised: false,
             parameterSignals: [],
             returnableSignals: [],
-            states: [pingState, checkState(externalVariables: ["pong"], reset: "ping")],
+            states: [
+                pingState, checkState(externalVariables: [VariableName(rawValue: "pong")!], reset: "ping")
+            ],
             transitions: [pingTransition, pingWaitTransition],
             initialState: 0,
             suspendedState: nil
@@ -229,7 +231,9 @@ struct PingPongArrangement {
             isParameterised: false,
             parameterSignals: [],
             returnableSignals: [],
-            states: [checkState(externalVariables: ["ping"], reset: "pong"), pongState],
+            states: [
+                checkState(externalVariables: [VariableName(rawValue: "ping")!], reset: "pong"), pongState
+            ],
             transitions: [pongWaitTransition, pongTransition],
             initialState: 0,
             suspendedState: nil
@@ -346,7 +350,7 @@ struct PingPongArrangement {
     ///   - externalVariables: The variables to check.
     ///   - reset: What to reset.
     /// - Returns: The check state.
-    func checkState(externalVariables: [String], reset: String) -> State {
+    func checkState(externalVariables: [VariableName], reset: String) -> State {
         State(
             name: VariableName(rawValue: "Check")!,
             actions: emptyActions(reset: reset),
