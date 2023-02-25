@@ -59,6 +59,8 @@ import VHDLParsing
 /// Add conversion init.
 extension Expression {
 
+    // swiftlint:disable cyclomatic_complexity
+
     /// Convert a ``TransitionCondition`` into an `Expression`.
     /// - Parameter condition: The ``TransitionCondition`` to convert.
     @inlinable
@@ -106,6 +108,8 @@ extension Expression {
             self = .reference(variable: .variable(name: name))
         }
     }
+
+    // swiftlint:enable cyclomatic_complexity
 
     /// Convert an ``AfterStatement`` into an `Expression`.
     /// - Parameter after: The statement to convert.
