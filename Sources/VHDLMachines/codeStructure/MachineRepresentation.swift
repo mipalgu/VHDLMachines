@@ -87,6 +87,19 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
     /// - Parameter machine: The machine to convert into a `VHDL` file.
     @inlinable
     public init?(machine: Machine) {
+        let machineAndExternals = machine.externalSignals.map(\.name) + machine.machineSignals.map(\.name)
+        let variables = Set(machineAndExternals)
+        guard
+            variables.count == machineAndExternals.count,
+            machine.states.allSatisfy({
+                $0.signals.allSatisfy {
+                    !variables.contains($0.name)
+                }
+            })
+        else {
+            // Duplicate variable names.
+            return nil
+        }
         guard
             let entity = Entity(machine: machine),
             let architectureName = VariableName(rawValue: "Behavioral"),

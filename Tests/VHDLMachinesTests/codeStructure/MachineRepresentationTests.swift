@@ -82,4 +82,22 @@ final class MachineRepresentationTests: XCTestCase {
         XCTAssertEqual(representation?.includes, machine.includes)
     }
 
+    /// Test that duplicate variables in machine return nil.
+    func testDuplicateVariablesReturnsNil() {
+        var machine = Machine.testMachine()
+        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
+        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
+        XCTAssertNil(MachineRepresentation(machine: machine))
+        machine = Machine.testMachine()
+        guard let var1 = VariableName(rawValue: "duplicateVar") else {
+            XCTFail("Failed to create test variables.")
+            return
+        }
+        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
+        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
+        XCTAssertNotNil(MachineRepresentation(machine: machine))
+        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
+        XCTAssertNil(MachineRepresentation(machine: machine))
+    }
+
 }
