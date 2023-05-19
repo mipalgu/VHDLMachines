@@ -67,6 +67,8 @@ extension VariableName {
 
     static var g: VariableName { VariableName(rawValue: "g")! }
 
+    static var initialX: VariableName { VariableName(rawValue: "initialX")! }
+
     static var p: VariableName { VariableName(rawValue: "p")! }
 
     static var r: VariableName { VariableName(rawValue: "r")! }

@@ -382,6 +382,13 @@ final class ArchitectureHeadTests: XCTestCase {
                     value: .bits(value: BitVector(values: [.high, .high, .high]))
                 )),
                 comment: Comment(rawValue: "-- machine signal 2")!
+            ))),
+            .comment(value: Comment(rawValue: "-- State Signals")!),
+            .definition(value: .signal(value: LocalSignal(
+                type: .stdLogic,
+                name: VariableName(rawValue: "STATE_Initial_\(VariableName.initialX.rawValue)")!,
+                defaultValue: nil,
+                comment: nil
             )))
         ])
         XCTAssertEqual(result, expected)

@@ -66,7 +66,7 @@ extension Machine {
 
     /// A default test machine.
     static func testMachine(directory: URL = PingPongArrangement().machinePath) -> Machine {
-        VHDLMachines.Machine(
+        var machine = VHDLMachines.Machine(
             actions: [.onEntry, .internal, .onExit, .onResume, .onSuspend],
             name: VariableName(rawValue: "TestMachine")!,
             path: directory.appendingPathComponent("TestMachine.machine", isDirectory: true),
@@ -221,6 +221,8 @@ extension Machine {
             architectureHead: nil,
             architectureBody: nil
         )
+        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: .initialX)]
+        return machine
     }
 
     // swiftlint:enable force_unwrapping

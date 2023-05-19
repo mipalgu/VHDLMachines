@@ -186,6 +186,28 @@ extension ArchitectureHead {
             }
             statements += [.comment(value: machineSignalComment)] + machineSignals
         }
+        let stateVariables = machine.states.flatMap { state in
+            state.signals.map { (state.name, $0) }
+        }
+        if !stateVariables.isEmpty {
+            guard let machineStateSignalComment = Comment(rawValue: "-- State Signals") else {
+                return nil
+            }
+            let stateSignals: [HeadStatement] = stateVariables.compactMap {
+                guard
+                    let newName = VariableName(rawValue: "STATE_\($0.0.rawValue)_\($0.1.name.rawValue)")
+                else {
+                    return nil
+                }
+                return HeadStatement.definition(value: .signal(value: LocalSignal(
+                    type: $0.1.type, name: newName, defaultValue: $0.1.defaultValue, comment: $0.1.comment
+                )))
+            }
+            guard stateSignals.count == stateVariables.count else {
+                return nil
+            }
+            statements += [.comment(value: machineStateSignalComment)] + stateSignals
+        }
         if let head = machine.architectureHead {
             guard let userCodeComment = Comment(
                 rawValue: "-- User-Specific Code for Architecture Head"

@@ -236,6 +236,8 @@ class VHDLMachinesCompilerTests: XCTestCase {
             -- Machine Signals
             signal machineSignal1: std_logic;
             signal machineSignal2: std_logic_vector(2 downto 0) := "111"; -- machine signal 2
+            -- State Signals
+            signal STATE_Initial_initialX: std_logic;
         begin
             process(clk)
             begin
