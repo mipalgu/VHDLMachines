@@ -91,6 +91,10 @@ extension VariableName {
 
     static var parX: VariableName { VariableName(rawValue: "parX")! }
 
+    static var ping: VariableName { VariableName(rawValue: "ping")! }
+
+    static var pong: VariableName { VariableName(rawValue: "pong")! }
+
     static var parXs: VariableName { VariableName(rawValue: "parXs")! }
 
     static var retX: VariableName { VariableName(rawValue: "retX")! }

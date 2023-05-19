@@ -86,8 +86,9 @@ final class StateTests: XCTestCase {
     }
 
     /// The external variables.
-    var externalVariables: [String] {
-        ["A"]
+    var externalVariables: [VariableName] {
+        // swiftlint:disable:next force_unwrapping
+        [VariableName(rawValue: "A")!]
     }
 
     /// The state to test.
@@ -155,8 +156,10 @@ final class StateTests: XCTestCase {
                 )
             ]
         )
-        self.state.externalVariables = ["B"]
-        XCTAssertEqual(self.state.externalVariables, ["B"])
+        // swiftlint:disable:next force_unwrapping
+        let b = VariableName(rawValue: "B")!
+        self.state.externalVariables = [b]
+        XCTAssertEqual(self.state.externalVariables, [b])
     }
 
 }
