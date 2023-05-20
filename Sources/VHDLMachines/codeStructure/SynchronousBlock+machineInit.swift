@@ -80,24 +80,27 @@ extension SynchronousBlock {
         self = .ifStatement(block: code)
     }
 
-    init?(block: SynchronousBlock, stateVariables: [VariableName], state: VariableName) {
+    init?(block: SynchronousBlock, replacing variable: VariableName, with value: VariableName) {
         switch block {
         case .blocks(let blocks):
-            let newBlocks = blocks.compactMap { SynchronousBlock(block: $0, stateVariables: stateVariables, state: state) }
+            let newBlocks = blocks.compactMap {
+                SynchronousBlock(block: $0, replacing: variable, with: value)
+            }
             guard newBlocks.count == blocks.count else {
                 return nil
             }
             self = .blocks(blocks: newBlocks)
         case .caseStatement(let block):
-            let optionalCondition = stateVariables.reduce(Optional.some(block.condition)) {
-                guard
-                    let previous = $0,
-                    let newName = VariableName(rawValue: "STATE_\(state.rawValue)_\($1.rawValue)")
-                else {
-                    return nil
-                }
-                return Expression(expression: previous, replacing: $1, with: newName)
+            let newCases = block.cases.compactMap {
+                WhenCase(whenCase: $0, replacing: variable, with: value)
             }
+            guard
+                newCases.count == block.cases.count,
+                let condition = Expression(expression: block.condition, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .caseStatement(block: CaseStatement(condition: condition, cases: newCases))
         }
     }
 
@@ -105,8 +108,70 @@ extension SynchronousBlock {
 
 extension WhenCase {
 
-    init?(whenCase: WhenCase, stateVariables: [VariableName], state: VariableName) {
-        
+    init?(whenCase: WhenCase, replacing variable: VariableName, with value: VariableName) {
+        guard
+            let newCondition = WhenCondition(condition: whenCase.condition, replacing: variable, with: value),
+            let newCode = SynchronousBlock(block: whenCase.code, replacing: variable, with: value)
+        else {
+            return nil
+        }
+        self.init(condition: newCondition, code: newCode)
+    }
+
+}
+
+extension WhenCondition {
+
+    init?(condition: WhenCondition, replacing variable: VariableName, with value: VariableName) {
+        switch condition {
+        case .expression(let expression):
+            guard let newExpression = Expression(
+                expression: expression, replacing: variable, with: value
+            ) else {
+                return nil
+            }
+            self = .expression(expression: newExpression)
+        case .others:
+            self = .others
+        case .range(let range):
+            guard let newRange = VectorSize(size: range, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .range(range: newRange)
+        case .selection(let expressions):
+            let newExpressions = expressions.compactMap {
+                Expression(expression: $0, replacing: variable, with: value)
+            }
+            guard newExpressions.count == expressions.count else {
+                return nil
+            }
+            self = .selection(expressions: newExpressions)
+        }
+    }
+
+}
+
+extension VectorSize {
+
+    init?(size: VectorSize, replacing variable: VariableName, with value: VariableName) {
+        switch size {
+        case .downto(let upper, let lower):
+            guard
+                let newUpper = Expression(expression: upper, replacing: variable, with: value),
+                let newLower = Expression(expression: lower, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .downto(upper: newUpper, lower: newLower)
+        case .to(let lower, let upper):
+            guard
+                let newLower = Expression(expression: lower, replacing: variable, with: value),
+                let newUpper = Expression(expression: upper, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .to(lower: newLower, upper: newUpper)
+        }
     }
 
 }
