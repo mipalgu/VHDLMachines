@@ -91,17 +91,102 @@ extension SynchronousBlock {
             }
             self = .blocks(blocks: newBlocks)
         case .caseStatement(let block):
-            let newCases = block.cases.compactMap {
-                WhenCase(whenCase: $0, replacing: variable, with: value)
+            guard let newCase = CaseStatement(statement: block, replacing: variable, with: value) else {
+                return nil
             }
+            self = .caseStatement(block: newCase)
+        case .forLoop(let loop):
+            guard let newLoop = ForLoop(loop: loop, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .forLoop(loop: newLoop)
+        case .ifStatement(let block):
+            guard let newIf = IfBlock(block: block, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .ifStatement(block: newIf)
+        case .statement(let statement):
+            guard let newStatement = Statement(statement: statement, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .statement(statement: newStatement)
+        }
+    }
+
+}
+
+extension Statement {
+
+    init?(statement: Statement, replacing variable: VariableName, with value: VariableName) {
+        switch statement {
+        case .assignment(let name, let expression):
+            let newName = VariableReference(reference: name, replacing: variable, with: value)
             guard
-                newCases.count == block.cases.count,
-                let condition = Expression(expression: block.condition, replacing: variable, with: value)
+                let newExpression = Expression(expression: expression, replacing: variable, with: value)
             else {
                 return nil
             }
-            self = .caseStatement(block: CaseStatement(condition: condition, cases: newCases))
+            self = .assignment(name: newName, value: newExpression)
+        case .comment, .null:
+            self = statement
         }
+    }
+
+}
+
+extension IfBlock {
+
+    init?(block: IfBlock, replacing variable: VariableName, with value: VariableName) {
+        switch block {
+        case .ifElse(let condition, let ifBlock, let elseBlock):
+            guard
+                let newCondition = Expression(expression: condition, replacing: variable, with: value),
+                let newIfBlock = SynchronousBlock(block: ifBlock, replacing: variable, with: value),
+                let newElseBlock = SynchronousBlock(block: elseBlock, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .ifElse(condition: newCondition, ifBlock: newIfBlock, elseBlock: newElseBlock)
+        case .ifStatement(let condition, let ifBlock):
+            guard
+                let newCondition = Expression(expression: condition, replacing: variable, with: value),
+                let newIfBlock = SynchronousBlock(block: ifBlock, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .ifStatement(condition: newCondition, ifBlock: newIfBlock)
+        }
+    }
+
+}
+
+extension CaseStatement {
+
+    init?(statement: CaseStatement, replacing variable: VariableName, with value: VariableName) {
+        let newCases = statement.cases.compactMap {
+            WhenCase(whenCase: $0, replacing: variable, with: value)
+        }
+        guard
+            newCases.count == statement.cases.count,
+            let condition = Expression(expression: statement.condition, replacing: variable, with: value)
+        else {
+            return nil
+        }
+        self.init(condition: condition, cases: newCases)
+    }
+
+}
+
+extension ForLoop {
+
+    init?(loop: ForLoop, replacing variable: VariableName, with value: VariableName) {
+        guard
+            let newRange = VectorSize(size: loop.range, replacing: variable, with: value),
+            let newBody = SynchronousBlock(block: loop.body, replacing: variable, with: value)
+        else {
+            return nil
+        }
+        self.init(iterator: loop.iterator, range: newRange, body: newBody)
     }
 
 }
