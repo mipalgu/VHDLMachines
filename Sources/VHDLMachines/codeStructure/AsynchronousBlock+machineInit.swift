@@ -87,4 +87,131 @@ extension AsynchronousBlock {
         ])
     }
 
+    init?(block: AsynchronousBlock, replacing variable: VariableName, with value: VariableName) {
+        switch block {
+        case .blocks(let blocks):
+            let newBlocks = blocks.compactMap {
+                AsynchronousBlock(block: $0, replacing: variable, with: value)
+            }
+            guard newBlocks.count == blocks.count else {
+                return nil
+            }
+            self = .blocks(blocks: newBlocks)
+        case .component(let block):
+            guard let newComponent = ComponentInstantiation(
+                component: block, replacing: variable, with: value
+            ) else {
+                return nil
+            }
+            self = .component(block: newComponent)
+        case .process(let block):
+            guard let newProcess = ProcessBlock(process: block, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .process(block: newProcess)
+        case .statement(let statement):
+            guard let newStatement = Statement(statement: statement, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .statement(statement: newStatement)
+        }
+    }
+
+}
+
+extension ProcessBlock {
+
+    init?(process: ProcessBlock, replacing variable: VariableName, with value: VariableName) {
+        guard let newCode = SynchronousBlock(block: process.code, replacing: variable, with: value) else {
+            return nil
+        }
+        let newSensitivityList = process.sensitivityList.map { $0 == variable ? value : $0 }
+        self.init(sensitivityList: newSensitivityList, code: newCode)
+    }
+
+}
+
+extension ComponentInstantiation {
+
+    init?(component: ComponentInstantiation, replacing variable: VariableName, with value: VariableName) {
+        let generic: GenericMap?
+        if let gen = component.generic {
+            guard let newGen = GenericMap(map: gen, replacing: variable, with: value) else {
+                return nil
+            }
+            generic = newGen
+        }
+        guard let newPort = PortMap(map: component.port, replacing: variable, with: value) else {
+            return nil
+        }
+        let port = newPort
+        self.init(label: component.label, name: component.name, port: port, generic: generic)
+    }
+
+}
+
+extension PortMap {
+
+    init?(map: PortMap, replacing variable: VariableName, with value: VariableName) {
+        let newVariables = map.variables.compactMap {
+            VariableMap(map: $0, replacing: variable, with: value)
+        }
+        guard newVariables.count == map.variables.count else {
+            return nil
+        }
+        self.init(variables: newVariables)
+    }
+
+}
+
+extension VariableMap {
+
+    init?(map: VariableMap, replacing variable: VariableName, with value: VariableName) {
+        guard let newRhs = VariableAssignment(assignment: map.rhs, replacing: variable, with: value) else {
+            return nil
+        }
+        self.init(lhs: map.lhs, rhs: newRhs)
+    }
+
+}
+
+extension VariableAssignment {
+
+    init?(assignment: VariableAssignment, replacing variable: VariableName, with value: VariableName) {
+        switch assignment {
+        case .reference(let ref):
+            guard let newVariable = VariableReference(reference: ref, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .reference(variable: newVariable)
+        case .literal, .open:
+            self = assignment
+        }
+    }
+
+}
+
+extension GenericMap {
+
+    init?(map: GenericMap, replacing variable: VariableName, with value: VariableName) {
+        let newVariables = map.variables.compactMap {
+            GenericVariableMap(map: $0, replacing: variable, with: value)
+        }
+        guard newVariables.count == map.variables.count else {
+            return nil
+        }
+        self.init(variables: newVariables)
+    }
+
+}
+
+extension GenericVariableMap {
+
+    init?(map: GenericVariableMap, replacing variable: VariableName, with value: VariableName) {
+        guard let newRhs = Expression(expression: map.rhs, replacing: variable, with: value) else {
+            return nil
+        }
+        self.init(lhs: map.lhs, rhs: newRhs)
+    }
+
 }
