@@ -80,4 +80,216 @@ extension SynchronousBlock {
         self = .ifStatement(block: code)
     }
 
+    init?(block: SynchronousBlock, stateVariables: [VariableName]) {
+        switch block {
+        case .blocks(let blocks):
+            let newBlocks = blocks.compactMap { SynchronousBlock(block: $0, stateVariables: stateVariables) }
+            guard newBlocks.count == blocks.count else {
+                return nil
+            }
+            self = .blocks(blocks: newBlocks)
+        case .caseStatement(let block):
+            block.
+        }
+    }
+
+}
+
+extension Expression {
+
+    init?(expression: Expression, stateVariables: [VariableName]) {
+        switch expression {
+        case .binary(let operation):
+            guard
+                let newOperation = BinaryOperation(operation: operation, stateVariables: stateVariables)
+            else {
+                return nil
+            }
+            self = .binary(operation: newOperation)
+        case .cast(let cast):
+            guard let newCast = CastOperation(operation: cast, stateVariables: stateVariables) else {
+                return nil
+            }
+            self = .cast(operation: newCast)
+        case .conditional(let condition):
+            
+        }
+    }
+
+}
+
+extension BinaryOperation {
+
+    init?(operation: BinaryOperation, stateVariables: [VariableName]) {
+        switch operation {
+        case .addition(let lhs, let rhs):
+            guard
+                let newLhs = Expression(expression: lhs, stateVariables: stateVariables),
+                let newRhs = Expression(expression: rhs, stateVariables: stateVariables)
+            else {
+                return nil
+            }
+            self = .addition(lhs: newLhs, rhs: newRhs)
+        case .division(let lhs, let rhs):
+            guard
+                let newLhs = Expression(expression: lhs, stateVariables: stateVariables),
+                let newRhs = Expression(expression: rhs, stateVariables: stateVariables)
+            else {
+                return nil
+            }
+            self = .division(lhs: newLhs, rhs: newRhs)
+        case .subtraction(let lhs, let rhs):
+            guard
+                let newLhs = Expression(expression: lhs, stateVariables: stateVariables),
+                let newRhs = Expression(expression: rhs, stateVariables: stateVariables)
+            else {
+                return nil
+            }
+            self = .subtraction(lhs: newLhs, rhs: newRhs)
+        case .multiplication(let lhs, let rhs):
+            guard
+                let newLhs = Expression(expression: lhs, stateVariables: stateVariables),
+                let newRhs = Expression(expression: rhs, stateVariables: stateVariables)
+            else {
+                return nil
+            }
+            self = .multiplication(lhs: newLhs, rhs: newRhs)
+        }
+    }
+
+}
+
+extension CastOperation {
+
+    init?(operation: CastOperation, stateVariables: [VariableName]) {
+        switch operation {
+        case .bit(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .bit(expression: newExpression)
+        case .bitVector(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .bitVector(expression: newExpression)
+        case .boolean(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .boolean(expression: newExpression)
+        case .integer(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .integer(expression: newExpression)
+        case .natural(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .natural(expression: newExpression)
+        case .positive(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .positive(expression: newExpression)
+        case .real(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .real(expression: newExpression)
+        case .signed(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .signed(expression: newExpression)
+        case .stdLogic(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .stdLogic(expression: newExpression)
+        case .stdLogicVector(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .stdLogicVector(expression: newExpression)
+        case .stdULogic(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .stdULogic(expression: newExpression)
+        case .stdULogicVector(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .stdULogicVector(expression: newExpression)
+        case .unsigned(let expression):
+            guard let newExpression = Expression(
+                expression: expression, stateVariables: stateVariables
+            ) else {
+                return nil
+            }
+            self = .unsigned(expression: newExpression)
+        }
+    }
+
+}
+
+extension ComparisonOperation {
+
+    init?(operation: ComparisonOperation, stateVariables: [VariableName]) {
+        switch operation {
+        case .equality(let lhs, let rhs):
+            guard
+                let newLhs = Expression(expression: lhs, stateVariables: stateVariables),
+                let newRhs = Expression(expression: rhs, stateVariables: stateVariables)
+            else {
+                return nil
+            }
+            self = .equality(lhs: newLhs, rhs: newRhs)
+        case .greaterThan(let lhs, let rhs):
+            guard
+                let newLhs = Expression(expression: lhs, stateVariables: stateVariables),
+                let newRhs = Expression(expression: rhs, stateVariables: stateVariables)
+            else {
+                return nil
+            }
+            self = .greaterThan(lhs: newLhs, rhs: newRhs)
+        }
+    }
+
+}
+
+extension ConditionalExpression {
+
+    init(expression: ConditionalExpression, stateVariables: [VariableName]) {
+        switch expression {
+        case .comparison(value: ComparisonOperation)
+        }
+    }
+
 }
