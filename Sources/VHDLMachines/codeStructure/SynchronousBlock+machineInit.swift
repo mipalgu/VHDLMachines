@@ -80,6 +80,7 @@ extension SynchronousBlock {
         self = .ifStatement(block: code)
     }
 
+    @usableFromInline
     init?(block: SynchronousBlock, replacing variable: VariableName, with value: VariableName) {
         switch block {
         case .blocks(let blocks):
@@ -115,8 +116,77 @@ extension SynchronousBlock {
 
 }
 
+extension Machine {
+
+    @usableFromInline
+    init?(replacingStateRefsIn machine: Machine) {
+        let newStates: [State] = machine.states.compactMap { State(replacingStateVariablesIn: $0) }
+        guard newStates.count == machine.states.count else {
+            return nil
+        }
+        self.init(
+            actions: machine.actions,
+            name: machine.name,
+            path: machine.path,
+            includes: machine.includes,
+            externalSignals: machine.externalSignals,
+            clocks: machine.clocks,
+            drivingClock: machine.drivingClock,
+            dependentMachines: machine.dependentMachines,
+            machineSignals: machine.machineSignals,
+            isParameterised: machine.isParameterised,
+            parameterSignals: machine.parameterSignals,
+            returnableSignals: machine.returnableSignals,
+            states: newStates,
+            transitions: machine.transitions,
+            initialState: machine.initialState,
+            suspendedState: machine.suspendedState,
+            architectureHead: machine.architectureHead,
+            architectureBody: machine.architectureBody
+        )
+    }
+
+}
+
+extension State {
+
+    @usableFromInline
+    init?(replacingStateVariablesIn state: State) {
+        let newActions: [(VariableName, SynchronousBlock)] = state.actions
+        .compactMap { (action: VariableName, code: SynchronousBlock) in
+            guard let newCode = state.signals.reduce(Optional.some(code), {
+                guard
+                    let code = $0,
+                    let newName = VariableName(
+                        rawValue: "STATE_\(state.name.rawValue)_\($1.name.rawValue)"
+                    ),
+                    let newCode = SynchronousBlock(block: code, replacing: $1.name, with: newName)
+                else {
+                    return nil
+                }
+                return newCode
+            }) else {
+                return nil
+            }
+            return (action, newCode)
+        }
+        guard newActions.count == state.actions.count else {
+            return nil
+        }
+        let newActionsDictionary = Dictionary(uniqueKeysWithValues: newActions)
+        self.init(
+            name: state.name,
+            actions: newActionsDictionary,
+            signals: state.signals,
+            externalVariables: state.externalVariables
+        )
+    }
+
+}
+
 extension Statement {
 
+    @usableFromInline
     init?(statement: Statement, replacing variable: VariableName, with value: VariableName) {
         switch statement {
         case .assignment(let name, let expression):
@@ -136,6 +206,7 @@ extension Statement {
 
 extension IfBlock {
 
+    @usableFromInline
     init?(block: IfBlock, replacing variable: VariableName, with value: VariableName) {
         switch block {
         case .ifElse(let condition, let ifBlock, let elseBlock):
@@ -162,6 +233,7 @@ extension IfBlock {
 
 extension CaseStatement {
 
+    @usableFromInline
     init?(statement: CaseStatement, replacing variable: VariableName, with value: VariableName) {
         let newCases = statement.cases.compactMap {
             WhenCase(whenCase: $0, replacing: variable, with: value)
@@ -179,6 +251,7 @@ extension CaseStatement {
 
 extension ForLoop {
 
+    @usableFromInline
     init?(loop: ForLoop, replacing variable: VariableName, with value: VariableName) {
         guard
             let newRange = VectorSize(size: loop.range, replacing: variable, with: value),
@@ -193,6 +266,7 @@ extension ForLoop {
 
 extension WhenCase {
 
+    @usableFromInline
     init?(whenCase: WhenCase, replacing variable: VariableName, with value: VariableName) {
         guard
             let newCondition = WhenCondition(condition: whenCase.condition, replacing: variable, with: value),
@@ -207,6 +281,7 @@ extension WhenCase {
 
 extension WhenCondition {
 
+    @usableFromInline
     init?(condition: WhenCondition, replacing variable: VariableName, with value: VariableName) {
         switch condition {
         case .expression(let expression):
@@ -238,6 +313,7 @@ extension WhenCondition {
 
 extension VectorSize {
 
+    @usableFromInline
     init?(size: VectorSize, replacing variable: VariableName, with value: VariableName) {
         switch size {
         case .downto(let upper, let lower):
@@ -263,6 +339,7 @@ extension VectorSize {
 
 extension Expression {
 
+    @usableFromInline
     init?(expression: Expression, replacing variable: VariableName, with value: VariableName) {
         switch expression {
         case .binary(let operation):
@@ -314,6 +391,7 @@ extension Expression {
 
 extension VariableReference {
 
+    @usableFromInline
     init(reference: VariableReference, replacing variable: VariableName, with value: VariableName) {
         switch reference {
         case .indexed(let name, let index):
@@ -335,6 +413,7 @@ extension VariableReference {
 
 extension BooleanExpression {
 
+    @usableFromInline
     init?(expression: BooleanExpression, replacing variable: VariableName, with value: VariableName) {
         switch expression {
         case .and(let lhs, let rhs):
@@ -397,6 +476,7 @@ extension BooleanExpression {
 
 extension FunctionCall {
 
+    @usableFromInline
     init?(call: FunctionCall, replacing variable: VariableName, with value: VariableName) {
         switch call {
         case .custom(let function):
@@ -421,6 +501,7 @@ extension FunctionCall {
 
 extension MathRealFunctionCalls {
 
+    @usableFromInline
     init?(function: MathRealFunctionCalls, replacing variable: VariableName, with value: VariableName) {
         switch function {
         case .ceil(let expression):
@@ -481,6 +562,7 @@ extension MathRealFunctionCalls {
 
 extension BinaryOperation {
 
+    @usableFromInline
     init?(operation: BinaryOperation, replacing variable: VariableName, with value: VariableName) {
         switch operation {
         case .addition(let lhs, let rhs):
@@ -522,6 +604,7 @@ extension BinaryOperation {
 
 extension CastOperation {
 
+    @usableFromInline
     init?(operation: CastOperation, replacing variable: VariableName, with value: VariableName) {
         switch operation {
         case .bit(let expression):
@@ -622,6 +705,7 @@ extension CastOperation {
 
 extension ComparisonOperation {
 
+    @usableFromInline
     init?(operation: ComparisonOperation, replacing variable: VariableName, with value: VariableName) {
         switch operation {
         case .equality(let lhs, let rhs):
@@ -679,6 +763,7 @@ extension ComparisonOperation {
 
 extension ConditionalExpression {
 
+    @usableFromInline
     init?(expression: ConditionalExpression, replacing variable: VariableName, with value: VariableName) {
         switch expression {
         case .comparison(let operation):
@@ -704,6 +789,7 @@ extension ConditionalExpression {
 
 extension EdgeCondition {
 
+    @usableFromInline
     init?(condition: EdgeCondition, replacing variable: VariableName, with value: VariableName) {
         switch condition {
         case .rising(let expression):

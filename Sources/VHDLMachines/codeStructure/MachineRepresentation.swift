@@ -101,14 +101,15 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
             return nil
         }
         guard
-            let entity = Entity(machine: machine),
+            let newMachine = Machine(replacingStateRefsIn: machine),
+            let entity = Entity(machine: newMachine),
             let architectureName = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: machine),
-            let body = AsynchronousBlock(machine: machine)
+            let head = ArchitectureHead(machine: newMachine),
+            let body = AsynchronousBlock(machine: newMachine)
         else {
             return nil
         }
-        self.machine = machine
+        self.machine = newMachine
         self.entity = entity
         self.architectureName = architectureName
         self.architectureHead = head
