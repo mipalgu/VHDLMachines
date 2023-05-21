@@ -592,64 +592,6 @@ extension CastOperation {
 
 }
 
-extension ComparisonOperation {
-
-    @usableFromInline
-    init?(operation: ComparisonOperation, replacing variable: VariableName, with value: VariableName) {
-        switch operation {
-        case .equality(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .equality(lhs: newLhs, rhs: newRhs)
-        case .greaterThan(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .greaterThan(lhs: newLhs, rhs: newRhs)
-        case .greaterThanOrEqual(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .greaterThanOrEqual(lhs: newLhs, rhs: newRhs)
-        case .lessThan(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .lessThan(lhs: newLhs, rhs: newRhs)
-        case .lessThanOrEqual(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .lessThanOrEqual(lhs: newLhs, rhs: newRhs)
-        case .notEquals(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .notEquals(lhs: newLhs, rhs: newRhs)
-        }
-    }
-
-}
-
 extension ConditionalExpression {
 
     @usableFromInline
