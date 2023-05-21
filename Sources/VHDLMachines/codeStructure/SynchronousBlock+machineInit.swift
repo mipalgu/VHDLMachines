@@ -411,69 +411,6 @@ extension VariableReference {
 
 }
 
-extension BooleanExpression {
-
-    @usableFromInline
-    init?(expression: BooleanExpression, replacing variable: VariableName, with value: VariableName) {
-        switch expression {
-        case .and(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .and(lhs: newLhs, rhs: newRhs)
-        case .nand(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .nand(lhs: newLhs, rhs: newRhs)
-        case .nor(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .nor(lhs: newLhs, rhs: newRhs)
-        case .not(let expression):
-            guard let newValue = Expression(expression: expression, replacing: variable, with: value) else {
-                return nil
-            }
-            self = .not(value: newValue)
-        case .or(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .or(lhs: newLhs, rhs: newRhs)
-        case .xnor(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .xnor(lhs: newLhs, rhs: newRhs)
-        case .xor(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .xor(lhs: newLhs, rhs: newRhs)
-        }
-    }
-
-}
-
 extension FunctionCall {
 
     @usableFromInline
