@@ -87,7 +87,9 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
     /// - Parameter machine: The machine to convert into a `VHDL` file.
     @inlinable
     public init?(machine: Machine) {
-        let machineAndExternals = machine.externalSignals.map(\.name) + machine.machineSignals.map(\.name)
+        let machineAndExternals = machine.externalSignals.map(\.name) + machine.machineSignals.map(\.name) +
+            machine.clocks.map(\.name) + machine.parameterSignals.map(\.name) +
+            machine.returnableSignals.map(\.name) + machine.actions
         let variables = Set(machineAndExternals)
         guard
             variables.count == machineAndExternals.count,
