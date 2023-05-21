@@ -311,32 +311,6 @@ extension WhenCondition {
 
 }
 
-extension VectorSize {
-
-    @usableFromInline
-    init?(size: VectorSize, replacing variable: VariableName, with value: VariableName) {
-        switch size {
-        case .downto(let upper, let lower):
-            guard
-                let newUpper = Expression(expression: upper, replacing: variable, with: value),
-                let newLower = Expression(expression: lower, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .downto(upper: newUpper, lower: newLower)
-        case .to(let lower, let upper):
-            guard
-                let newLower = Expression(expression: lower, replacing: variable, with: value),
-                let newUpper = Expression(expression: upper, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .to(lower: newLower, upper: newUpper)
-        }
-    }
-
-}
-
 extension Expression {
 
     @usableFromInline
