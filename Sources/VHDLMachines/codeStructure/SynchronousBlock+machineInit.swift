@@ -675,27 +675,3 @@ extension ConditionalExpression {
     }
 
 }
-
-extension EdgeCondition {
-
-    @usableFromInline
-    init?(condition: EdgeCondition, replacing variable: VariableName, with value: VariableName) {
-        switch condition {
-        case .rising(let expression):
-            guard let newExpression = Expression(
-                expression: expression, replacing: variable, with: value
-            ) else {
-                return nil
-            }
-            self = .rising(expression: newExpression)
-        case .falling(let expression):
-            guard let newExpression = Expression(
-                expression: expression, replacing: variable, with: value
-            ) else {
-                return nil
-            }
-            self = .falling(expression: newExpression)
-        }
-    }
-
-}
