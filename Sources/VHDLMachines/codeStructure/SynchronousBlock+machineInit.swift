@@ -389,28 +389,6 @@ extension Expression {
 
 }
 
-extension VariableReference {
-
-    @usableFromInline
-    init(reference: VariableReference, replacing variable: VariableName, with value: VariableName) {
-        switch reference {
-        case .indexed(let name, let index):
-            guard name == variable else {
-                self = reference
-                return
-            }
-            self = .indexed(name: value, index: index)
-        case .variable(let name):
-            guard name == variable else {
-                self = reference
-                return
-            }
-            self = .variable(name: value)
-        }
-    }
-
-}
-
 extension FunctionCall {
 
     @usableFromInline
