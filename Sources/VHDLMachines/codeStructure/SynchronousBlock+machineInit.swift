@@ -591,29 +591,3 @@ extension CastOperation {
     }
 
 }
-
-extension ConditionalExpression {
-
-    @usableFromInline
-    init?(expression: ConditionalExpression, replacing variable: VariableName, with value: VariableName) {
-        switch expression {
-        case .comparison(let operation):
-            guard let newOperation = ComparisonOperation(
-                operation: operation, replacing: variable, with: value
-            ) else {
-                return nil
-            }
-            self = .comparison(value: newOperation)
-        case .edge(let condition):
-            guard let newCondition = EdgeCondition(
-                condition: condition, replacing: variable, with: value
-            ) else {
-                return nil
-            }
-            self = .edge(value: newCondition)
-        case .literal(let literal):
-            self = .literal(value: literal)
-        }
-    }
-
-}
