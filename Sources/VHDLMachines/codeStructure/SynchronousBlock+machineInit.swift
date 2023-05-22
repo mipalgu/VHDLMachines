@@ -80,40 +80,6 @@ extension SynchronousBlock {
         self = .ifStatement(block: code)
     }
 
-    @usableFromInline
-    init?(block: SynchronousBlock, replacing variable: VariableName, with value: VariableName) {
-        switch block {
-        case .blocks(let blocks):
-            let newBlocks = blocks.compactMap {
-                SynchronousBlock(block: $0, replacing: variable, with: value)
-            }
-            guard newBlocks.count == blocks.count else {
-                return nil
-            }
-            self = .blocks(blocks: newBlocks)
-        case .caseStatement(let block):
-            guard let newCase = CaseStatement(statement: block, replacing: variable, with: value) else {
-                return nil
-            }
-            self = .caseStatement(block: newCase)
-        case .forLoop(let loop):
-            guard let newLoop = ForLoop(loop: loop, replacing: variable, with: value) else {
-                return nil
-            }
-            self = .forLoop(loop: newLoop)
-        case .ifStatement(let block):
-            guard let newIf = IfBlock(block: block, replacing: variable, with: value) else {
-                return nil
-            }
-            self = .ifStatement(block: newIf)
-        case .statement(let statement):
-            guard let newStatement = Statement(statement: statement, replacing: variable, with: value) else {
-                return nil
-            }
-            self = .statement(statement: newStatement)
-        }
-    }
-
 }
 
 extension Machine {
