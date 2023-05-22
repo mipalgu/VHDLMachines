@@ -56,8 +56,14 @@
 
 import VHDLParsing
 
+/// Add replace initialiser.
 extension Expression {
 
+    /// Replace all occurances of a `variable` in `expression` with a new `value`.
+    /// - Parameters:
+    ///   - expression: The expression containing the `variable`'s to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The new `value` to replace the `variable` with.
     @usableFromInline
     init?(expression: Expression, replacing variable: VariableName, with value: VariableName) {
         switch expression {
