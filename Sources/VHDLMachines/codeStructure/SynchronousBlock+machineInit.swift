@@ -362,28 +362,3 @@ extension Expression {
     }
 
 }
-
-extension FunctionCall {
-
-    @usableFromInline
-    init?(call: FunctionCall, replacing variable: VariableName, with value: VariableName) {
-        switch call {
-        case .custom(let function):
-            let newArguments = function.arguments.compactMap {
-                Expression(expression: $0, replacing: variable, with: value)
-            }
-            guard newArguments.count == function.arguments.count else {
-                return nil
-            }
-            self = .custom(function: CustomFunctionCall(name: function.name, arguments: newArguments))
-        case .mathReal(let function):
-            guard let newFunction = MathRealFunctionCalls(
-                function: function, replacing: variable, with: value
-            ) else {
-                return nil
-            }
-            self = .mathReal(function: newFunction)
-        }
-    }
-
-}
