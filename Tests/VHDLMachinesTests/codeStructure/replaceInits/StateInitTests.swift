@@ -1,5 +1,5 @@
-// SynchronousBlock+machineInit.swift
-// Machines
+// StateInitTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,62 +54,65 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+@testable import VHDLMachines
 import VHDLParsing
+import XCTest
 
-/// Add init for top-level if-statement in process block.
-extension SynchronousBlock {
+/// Test class for ``State`` replace initialiser.
+final class StateInitTests: XCTestCase {
 
-    /// Create the top-level if-statement for the rising edge of the driving clock in the machine. This
-    /// block contains all of the logic of the machine.
-    /// - Parameter machine: The machine to create the if-statement for.
-    init?(machine: Machine) {
-        guard
-            machine.drivingClock >= 0,
-            machine.drivingClock < machine.clocks.count,
-            let caseStatement = CaseStatement(machine: machine)
-        else {
-            return nil
-        }
-        let clock = machine.clocks[machine.drivingClock].name
-        let code = IfBlock.ifStatement(
-            condition: .conditional(
-                condition: .edge(value: .rising(expression: .reference(variable: .variable(name: clock))))
-            ),
-            ifBlock: .caseStatement(block: caseStatement)
-        )
-        self = .ifStatement(block: code)
+    /// An `x` variable.
+    let x = Expression.reference(variable: .variable(name: .x))
+
+    /// A `y` variable.
+    let y = Expression.reference(variable: .variable(name: .y))
+
+    // swiftlint:disable force_unwrapping
+
+    /// The new name for variable `x`.
+    let newX = VariableName(rawValue: "STATE_Initial_x")!
+
+    /// The new name for variable `y`.
+    let newY = VariableName(rawValue: "STATE_Initial_y")!
+
+    // swiftlint:enable force_unwrapping
+
+    /// `newX` as an expression.
+    var expNewX: Expression {
+        .reference(variable: .variable(name: newX))
     }
 
-}
+    /// `newY` as an expression.
+    var expNewY: Expression {
+        .reference(variable: .variable(name: newY))
+    }
 
-extension Machine {
-
-    @usableFromInline
-    init?(replacingStateRefsIn machine: Machine) {
-        let newStates: [State] = machine.states.compactMap { State(replacingStateVariablesIn: $0) }
-        guard newStates.count == machine.states.count else {
-            return nil
-        }
-        self.init(
-            actions: machine.actions,
-            name: machine.name,
-            path: machine.path,
-            includes: machine.includes,
-            externalSignals: machine.externalSignals,
-            clocks: machine.clocks,
-            drivingClock: machine.drivingClock,
-            dependentMachines: machine.dependentMachines,
-            machineSignals: machine.machineSignals,
-            isParameterised: machine.isParameterised,
-            parameterSignals: machine.parameterSignals,
-            returnableSignals: machine.returnableSignals,
-            states: newStates,
-            transitions: machine.transitions,
-            initialState: machine.initialState,
-            suspendedState: machine.suspendedState,
-            architectureHead: machine.architectureHead,
-            architectureBody: machine.architectureBody
-        )
+    /// Test init replaces variables correctly.
+    func testReplaceVariablesCorrectly() {
+        var state = State.defaultState(name: .initial)
+        state.actions = [:]
+        state.signals = [LocalSignal(type: .stdLogic, name: .x), LocalSignal(type: .stdLogic, name: .y)]
+        var expected = state
+        state.actions[.onEntry] = .blocks(blocks: [
+            .statement(statement: .assignment(name: .variable(name: .x), value: y)),
+            .statement(statement: .assignment(
+                name: .variable(name: .z), value: .literal(value: .boolean(value: true))
+            )),
+            .statement(statement: .assignment(
+                name: .variable(name: .y), value: .literal(value: .logic(value: .high))
+            ))
+        ])
+        expected.actions[.onEntry] = .blocks(blocks: [
+            .statement(statement: .assignment(name: .variable(name: newX), value: expNewY)),
+            .statement(statement: .assignment(
+                name: .variable(name: .z), value: .literal(value: .boolean(value: true))
+            )),
+            .statement(statement: .assignment(
+                name: .variable(name: newY), value: .literal(value: .logic(value: .high))
+            ))
+        ])
+        let result = State(replacingStateVariablesIn: state)
+        XCTAssertEqual(result, expected)
     }
 
 }

@@ -1,5 +1,5 @@
-// SynchronousBlock+machineInit.swift
-// Machines
+// State+replaceInit.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -56,59 +56,37 @@
 
 import VHDLParsing
 
-/// Add init for top-level if-statement in process block.
-extension SynchronousBlock {
-
-    /// Create the top-level if-statement for the rising edge of the driving clock in the machine. This
-    /// block contains all of the logic of the machine.
-    /// - Parameter machine: The machine to create the if-statement for.
-    init?(machine: Machine) {
-        guard
-            machine.drivingClock >= 0,
-            machine.drivingClock < machine.clocks.count,
-            let caseStatement = CaseStatement(machine: machine)
-        else {
-            return nil
-        }
-        let clock = machine.clocks[machine.drivingClock].name
-        let code = IfBlock.ifStatement(
-            condition: .conditional(
-                condition: .edge(value: .rising(expression: .reference(variable: .variable(name: clock))))
-            ),
-            ifBlock: .caseStatement(block: caseStatement)
-        )
-        self = .ifStatement(block: code)
-    }
-
-}
-
-extension Machine {
+extension State {
 
     @usableFromInline
-    init?(replacingStateRefsIn machine: Machine) {
-        let newStates: [State] = machine.states.compactMap { State(replacingStateVariablesIn: $0) }
-        guard newStates.count == machine.states.count else {
+    init?(replacingStateVariablesIn state: State) {
+        let newActions: [(VariableName, SynchronousBlock)] = state.actions
+        .compactMap { (action: VariableName, code: SynchronousBlock) in
+            guard let newCode = state.signals.reduce(Optional.some(code), {
+                guard
+                    let code = $0,
+                    let newName = VariableName(
+                        rawValue: "STATE_\(state.name.rawValue)_\($1.name.rawValue)"
+                    ),
+                    let newCode = SynchronousBlock(block: code, replacing: $1.name, with: newName)
+                else {
+                    return nil
+                }
+                return newCode
+            }) else {
+                return nil
+            }
+            return (action, newCode)
+        }
+        guard newActions.count == state.actions.count else {
             return nil
         }
+        let newActionsDictionary = Dictionary(uniqueKeysWithValues: newActions)
         self.init(
-            actions: machine.actions,
-            name: machine.name,
-            path: machine.path,
-            includes: machine.includes,
-            externalSignals: machine.externalSignals,
-            clocks: machine.clocks,
-            drivingClock: machine.drivingClock,
-            dependentMachines: machine.dependentMachines,
-            machineSignals: machine.machineSignals,
-            isParameterised: machine.isParameterised,
-            parameterSignals: machine.parameterSignals,
-            returnableSignals: machine.returnableSignals,
-            states: newStates,
-            transitions: machine.transitions,
-            initialState: machine.initialState,
-            suspendedState: machine.suspendedState,
-            architectureHead: machine.architectureHead,
-            architectureBody: machine.architectureBody
+            name: state.name,
+            actions: newActionsDictionary,
+            signals: state.signals,
+            externalVariables: state.externalVariables
         )
     }
 
