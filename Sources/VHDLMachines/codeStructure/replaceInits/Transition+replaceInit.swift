@@ -196,16 +196,3 @@ extension TransitionCondition {
     }
 
 }
-
-extension AfterStatement {
-
-    init?(statement: AfterStatement, replacing variable: VariableName, with value: VariableName) {
-        guard let newAmount = Expression(
-            expression: statement.amount, replacing: variable, with: value
-        ) else {
-            return nil
-        }
-        self.init(amount: newAmount, period: statement.period)
-    }
-
-}
