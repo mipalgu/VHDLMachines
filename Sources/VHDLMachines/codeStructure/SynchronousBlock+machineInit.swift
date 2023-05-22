@@ -278,35 +278,3 @@ extension WhenCase {
     }
 
 }
-
-extension WhenCondition {
-
-    @usableFromInline
-    init?(condition: WhenCondition, replacing variable: VariableName, with value: VariableName) {
-        switch condition {
-        case .expression(let expression):
-            guard let newExpression = Expression(
-                expression: expression, replacing: variable, with: value
-            ) else {
-                return nil
-            }
-            self = .expression(expression: newExpression)
-        case .others:
-            self = .others
-        case .range(let range):
-            guard let newRange = VectorSize(size: range, replacing: variable, with: value) else {
-                return nil
-            }
-            self = .range(range: newRange)
-        case .selection(let expressions):
-            let newExpressions = expressions.compactMap {
-                Expression(expression: $0, replacing: variable, with: value)
-            }
-            guard newExpressions.count == expressions.count else {
-                return nil
-            }
-            self = .selection(expressions: newExpressions)
-        }
-    }
-
-}
