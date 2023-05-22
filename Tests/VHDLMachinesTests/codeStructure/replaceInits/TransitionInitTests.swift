@@ -1,4 +1,4 @@
-// Transition+replaceInit.swift
+// TransitionInitTests.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -54,39 +54,43 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+@testable import VHDLMachines
 import VHDLParsing
+import XCTest
 
-/// Add replace initialiser.
-extension Transition {
+/// Test class for ``Transition`` replace initialiser.
+final class TransitionInitTests: XCTestCase {
 
-    /// Replace all state variables in `transition` with the new encoded variable names. This encoding
-    /// prepends the state name to the variable name. For example, the `x` variable in the `Initial` state
-    /// would be encoded as `STATE_Initial_x`.
-    /// - Parameters:
-    ///   - transition: The transition to convert.
-    ///   - machine: The machine containing the state variables.
-    @usableFromInline
-    init?(replacingStateRefsIn transition: Transition, in machine: Machine) {
-        guard transition.source >= 0 && transition.source < machine.states.count else {
-            return nil
-        }
-        let state = machine.states[transition.source]
-        let stateVars = state.signals
-        let newNames = stateVars.compactMap {
-            VariableName(rawValue: "STATE_\(state.name.rawValue)_\($0.name.rawValue)")
-        }
-        guard newNames.count == stateVars.count else {
-            return nil
-        }
-        guard let conversions = zip(stateVars, newNames).reduce(Optional.some(transition.condition), {
-            guard let condition = $0 else {
-                return nil
-            }
-            return TransitionCondition(condition: condition, replacing: $1.0.name, with: $1.1)
-        }) else {
-            return nil
-        }
-        self.init(condition: conversions, source: transition.source, target: transition.target)
+    /// An `x` variable.
+    let x = TransitionCondition.variable(name: .x)
+
+    /// A `y` variable.
+    let y = TransitionCondition.variable(name: .y)
+
+    // swiftlint:disable force_unwrapping
+
+    /// The new name for variable `x`.
+    let newX = VariableName(rawValue: "STATE_Initial_x")!
+
+    /// The new name for variable `y`.
+    let newY = VariableName(rawValue: "STATE_Initial_y")!
+
+    // swiftlint:enable force_unwrapping
+
+    /// Test init replaces variables correctly.
+    func testReplaceInit() {
+        let original = Transition(condition: .and(lhs: x, rhs: y), source: 0, target: 1)
+        var machine = Machine.testMachine()
+        machine.states[0].signals = [
+            LocalSignal(type: .stdLogic, name: .x), LocalSignal(type: .stdLogic, name: .y)
+        ]
+        let result = Transition(replacingStateRefsIn: original, in: machine)
+        XCTAssertEqual(
+            result,
+            Transition(
+                condition: .and(lhs: .variable(name: newX), rhs: .variable(name: newY)), source: 0, target: 1
+            )
+        )
     }
 
 }
