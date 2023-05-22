@@ -106,9 +106,13 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
         let variables = Set(machineAndExternals)
         guard
             variables.count == machineAndExternals.count,
-            machine.states.allSatisfy({
-                $0.signals.allSatisfy {
-                    !variables.contains($0.name)
+            machine.states.allSatisfy({ state in
+                state.signals.allSatisfy {
+                    !variables.contains($0.name) &&
+                    !variables.contains(
+                        // swiftlint:disable:next force_unwrapping
+                        VariableName(rawValue: "STATE_\(state.name.rawValue)_\($0.name.rawValue)")!
+                    )
                 }
             })
         else {
