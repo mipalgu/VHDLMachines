@@ -184,26 +184,6 @@ extension State {
 
 }
 
-extension Statement {
-
-    @usableFromInline
-    init?(statement: Statement, replacing variable: VariableName, with value: VariableName) {
-        switch statement {
-        case .assignment(let name, let expression):
-            let newName = VariableReference(reference: name, replacing: variable, with: value)
-            guard
-                let newExpression = Expression(expression: expression, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .assignment(name: newName, value: newExpression)
-        case .comment, .null:
-            self = statement
-        }
-    }
-
-}
-
 extension IfBlock {
 
     @usableFromInline
