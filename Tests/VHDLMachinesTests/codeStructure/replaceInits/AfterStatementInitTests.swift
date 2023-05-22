@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// AfterStatementInitTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -58,47 +58,29 @@
 import VHDLParsing
 import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Test class for ``AfterStatement`` replace initialiser.
+final class AfterStatementInitTests: XCTestCase {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
-        }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
+    /// An `x` variable.
+    let x = Expression.reference(variable: .variable(name: .x))
+
+    // swiftlint:disable force_unwrapping
+
+    /// The new name for variable `x`.
+    let newX = VariableName(rawValue: "STATE_Initial_x")!
+
+    // swiftlint:enable force_unwrapping
+
+    /// `newX` as an expression.
+    var expNewX: Expression {
+        .reference(variable: .variable(name: newX))
     }
 
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
-        }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
+    /// Test init replaces expression correctly.
+    func testReplaceInit() {
+        let original = AfterStatement(amount: x, period: .ns)
+        let result = AfterStatement(statement: original, replacing: .x, with: newX)
+        XCTAssertEqual(result, AfterStatement(amount: expNewX, period: .ns))
     }
 
 }

@@ -66,7 +66,7 @@ extension VariableName {
     @usableFromInline static let clk = VariableName(rawValue: "clk")!
 
     /// The clock period.
-    static let clockPeriod = VariableName(rawValue: "clockPeriod")!
+    @usableFromInline static let clockPeriod = VariableName(rawValue: "clockPeriod")!
 
     /// The initial state name.
     @usableFromInline static let initial = VariableName(rawValue: "Initial")!
@@ -75,7 +75,7 @@ extension VariableName {
     @usableFromInline static let suspendedState = VariableName(rawValue: "Suspended")!
 
     /// The ringlet length variable.
-    static let ringletLength = VariableName(rawValue: "ringletLength")!
+    @usableFromInline static let ringletLength = VariableName(rawValue: "ringletLength")!
 
     /// The ringlets per ps constant.
     @usableFromInline static let ringletPerPs = VariableName(rawValue: "RINGLETS_PER_PS")!
@@ -96,25 +96,25 @@ extension VariableName {
     @usableFromInline static let ringletCounter = VariableName(rawValue: "ringlet_counter")!
 
     /// The suspended flag.
-    static let suspended = VariableName(rawValue: "suspended")!
+    @usableFromInline static let suspended = VariableName(rawValue: "suspended")!
 
     /// The command signal.
-    static let command = VariableName(rawValue: "command")!
+    @usableFromInline static let command = VariableName(rawValue: "command")!
 
     /// The current state variable.
-    static let currentState = VariableName(rawValue: "currentState")!
+    @usableFromInline static let currentState = VariableName(rawValue: "currentState")!
 
     /// The target state variable.
-    static let targetState = VariableName(rawValue: "targetState")!
+    @usableFromInline static let targetState = VariableName(rawValue: "targetState")!
 
     /// The previous state variable.
-    static let previousRinglet = VariableName(rawValue: "previousRinglet")!
+    @usableFromInline static let previousRinglet = VariableName(rawValue: "previousRinglet")!
 
     /// The suspended from variable.
-    static let suspendedFrom = VariableName(rawValue: "suspendedFrom")!
+    @usableFromInline static let suspendedFrom = VariableName(rawValue: "suspendedFrom")!
 
     /// The internal state variable.
-    static let internalState = VariableName(rawValue: "internalState")!
+    @usableFromInline static let internalState = VariableName(rawValue: "internalState")!
 
     /// The read snapshot constant.
     @usableFromInline static let readSnapshot = VariableName(rawValue: "ReadSnapshot")!
@@ -144,16 +144,16 @@ extension VariableName {
     @usableFromInline static let `internal` = VariableName(rawValue: "Internal")!
 
     /// The null command constant.
-    static let nullCommand = VariableName(rawValue: "COMMAND_NULL")!
+    @usableFromInline static let nullCommand = VariableName(rawValue: "COMMAND_NULL")!
 
     /// The restart command constant.
-    static let restartCommand = VariableName(rawValue: "COMMAND_RESTART")!
+    @usableFromInline static let restartCommand = VariableName(rawValue: "COMMAND_RESTART")!
 
     /// The resume command constant.
-    static let resumeCommand = VariableName(rawValue: "COMMAND_RESUME")!
+    @usableFromInline static let resumeCommand = VariableName(rawValue: "COMMAND_RESUME")!
 
     /// The suspend command constant.
-    static let suspendCommand = VariableName(rawValue: "COMMAND_SUSPEND")!
+    @usableFromInline static let suspendCommand = VariableName(rawValue: "COMMAND_SUSPEND")!
 
     /// The name for the given states constant bit representation.
     /// - Parameter state: The state to get the name for.

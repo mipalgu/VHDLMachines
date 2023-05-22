@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// MachineInitTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -58,47 +58,60 @@
 import VHDLParsing
 import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Test class for ``Machine`` replace initialiser.
+final class MachineInitTests: XCTestCase {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
-        }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
+    /// An `x` variable.
+    let x = Expression.reference(variable: .variable(name: .x))
+
+    /// A `y` variable.
+    let y = Expression.reference(variable: .variable(name: .y))
+
+    // swiftlint:disable force_unwrapping
+
+    /// The new name for variable `x`.
+    let newX = VariableName(rawValue: "STATE_Initial_x")!
+
+    /// The new name for variable `y`.
+    let newY = VariableName(rawValue: "STATE_Suspended_y")!
+
+    // swiftlint:enable force_unwrapping
+
+    /// `newX` as an expression.
+    var expNewX: Expression {
+        .reference(variable: .variable(name: newX))
     }
 
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
+    /// `newY` as an expression.
+    var expNewY: Expression {
+        .reference(variable: .variable(name: newY))
+    }
+
+    /// Test that all states are replaced correctly.
+    func testStatesReplacedCorrectly() {
         var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
-        }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
+        machine.transitions = [Transition(condition: .variable(name: .x), source: 0, target: 1)]
+        machine.states[0].actions = [:]
+        machine.states[1].actions = [:]
+        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: .x)]
+        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: .y)]
+        machine.states[0].actions[.onEntry] = .statement(
+            statement: .assignment(name: .variable(name: .x), value: y)
+        )
+        machine.states[1].actions[.onEntry] = .statement(
+            statement: .assignment(name: .variable(name: .x), value: y)
+        )
+        machine.states = [machine.states[0], machine.states[1]]
+        var expected = machine
+        let result = Machine(replacingStateRefsIn: machine)
+        expected.states[0].actions[.onEntry] = .statement(
+            statement: .assignment(name: .variable(name: newX), value: y)
+        )
+        expected.states[1].actions[.onEntry] = .statement(
+            statement: .assignment(name: .variable(name: .x), value: expNewY)
+        )
+        expected.transitions = [Transition(condition: .variable(name: newX), source: 0, target: 1)]
+        XCTAssertEqual(result, expected)
     }
 
 }

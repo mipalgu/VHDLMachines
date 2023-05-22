@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// State+replaceInit.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,51 +54,43 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import VHDLMachines
 import VHDLParsing
-import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Add replace initialiser.
+extension State {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
+    /// Replace the code within a state with new code that uses a states state variables.
+    /// - Parameter state: The state to transform.
+    @usableFromInline
+    init?(replacingStateVariablesIn state: State) {
+        let newActions: [(VariableName, SynchronousBlock)] = state.actions
+        .compactMap { (action: VariableName, code: SynchronousBlock) in
+            guard let newCode = state.signals.reduce(Optional.some(code), {
+                guard
+                    let code = $0,
+                    let newName = VariableName(
+                        rawValue: "STATE_\(state.name.rawValue)_\($1.name.rawValue)"
+                    ),
+                    let newCode = SynchronousBlock(block: code, replacing: $1.name, with: newName)
+                else {
+                    return nil
+                }
+                return newCode
+            }) else {
+                return nil
+            }
+            return (action, newCode)
         }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
-    }
-
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
+        guard newActions.count == state.actions.count else {
+            return nil
         }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
+        let newActionsDictionary = Dictionary(uniqueKeysWithValues: newActions)
+        self.init(
+            name: state.name,
+            actions: newActionsDictionary,
+            signals: state.signals,
+            externalVariables: state.externalVariables
+        )
     }
 
 }

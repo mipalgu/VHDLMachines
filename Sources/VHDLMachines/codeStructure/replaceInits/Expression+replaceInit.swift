@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// Expression+replaceInit.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,51 +54,62 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import VHDLMachines
 import VHDLParsing
-import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Add replace initialiser.
+extension Expression {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
+    /// Replace all occurances of a `variable` in `expression` with a new `value`.
+    /// - Parameters:
+    ///   - expression: The expression containing the `variable`'s to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The new `value` to replace the `variable` with.
+    @usableFromInline
+    init?(expression: Expression, replacing variable: VariableName, with value: VariableName) {
+        switch expression {
+        case .binary(let operation):
+            guard
+                let newOperation = BinaryOperation(operation: operation, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .binary(operation: newOperation)
+        case .cast(let cast):
+            guard let newCast = CastOperation(operation: cast, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .cast(operation: newCast)
+        case .conditional(let condition):
+            guard let newCondition = ConditionalExpression(
+                expression: condition, replacing: variable, with: value
+            ) else {
+                return nil
+            }
+            self = .conditional(condition: newCondition)
+        case .functionCall(let call):
+            guard let newCall = FunctionCall(call: call, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .functionCall(call: newCall)
+        case .literal:
+            self = expression
+        case .logical(let operation):
+            guard let newOperation = BooleanExpression(
+                expression: operation, replacing: variable, with: value
+            ) else {
+                return nil
+            }
+            self = .logical(operation: newOperation)
+        case .precedence(let expression):
+            guard let newValue = Expression(expression: expression, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .precedence(value: newValue)
+        case .reference(let reference):
+            self = .reference(variable: VariableReference(
+                reference: reference, replacing: variable, with: value
+            ))
         }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
-    }
-
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
-        }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
     }
 
 }

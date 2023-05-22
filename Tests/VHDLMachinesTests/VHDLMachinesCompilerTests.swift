@@ -236,6 +236,9 @@ class VHDLMachinesCompilerTests: XCTestCase {
             -- Machine Signals
             signal machineSignal1: std_logic;
             signal machineSignal2: std_logic_vector(2 downto 0) := "111"; -- machine signal 2
+            -- State Signals
+            signal STATE_Initial_initialX: std_logic;
+            signal STATE_Initial_z: std_logic;
         begin
             process(clk)
             begin
@@ -244,7 +247,10 @@ class VHDLMachinesCompilerTests: XCTestCase {
                         when CheckTransition =>
                             case currentState is
                                 when STATE_Initial =>
-                                    if (false) then
+                                    if (STATE_Initial_z = '1') then
+                                        targetState <= STATE_Suspended;
+                                        internalState <= OnExit;
+                                    elsif (false) then
                                         targetState <= STATE_Suspended;
                                         internalState <= OnExit;
                                     elsif ((ringlet_counter >= integer(ceil(real(50.0) * RINGLETS_PER_MS))) or (ringlet_counter >= integer(ceil(real(2.0) * RINGLETS_PER_S))) or (ringlet_counter >= integer(ceil(real(20000.0))))) then
@@ -290,8 +296,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
                         when OnEntry =>
                             case currentState is
                                 when STATE_Initial =>
-                                    x <= '1';
-                                    xx <= "00";
+                                    STATE_Initial_z <= '0';
                                     ringlet_counter <= 0;
                                 when STATE_Suspended =>
                                     x <= '1';
@@ -319,8 +324,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
                             case currentState is
                                 when STATE_Initial =>
                                     x <= '0';
-                                    x <= '1';
-                                    xx <= "00";
+                                    STATE_Initial_z <= '0';
                                     ringlet_counter <= 0;
                                 when STATE_Suspended =>
                                     x <= '0';

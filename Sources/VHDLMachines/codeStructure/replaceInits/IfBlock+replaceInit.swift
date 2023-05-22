@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// IfBlock+replaceInit.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,51 +54,37 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import VHDLMachines
 import VHDLParsing
-import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Add replace initialiser.
+extension IfBlock {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
+    /// Replace all occurances of `variable` in `block` with a new `value`.
+    /// - Parameters:
+    ///   - block: The block containing all `variable`'s to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The new value to replace `variable` with.
+    @usableFromInline
+    init?(block: IfBlock, replacing variable: VariableName, with value: VariableName) {
+        switch block {
+        case .ifElse(let condition, let ifBlock, let elseBlock):
+            guard
+                let newCondition = Expression(expression: condition, replacing: variable, with: value),
+                let newIfBlock = SynchronousBlock(block: ifBlock, replacing: variable, with: value),
+                let newElseBlock = SynchronousBlock(block: elseBlock, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .ifElse(condition: newCondition, ifBlock: newIfBlock, elseBlock: newElseBlock)
+        case .ifStatement(let condition, let ifBlock):
+            guard
+                let newCondition = Expression(expression: condition, replacing: variable, with: value),
+                let newIfBlock = SynchronousBlock(block: ifBlock, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .ifStatement(condition: newCondition, ifBlock: newIfBlock)
         }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
-    }
-
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
-        }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
     }
 
 }

@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// MathRealFunctionCallsInitTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -58,47 +58,74 @@
 import VHDLParsing
 import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Test class for `MathRealFunctionCalls` replace initialiser.
+final class MathRealFunctionCallsInitTests: XCTestCase {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
-        }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
+    /// An `x` variable.
+    let x = Expression.reference(variable: .variable(name: .x))
+
+    /// A `y` variable.
+    let y = Expression.reference(variable: .variable(name: .y))
+
+    // swiftlint:disable force_unwrapping
+
+    /// The new name for variable `x`.
+    let newX = VariableName(rawValue: "STATE_Initial_x")!
+
+    // swiftlint:enable force_unwrapping
+
+    /// `newX` as an expression.
+    var expNewX: Expression {
+        .reference(variable: .variable(name: newX))
     }
 
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
-        }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
+    /// Test `ceil` function.
+    func testCeil() {
+        let function = MathRealFunctionCalls.ceil(expression: x)
+        let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
+        XCTAssertEqual(result, MathRealFunctionCalls.ceil(expression: expNewX))
+    }
+
+    /// Test `floor` function.
+    func testFloor() {
+        let function = MathRealFunctionCalls.floor(expression: x)
+        let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
+        XCTAssertEqual(result, MathRealFunctionCalls.floor(expression: expNewX))
+    }
+
+    /// Test `fmax` function.
+    func testFMax() {
+        let function = MathRealFunctionCalls.fmax(arg0: x, arg1: y)
+        let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
+        XCTAssertEqual(result, MathRealFunctionCalls.fmax(arg0: expNewX, arg1: y))
+    }
+
+    /// Test `fmin` function.
+    func testFMin() {
+        let function = MathRealFunctionCalls.fmin(arg0: x, arg1: y)
+        let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
+        XCTAssertEqual(result, MathRealFunctionCalls.fmin(arg0: expNewX, arg1: y))
+    }
+
+    /// Test `round` function.
+    func testRound() {
+        let function = MathRealFunctionCalls.round(expression: x)
+        let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
+        XCTAssertEqual(result, MathRealFunctionCalls.round(expression: expNewX))
+    }
+
+    /// Test `sign` function.
+    func testSign() {
+        let function = MathRealFunctionCalls.sign(expression: x)
+        let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
+        XCTAssertEqual(result, MathRealFunctionCalls.sign(expression: expNewX))
+    }
+
+    /// Test `sqrt` function.
+    func testSqrt() {
+        let function = MathRealFunctionCalls.sqrt(expression: x)
+        let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
+        XCTAssertEqual(result, MathRealFunctionCalls.sqrt(expression: expNewX))
     }
 
 }

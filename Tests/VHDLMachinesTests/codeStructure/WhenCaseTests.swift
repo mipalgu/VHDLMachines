@@ -73,7 +73,10 @@ final class WhenCaseTests: XCTestCase {
     when CheckTransition =>
         case currentState is
             when STATE_Initial =>
-                if (false) then
+                if (z = '1') then
+                    targetState <= STATE_Suspended;
+                    internalState <= OnExit;
+                elsif (false) then
                     targetState <= STATE_Suspended;
                     internalState <= OnExit;
                 elsif ((ringlet_counter >= integer(ceil(real(50.0) * RINGLETS_PER_MS))) or (ringlet_counter >= integer(ceil(real(2.0) * RINGLETS_PER_S))) or (ringlet_counter >= integer(ceil(real(20000.0))))) then
@@ -175,8 +178,7 @@ final class WhenCaseTests: XCTestCase {
     when OnEntry =>
         case currentState is
             when STATE_Initial =>
-                x <= '1';
-                xx <= "00";
+                z <= '0';
                 ringlet_counter <= 0;
             when STATE_Suspended =>
                 x <= '1';
@@ -212,8 +214,7 @@ final class WhenCaseTests: XCTestCase {
         case currentState is
             when STATE_Initial =>
                 x <= '0';
-                x <= '1';
-                xx <= "00";
+                z <= '0';
                 ringlet_counter <= 0;
             when STATE_Suspended =>
                 x <= '0';

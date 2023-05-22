@@ -87,15 +87,48 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
     /// - Parameter machine: The machine to convert into a `VHDL` file.
     @inlinable
     public init?(machine: Machine) {
+        let representationVariables: [VariableName] = [
+            .suspended, .internalState, .currentState, .previousRinglet, .suspendedFrom, .ringletLength,
+            .clockPeriod, .ringletPerPs, .ringletPerNs, .ringletPerUs, .ringletPerMs, .ringletPerS,
+            .readSnapshot, .writeSnapshot, .checkTransition, .noOnEntry, .nullCommand, .restartCommand,
+            .resumeCommand, .suspendCommand, .ringletCounter, .command, .targetState
+        ]
+        let parameters = machine.parameterSignals.map { VariableName.name(for: $0) } +
+            machine.parameterSignals.map(\.name)
+        let returnables = machine.returnableSignals.map { VariableName.name(for: $0) } +
+            machine.returnableSignals.map(\.name)
+        let externals = machine.externalSignals.map(\.name) +
+            machine.externalSignals.map { VariableName.name(for: $0) }
+        let constants = machine.states.map { VariableName.name(for: $0) } + machine.actions
+        let otherSignals = machine.machineSignals.map(\.name) + machine.clocks.map(\.name)
+        let machineAndExternals = representationVariables + parameters + returnables + externals + constants +
+            otherSignals
+        let variables = Set(machineAndExternals)
         guard
-            let entity = Entity(machine: machine),
+            variables.count == machineAndExternals.count,
+            machine.states.allSatisfy({ state in
+                state.signals.allSatisfy {
+                    !variables.contains($0.name) &&
+                    !variables.contains(
+                        // swiftlint:disable:next force_unwrapping
+                        VariableName(rawValue: "STATE_\(state.name.rawValue)_\($0.name.rawValue)")!
+                    )
+                }
+            })
+        else {
+            // Duplicate variable names.
+            return nil
+        }
+        guard
+            let newMachine = Machine(replacingStateRefsIn: machine),
+            let entity = Entity(machine: newMachine),
             let architectureName = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: machine),
-            let body = AsynchronousBlock(machine: machine)
+            let head = ArchitectureHead(machine: newMachine),
+            let body = AsynchronousBlock(machine: newMachine)
         else {
             return nil
         }
-        self.machine = machine
+        self.machine = newMachine
         self.entity = entity
         self.architectureName = architectureName
         self.architectureHead = head

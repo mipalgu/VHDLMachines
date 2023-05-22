@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// VariableReferenceInitTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -58,47 +58,50 @@
 import VHDLParsing
 import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Test class for `VariableReferece` replace initialiser.
+final class VariableReferenceInitTests: XCTestCase {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
-        }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
+    // swiftlint:disable force_unwrapping
+
+    /// The new name for variable `x`.
+    let newX = VariableName(rawValue: "STATE_Initial_x")!
+
+    // swiftlint:enable force_unwrapping
+
+    /// Test `variable` case.
+    func testVariable() {
+        let x = VariableReference.variable(name: .x)
+        let result = VariableReference(reference: x, replacing: .x, with: newX)
+        let expected = VariableReference.variable(name: newX)
+        XCTAssertEqual(result, expected)
     }
 
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
-        }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
+    /// Test `variable` case when variable doesn't match.
+    func testInvalidVariable() {
+        let x = VariableReference.variable(name: .x)
+        let result = VariableReference(reference: x, replacing: .y, with: newX)
+        XCTAssertEqual(result, x)
+    }
+
+    /// Test `indexed` case.
+    func testIndexed() {
+        let range = VectorIndex.range(value: .downto(
+            upper: .literal(value: .integer(value: 3)), lower: .literal(value: .integer(value: 0))
+        ))
+        let x = VariableReference.indexed(name: .x, index: range)
+        let result = VariableReference(reference: x, replacing: .x, with: newX)
+        let expected = VariableReference.indexed(name: newX, index: range)
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test `indexed` case when variable doesn't match.
+    func testInvalidIndexed() {
+        let range = VectorIndex.range(value: .downto(
+            upper: .literal(value: .integer(value: 3)), lower: .literal(value: .integer(value: 0))
+        ))
+        let x = VariableReference.indexed(name: .x, index: range)
+        let result = VariableReference(reference: x, replacing: .y, with: newX)
+        XCTAssertEqual(result, x)
     }
 
 }

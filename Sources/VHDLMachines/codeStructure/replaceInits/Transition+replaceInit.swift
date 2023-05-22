@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// Transition+replaceInit.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,51 +54,39 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import VHDLMachines
 import VHDLParsing
-import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Add replace initialiser.
+extension Transition {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
+    /// Replace all state variables in `transition` with the new encoded variable names. This encoding
+    /// prepends the state name to the variable name. For example, the `x` variable in the `Initial` state
+    /// would be encoded as `STATE_Initial_x`.
+    /// - Parameters:
+    ///   - transition: The transition to convert.
+    ///   - machine: The machine containing the state variables.
+    @usableFromInline
+    init?(replacingStateRefsIn transition: Transition, in machine: Machine) {
+        guard transition.source >= 0 && transition.source < machine.states.count else {
+            return nil
         }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
-    }
-
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
+        let state = machine.states[transition.source]
+        let stateVars = state.signals
+        let newNames = stateVars.compactMap {
+            VariableName(rawValue: "STATE_\(state.name.rawValue)_\($0.name.rawValue)")
         }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
+        guard newNames.count == stateVars.count else {
+            return nil
+        }
+        guard let conversions = zip(stateVars, newNames).reduce(Optional.some(transition.condition), {
+            guard let condition = $0 else {
+                return nil
+            }
+            return TransitionCondition(condition: condition, replacing: $1.0.name, with: $1.1)
+        }) else {
+            return nil
+        }
+        self.init(condition: conversions, source: transition.source, target: transition.target)
     }
 
 }

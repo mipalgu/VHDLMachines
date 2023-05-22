@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// VectorSize+replaceInit.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,51 +54,36 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import VHDLMachines
 import VHDLParsing
-import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Add replace init.
+extension VectorSize {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
+    /// Replaces all occurences of `variable` in a `VectorSize` with `value`.
+    /// - Parameters:
+    ///   - size: The size containing the `variable`'s to replace.
+    ///   - variable: The `variable` to replace.
+    ///   - value: The `value` to replace the `variable` with.
+    @usableFromInline
+    init?(size: VectorSize, replacing variable: VariableName, with value: VariableName) {
+        switch size {
+        case .downto(let upper, let lower):
+            guard
+                let newUpper = Expression(expression: upper, replacing: variable, with: value),
+                let newLower = Expression(expression: lower, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .downto(upper: newUpper, lower: newLower)
+        case .to(let lower, let upper):
+            guard
+                let newLower = Expression(expression: lower, replacing: variable, with: value),
+                let newUpper = Expression(expression: upper, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .to(lower: newLower, upper: newUpper)
         }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
-    }
-
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
-        }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
     }
 
 }

@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// FunctionCall+replaceInit.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,51 +54,35 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import VHDLMachines
 import VHDLParsing
-import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Add replace initialiser.
+extension FunctionCall {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
+    /// Replace all occurances of `variable` in `call` with a new `value`.
+    /// - Parameters:
+    ///   - call: The call containing the `variable`'s to replace.
+    ///   - variable: The `variable` to replace.
+    ///   - value: The new `value` to replace the `variable` with.
+    @usableFromInline
+    init?(call: FunctionCall, replacing variable: VariableName, with value: VariableName) {
+        switch call {
+        case .custom(let function):
+            let newArguments = function.arguments.compactMap {
+                Expression(expression: $0, replacing: variable, with: value)
+            }
+            guard newArguments.count == function.arguments.count else {
+                return nil
+            }
+            self = .custom(function: CustomFunctionCall(name: function.name, arguments: newArguments))
+        case .mathReal(let function):
+            guard let newFunction = MathRealFunctionCalls(
+                function: function, replacing: variable, with: value
+            ) else {
+                return nil
+            }
+            self = .mathReal(function: newFunction)
         }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
-    }
-
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
-        }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
     }
 
 }

@@ -66,7 +66,11 @@ extension Machine {
 
     /// A default test machine.
     static func testMachine(directory: URL = PingPongArrangement().machinePath) -> Machine {
-        VHDLMachines.Machine(
+        var initialState = State.defaultState(name: .initial)
+        initialState.actions[.onEntry] = .statement(statement: .assignment(
+            name: .variable(name: .z), value: .literal(value: .bit(value: .low))
+        ))
+        var machine = VHDLMachines.Machine(
             actions: [.onEntry, .internal, .onExit, .onResume, .onSuspend],
             name: VariableName(rawValue: "TestMachine")!,
             path: directory.appendingPathComponent("TestMachine.machine", isDirectory: true),
@@ -157,11 +161,19 @@ extension Machine {
                 )
             ],
             states: [
-                State.defaultState(name: VariableName.initial),
+                initialState,
                 State.defaultState(name: VariableName.suspendedState),
                 State.defaultState(name: VariableName.state0)
             ],
             transitions: [
+                VHDLMachines.Transition(
+                    condition: .conditional(condition: .comparison(value: .equality(
+                        lhs: .reference(variable: .variable(name: .z)),
+                        rhs: .literal(value: .bit(value: .high))
+                    ))),
+                    source: 0,
+                    target: 1
+                ),
                 VHDLMachines.Transition(
                     condition: .conditional(condition: .literal(value: false)), source: 0, target: 1
                 ),
@@ -221,6 +233,11 @@ extension Machine {
             architectureHead: nil,
             architectureBody: nil
         )
+        machine.states[0].signals = [
+            LocalSignal(type: .stdLogic, name: .initialX),
+            LocalSignal(type: .stdLogic, name: .z)
+        ]
+        return machine
     }
 
     // swiftlint:enable force_unwrapping

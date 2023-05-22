@@ -1,5 +1,5 @@
-// MachineRepresentationTests.swift
-// Machines
+// FunctionCallsInitTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -58,47 +58,53 @@
 import VHDLParsing
 import XCTest
 
-/// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+/// Test class for `FunctionCall` replace initialiser.
+final class FunctionCallsInitTests: XCTestCase {
 
-    /// Test the machine initialiser creates the stored properties correctly.
-    func testMachineInit() {
-        let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
-        guard
-            let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
-            let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: newMachine),
-            let body = AsynchronousBlock(machine: newMachine)
-        else {
-            XCTFail("Invalid data.")
-            return
-        }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
+    /// An `x` variable.
+    let x = Expression.reference(variable: .variable(name: .x))
+
+    /// A `y` variable.
+    let y = Expression.reference(variable: .variable(name: .y))
+
+    // swiftlint:disable force_unwrapping
+
+    /// The new name for variable `x`.
+    let newX = VariableName(rawValue: "STATE_Initial_x")!
+
+    // swiftlint:enable force_unwrapping
+
+    /// `newX` as an expression.
+    var expNewX: Expression {
+        .reference(variable: .variable(name: newX))
     }
 
-    /// Test that duplicate variables in machine return nil.
-    func testDuplicateVariablesReturnsNil() {
-        var machine = Machine.testMachine()
-        machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
-        machine = Machine.testMachine()
-        guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
-            return
-        }
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
-        machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
+    /// Test `mathReal` case.
+    func testMathReal() {
+        let original = FunctionCall.mathReal(function: .ceil(expression: x))
+        let result = FunctionCall(call: original, replacing: .x, with: newX)
+        XCTAssertEqual(result, .mathReal(function: .ceil(expression: expNewX)))
+    }
+
+    /// Test `mathReal` case does nothing for invalid variable.
+    func testMathRealDoesNothing() {
+        let original = FunctionCall.mathReal(function: .ceil(expression: x))
+        let result = FunctionCall(call: original, replacing: .y, with: newX)
+        XCTAssertEqual(result, original)
+    }
+
+    /// Test `custom` case.
+    func testCustom() {
+        let original = FunctionCall.custom(function: CustomFunctionCall(name: .y, arguments: [x]))
+        let result = FunctionCall(call: original, replacing: .x, with: newX)
+        XCTAssertEqual(result, .custom(function: CustomFunctionCall(name: .y, arguments: [expNewX])))
+    }
+
+    /// Test `custom` does nothing for invalid variable.
+    func testCustomDoesNothing() {
+        let original = FunctionCall.custom(function: CustomFunctionCall(name: .x, arguments: [y]))
+        let result = FunctionCall(call: original, replacing: .x, with: newX)
+        XCTAssertEqual(result, original)
     }
 
 }
