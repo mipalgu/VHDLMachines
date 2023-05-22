@@ -167,6 +167,14 @@ extension Machine {
             ],
             transitions: [
                 VHDLMachines.Transition(
+                    condition: .conditional(condition: .comparison(value: .equality(
+                        lhs: .reference(variable: .variable(name: .z)),
+                        rhs: .literal(value: .bit(value: .high))
+                    ))),
+                    source: 0,
+                    target: 1
+                ),
+                VHDLMachines.Transition(
                     condition: .conditional(condition: .literal(value: false)), source: 0, target: 1
                 ),
                 VHDLMachines.Transition(

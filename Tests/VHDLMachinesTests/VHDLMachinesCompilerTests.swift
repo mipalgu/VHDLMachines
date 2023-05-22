@@ -247,7 +247,10 @@ class VHDLMachinesCompilerTests: XCTestCase {
                         when CheckTransition =>
                             case currentState is
                                 when STATE_Initial =>
-                                    if (false) then
+                                    if (STATE_Initial_z = '1') then
+                                        targetState <= STATE_Suspended;
+                                        internalState <= OnExit;
+                                    elsif (false) then
                                         targetState <= STATE_Suspended;
                                         internalState <= OnExit;
                                     elsif ((ringlet_counter >= integer(ceil(real(50.0) * RINGLETS_PER_MS))) or (ringlet_counter >= integer(ceil(real(2.0) * RINGLETS_PER_S))) or (ringlet_counter >= integer(ceil(real(20000.0))))) then
