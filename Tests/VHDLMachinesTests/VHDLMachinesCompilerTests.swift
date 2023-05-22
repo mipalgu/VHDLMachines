@@ -238,6 +238,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
             signal machineSignal2: std_logic_vector(2 downto 0) := "111"; -- machine signal 2
             -- State Signals
             signal STATE_Initial_initialX: std_logic;
+            signal STATE_Initial_z: std_logic;
         begin
             process(clk)
             begin
@@ -292,8 +293,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
                         when OnEntry =>
                             case currentState is
                                 when STATE_Initial =>
-                                    x <= '1';
-                                    xx <= "00";
+                                    STATE_Initial_z <= '0';
                                     ringlet_counter <= 0;
                                 when STATE_Suspended =>
                                     x <= '1';
@@ -321,8 +321,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
                             case currentState is
                                 when STATE_Initial =>
                                     x <= '0';
-                                    x <= '1';
-                                    xx <= "00";
+                                    STATE_Initial_z <= '0';
                                     ringlet_counter <= 0;
                                 when STATE_Suspended =>
                                     x <= '0';

@@ -66,6 +66,10 @@ extension Machine {
 
     /// A default test machine.
     static func testMachine(directory: URL = PingPongArrangement().machinePath) -> Machine {
+        var initialState = State.defaultState(name: .initial)
+        initialState.actions[.onEntry] = .statement(statement: .assignment(
+            name: .variable(name: .z), value: .literal(value: .bit(value: .low))
+        ))
         var machine = VHDLMachines.Machine(
             actions: [.onEntry, .internal, .onExit, .onResume, .onSuspend],
             name: VariableName(rawValue: "TestMachine")!,
@@ -157,7 +161,7 @@ extension Machine {
                 )
             ],
             states: [
-                State.defaultState(name: VariableName.initial),
+                initialState,
                 State.defaultState(name: VariableName.suspendedState),
                 State.defaultState(name: VariableName.state0)
             ],
@@ -221,7 +225,10 @@ extension Machine {
             architectureHead: nil,
             architectureBody: nil
         )
-        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: .initialX)]
+        machine.states[0].signals = [
+            LocalSignal(type: .stdLogic, name: .initialX),
+            LocalSignal(type: .stdLogic, name: .z)
+        ]
         return machine
     }
 

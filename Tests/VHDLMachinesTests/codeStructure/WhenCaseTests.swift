@@ -175,8 +175,7 @@ final class WhenCaseTests: XCTestCase {
     when OnEntry =>
         case currentState is
             when STATE_Initial =>
-                x <= '1';
-                xx <= "00";
+                z <= '0';
                 ringlet_counter <= 0;
             when STATE_Suspended =>
                 x <= '1';
@@ -212,8 +211,7 @@ final class WhenCaseTests: XCTestCase {
         case currentState is
             when STATE_Initial =>
                 x <= '0';
-                x <= '1';
-                xx <= "00";
+                z <= '0';
                 ringlet_counter <= 0;
             when STATE_Suspended =>
                 x <= '0';

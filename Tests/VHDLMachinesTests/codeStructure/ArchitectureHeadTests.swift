@@ -389,6 +389,12 @@ final class ArchitectureHeadTests: XCTestCase {
                 name: VariableName(rawValue: "STATE_Initial_\(VariableName.initialX.rawValue)")!,
                 defaultValue: nil,
                 comment: nil
+            ))),
+            .definition(value: .signal(value: LocalSignal(
+                type: .stdLogic,
+                name: VariableName(rawValue: "STATE_Initial_\(VariableName.z.rawValue)")!,
+                defaultValue: nil,
+                comment: nil
             )))
         ])
         XCTAssertEqual(result, expected)

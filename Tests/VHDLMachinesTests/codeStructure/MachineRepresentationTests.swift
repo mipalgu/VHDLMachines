@@ -66,10 +66,11 @@ final class MachineRepresentationTests: XCTestCase {
         let machine = Machine.testMachine()
         let representation = MachineRepresentation(machine: machine)
         guard
-            let entity = Entity(machine: machine),
+            let newMachine = Machine(replacingStateRefsIn: machine),
+            let entity = Entity(machine: newMachine),
             let name = VariableName(rawValue: "Behavioral"),
-            let head = ArchitectureHead(machine: machine),
-            let body = AsynchronousBlock(machine: machine)
+            let head = ArchitectureHead(machine: newMachine),
+            let body = AsynchronousBlock(machine: newMachine)
         else {
             XCTFail("Invalid data.")
             return
@@ -78,8 +79,8 @@ final class MachineRepresentationTests: XCTestCase {
         XCTAssertEqual(representation?.architectureName, name)
         XCTAssertEqual(representation?.architectureHead, head)
         XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, machine)
-        XCTAssertEqual(representation?.includes, machine.includes)
+        XCTAssertEqual(representation?.machine, newMachine)
+        XCTAssertEqual(representation?.includes, newMachine.includes)
     }
 
     /// Test that duplicate variables in machine return nil.
