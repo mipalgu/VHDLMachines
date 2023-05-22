@@ -56,8 +56,11 @@
 
 import VHDLParsing
 
+/// Add replace initialiser.
 extension State {
 
+    /// Replace the code within a state with new code that uses a states state variables.
+    /// - Parameter state: The state to transform.
     @usableFromInline
     init?(replacingStateVariablesIn state: State) {
         let newActions: [(VariableName, SynchronousBlock)] = state.actions
