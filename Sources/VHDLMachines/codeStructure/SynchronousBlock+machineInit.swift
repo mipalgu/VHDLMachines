@@ -210,21 +210,3 @@ extension IfBlock {
     }
 
 }
-
-extension CaseStatement {
-
-    @usableFromInline
-    init?(statement: CaseStatement, replacing variable: VariableName, with value: VariableName) {
-        let newCases = statement.cases.compactMap {
-            WhenCase(whenCase: $0, replacing: variable, with: value)
-        }
-        guard
-            newCases.count == statement.cases.count,
-            let condition = Expression(expression: statement.condition, replacing: variable, with: value)
-        else {
-            return nil
-        }
-        self.init(condition: condition, cases: newCases)
-    }
-
-}
