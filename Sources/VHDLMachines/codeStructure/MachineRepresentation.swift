@@ -87,9 +87,21 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
     /// - Parameter machine: The machine to convert into a `VHDL` file.
     @inlinable
     public init?(machine: Machine) {
-        let machineAndExternals = machine.externalSignals.map(\.name) + machine.machineSignals.map(\.name) +
-            machine.clocks.map(\.name) + machine.parameterSignals.map(\.name) +
-            machine.returnableSignals.map(\.name) + machine.actions
+        let representationVariables: [VariableName] = [.suspended, .internalState, .currentState] +
+            [.previousRinglet, .suspendedFrom, .ringletLength, .clockPeriod, .ringletPerPs, .ringletPerNs] +
+            [.ringletPerUs, .ringletPerMs, .ringletPerS, .readSnapshot, .writeSnapshot, .checkTransition] +
+            [.noOnEntry, .nullCommand, .restartCommand, .resumeCommand, .suspendCommand, .ringletCounter] +
+            [.command, .targetState]
+        let parameters = machine.parameterSignals.map { VariableName.name(for: $0) } +
+            machine.parameterSignals.map(\.name)
+        let returnables = machine.returnableSignals.map { VariableName.name(for: $0) } +
+            machine.returnableSignals.map(\.name)
+        let externals = machine.externalSignals.map(\.name) +
+            machine.externalSignals.map { VariableName.name(for: $0) }
+        let constants = machine.states.map { VariableName.name(for: $0) } + machine.actions
+        let otherSignals = machine.machineSignals.map(\.name) + machine.clocks.map(\.name)
+        let machineAndExternals = representationVariables + parameters + returnables + externals + constants +
+            otherSignals
         let variables = Set(machineAndExternals)
         guard
             variables.count == machineAndExternals.count,
