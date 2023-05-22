@@ -183,30 +183,3 @@ extension State {
     }
 
 }
-
-extension IfBlock {
-
-    @usableFromInline
-    init?(block: IfBlock, replacing variable: VariableName, with value: VariableName) {
-        switch block {
-        case .ifElse(let condition, let ifBlock, let elseBlock):
-            guard
-                let newCondition = Expression(expression: condition, replacing: variable, with: value),
-                let newIfBlock = SynchronousBlock(block: ifBlock, replacing: variable, with: value),
-                let newElseBlock = SynchronousBlock(block: elseBlock, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .ifElse(condition: newCondition, ifBlock: newIfBlock, elseBlock: newElseBlock)
-        case .ifStatement(let condition, let ifBlock):
-            guard
-                let newCondition = Expression(expression: condition, replacing: variable, with: value),
-                let newIfBlock = SynchronousBlock(block: ifBlock, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .ifStatement(condition: newCondition, ifBlock: newIfBlock)
-        }
-    }
-
-}
