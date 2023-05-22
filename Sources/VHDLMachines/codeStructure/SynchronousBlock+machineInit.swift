@@ -449,48 +449,6 @@ extension MathRealFunctionCalls {
 
 }
 
-extension BinaryOperation {
-
-    @usableFromInline
-    init?(operation: BinaryOperation, replacing variable: VariableName, with value: VariableName) {
-        switch operation {
-        case .addition(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .addition(lhs: newLhs, rhs: newRhs)
-        case .division(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .division(lhs: newLhs, rhs: newRhs)
-        case .subtraction(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .subtraction(lhs: newLhs, rhs: newRhs)
-        case .multiplication(let lhs, let rhs):
-            guard
-                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
-                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .multiplication(lhs: newLhs, rhs: newRhs)
-        }
-    }
-
-}
-
 extension CastOperation {
 
     @usableFromInline
