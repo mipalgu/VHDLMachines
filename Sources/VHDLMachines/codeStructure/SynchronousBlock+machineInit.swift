@@ -243,18 +243,3 @@ extension ForLoop {
     }
 
 }
-
-extension WhenCase {
-
-    @usableFromInline
-    init?(whenCase: WhenCase, replacing variable: VariableName, with value: VariableName) {
-        guard
-            let newCondition = WhenCondition(condition: whenCase.condition, replacing: variable, with: value),
-            let newCode = SynchronousBlock(block: whenCase.code, replacing: variable, with: value)
-        else {
-            return nil
-        }
-        self.init(condition: newCondition, code: newCode)
-    }
-
-}
