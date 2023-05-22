@@ -228,18 +228,3 @@ extension CaseStatement {
     }
 
 }
-
-extension ForLoop {
-
-    @usableFromInline
-    init?(loop: ForLoop, replacing variable: VariableName, with value: VariableName) {
-        guard
-            let newRange = VectorSize(size: loop.range, replacing: variable, with: value),
-            let newBody = SynchronousBlock(block: loop.body, replacing: variable, with: value)
-        else {
-            return nil
-        }
-        self.init(iterator: loop.iterator, range: newRange, body: newBody)
-    }
-
-}
