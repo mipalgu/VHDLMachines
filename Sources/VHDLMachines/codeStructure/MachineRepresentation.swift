@@ -87,11 +87,12 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
     /// - Parameter machine: The machine to convert into a `VHDL` file.
     @inlinable
     public init?(machine: Machine) {
-        let representationVariables: [VariableName] = [.suspended, .internalState, .currentState] +
-            [.previousRinglet, .suspendedFrom, .ringletLength, .clockPeriod, .ringletPerPs, .ringletPerNs] +
-            [.ringletPerUs, .ringletPerMs, .ringletPerS, .readSnapshot, .writeSnapshot, .checkTransition] +
-            [.noOnEntry, .nullCommand, .restartCommand, .resumeCommand, .suspendCommand, .ringletCounter] +
-            [.command, .targetState]
+        let representationVariables: [VariableName] = [
+            .suspended, .internalState, .currentState, .previousRinglet, .suspendedFrom, .ringletLength,
+            .clockPeriod, .ringletPerPs, .ringletPerNs, .ringletPerUs, .ringletPerMs, .ringletPerS,
+            .readSnapshot, .writeSnapshot, .checkTransition, .noOnEntry, .nullCommand, .restartCommand,
+            .resumeCommand, .suspendCommand, .ringletCounter, .command, .targetState
+        ]
         let parameters = machine.parameterSignals.map { VariableName.name(for: $0) } +
             machine.parameterSignals.map(\.name)
         let returnables = machine.returnableSignals.map { VariableName.name(for: $0) } +
