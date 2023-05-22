@@ -90,6 +90,7 @@ final class MachineInitTests: XCTestCase {
     /// Test that all states are replaced correctly.
     func testStatesReplacedCorrectly() {
         var machine = Machine.testMachine()
+        machine.transitions = [Transition(condition: .variable(name: .x), source: 0, target: 1)]
         machine.states[0].actions = [:]
         machine.states[1].actions = [:]
         machine.states[0].signals = [LocalSignal(type: .stdLogic, name: .x)]
@@ -109,6 +110,7 @@ final class MachineInitTests: XCTestCase {
         expected.states[1].actions[.onEntry] = .statement(
             statement: .assignment(name: .variable(name: .x), value: expNewY)
         )
+        expected.transitions = [Transition(condition: .variable(name: newX), source: 0, target: 1)]
         XCTAssertEqual(result, expected)
     }
 
