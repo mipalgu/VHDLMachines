@@ -1,5 +1,5 @@
-// SynchronousBlock+machineInit.swift
-// Machines
+// MachineInitTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,30 +54,62 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+@testable import VHDLMachines
 import VHDLParsing
+import XCTest
 
-/// Add init for top-level if-statement in process block.
-extension SynchronousBlock {
+/// Test class for ``Machine`` replace initialiser.
+final class MachineInitTests: XCTestCase {
 
-    /// Create the top-level if-statement for the rising edge of the driving clock in the machine. This
-    /// block contains all of the logic of the machine.
-    /// - Parameter machine: The machine to create the if-statement for.
-    init?(machine: Machine) {
-        guard
-            machine.drivingClock >= 0,
-            machine.drivingClock < machine.clocks.count,
-            let caseStatement = CaseStatement(machine: machine)
-        else {
-            return nil
-        }
-        let clock = machine.clocks[machine.drivingClock].name
-        let code = IfBlock.ifStatement(
-            condition: .conditional(
-                condition: .edge(value: .rising(expression: .reference(variable: .variable(name: clock))))
-            ),
-            ifBlock: .caseStatement(block: caseStatement)
+    /// An `x` variable.
+    let x = Expression.reference(variable: .variable(name: .x))
+
+    /// A `y` variable.
+    let y = Expression.reference(variable: .variable(name: .y))
+
+    // swiftlint:disable force_unwrapping
+
+    /// The new name for variable `x`.
+    let newX = VariableName(rawValue: "STATE_Initial_x")!
+
+    /// The new name for variable `y`.
+    let newY = VariableName(rawValue: "STATE_Suspended_y")!
+
+    // swiftlint:enable force_unwrapping
+
+    /// `newX` as an expression.
+    var expNewX: Expression {
+        .reference(variable: .variable(name: newX))
+    }
+
+    /// `newY` as an expression.
+    var expNewY: Expression {
+        .reference(variable: .variable(name: newY))
+    }
+
+    /// Test that all states are replaced correctly.
+    func testStatesReplacedCorrectly() {
+        var machine = Machine.testMachine()
+        machine.states[0].actions = [:]
+        machine.states[1].actions = [:]
+        machine.states[0].signals = [LocalSignal(type: .stdLogic, name: .x)]
+        machine.states[1].signals = [LocalSignal(type: .stdLogic, name: .y)]
+        machine.states[0].actions[.onEntry] = .statement(
+            statement: .assignment(name: .variable(name: .x), value: y)
         )
-        self = .ifStatement(block: code)
+        machine.states[1].actions[.onEntry] = .statement(
+            statement: .assignment(name: .variable(name: .x), value: y)
+        )
+        machine.states = [machine.states[0], machine.states[1]]
+        var expected = machine
+        let result = Machine(replacingStateRefsIn: machine)
+        expected.states[0].actions[.onEntry] = .statement(
+            statement: .assignment(name: .variable(name: newX), value: y)
+        )
+        expected.states[1].actions[.onEntry] = .statement(
+            statement: .assignment(name: .variable(name: .x), value: expNewY)
+        )
+        XCTAssertEqual(result, expected)
     }
 
 }
