@@ -66,6 +66,12 @@ extension Machine {
         guard newStates.count == machine.states.count else {
             return nil
         }
+        let newTransitions = machine.transitions.compactMap {
+            Transition(replacingStateRefsIn: $0, in: machine)
+        }
+        guard newTransitions.count == machine.transitions.count else {
+            return nil
+        }
         self.init(
             actions: machine.actions,
             name: machine.name,
@@ -80,7 +86,7 @@ extension Machine {
             parameterSignals: machine.parameterSignals,
             returnableSignals: machine.returnableSignals,
             states: newStates,
-            transitions: machine.transitions,
+            transitions: newTransitions,
             initialState: machine.initialState,
             suspendedState: machine.suspendedState,
             architectureHead: machine.architectureHead,
