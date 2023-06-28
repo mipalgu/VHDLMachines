@@ -82,14 +82,17 @@ extension VHDLMachines.State {
         else {
             return nil
         }
-        let actions: [(VariableName, SynchronousBlock)] = state.actions.compactMap {
+        let validActions = state.actions.lazy.filter {
+            !$1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        let actions: [(VariableName, SynchronousBlock)] = validActions.compactMap {
             guard let name = VariableName(rawValue: $0), let code = SynchronousBlock(rawValue: $1) else {
                 return nil
             }
             return (name, code)
         }
         let actionsDictionary = Dictionary(uniqueKeysWithValues: actions)
-        guard actionsDictionary.count == state.actions.count else {
+        guard actionsDictionary.count == validActions.count else {
             return nil
         }
         self.init(name: name, actions: actionsDictionary, signals: signals, externalVariables: externals)

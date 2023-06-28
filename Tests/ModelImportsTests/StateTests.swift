@@ -183,4 +183,25 @@ final class StateTests: XCTestCase {
         XCTAssertNil(VHDLMachines.State(state: state, externalVariables: externals))
     }
 
+    /// Test `init(state:)` returns correct actions when code is empty.
+    func testInitEmptyActions() {
+        let state = LLFSMModel.State(
+            actions: ["OnEntry": "", "OnExit": "y <= x;"],
+            externalVariables: state.externalVariables,
+            name: state.name,
+            transitions: state.transitions,
+            variables: state.variables
+        )
+        guard let state = VHDLMachines.State(state: state, externalVariables: externals) else {
+            XCTFail("Failed to create state.")
+            return
+        }
+        expected.actions = [
+            .onExit: .statement(statement: .assignment(
+                name: .variable(name: .y), value: .reference(variable: .variable(name: .x))
+            ))
+        ]
+        XCTAssertEqual(state, expected)
+    }
+
 }
