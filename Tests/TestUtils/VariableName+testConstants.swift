@@ -58,6 +58,8 @@ import VHDLParsing
 
 // swiftlint:disable force_unwrapping
 
+// swiftlint:disable missing_docs
+
 /// Add test constants.
 public extension VariableName {
 
@@ -108,5 +110,7 @@ public extension VariableName {
     static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
 
 }
+
+// swiftlint:enable missing_docs
 
 // swiftlint:enable force_unwrapping
