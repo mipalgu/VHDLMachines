@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "llfsmmodel",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mipalgu/LLFSMModel",
+      "state" : {
+        "branch" : "model",
+        "revision" : "18ee96f3adf678f29ef84dad29d8a3a31c8f179b"
+      }
+    },
+    {
       "identity" : "swift-docc-plugin",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-docc-plugin",
