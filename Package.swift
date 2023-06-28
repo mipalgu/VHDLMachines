@@ -9,7 +9,7 @@ let package = Package(
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other
         // packages.
-        .library(name: "VHDLMachines", targets: ["VHDLMachines"])
+        .library(name: "VHDLMachines", targets: ["VHDLMachines", "ModelImports"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -34,6 +34,10 @@ let package = Package(
                 .product(name: "StringHelpers", package: "VHDLParsing")
             ]
         ),
+        .target(
+            name: "ModelImports",
+            dependencies: ["VHDLMachines", .product(name: "LLFSMModel", package: "LLFSMModel")]
+        ),
         .testTarget(
             name: "VHDLMachinesTests",
             dependencies: [
@@ -43,6 +47,12 @@ let package = Package(
                 .product(name: "Functional", package: "swift_helpers"),
                 .product(name: "GUUnits", package: "GUUnits"),
                 "VHDLParsing"
+            ]
+        ),
+        .testTarget(
+            name: "ModelImportsTests",
+            dependencies: [
+                "ModelImports", "VHDLMachines", .product(name: "LLFSMModel", package: "LLFSMModel")
             ]
         )
     ]
