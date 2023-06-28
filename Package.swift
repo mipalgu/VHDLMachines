@@ -36,7 +36,11 @@ let package = Package(
         ),
         .target(
             name: "ModelImports",
-            dependencies: ["VHDLMachines", .product(name: "LLFSMModel", package: "LLFSMModel")]
+            dependencies: [
+                "VHDLMachines",
+                .product(name: "LLFSMModel", package: "LLFSMModel"),
+                .product(name: "VHDLParsing", package: "VHDLParsing")
+            ]
         ),
         .testTarget(
             name: "VHDLMachinesTests",
@@ -52,7 +56,10 @@ let package = Package(
         .testTarget(
             name: "ModelImportsTests",
             dependencies: [
-                "ModelImports", "VHDLMachines", .product(name: "LLFSMModel", package: "LLFSMModel")
+                "ModelImports",
+                "VHDLMachines",
+                .product(name: "LLFSMModel", package: "LLFSMModel"),
+                .product(name: "VHDLParsing", package: "VHDLParsing")
             ]
         )
     ]
