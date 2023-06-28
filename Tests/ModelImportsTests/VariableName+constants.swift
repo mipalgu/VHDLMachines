@@ -67,6 +67,9 @@ extension VariableName {
     /// An OnEntry name.
     static let onEntry = VariableName(rawValue: "OnEntry")!
 
+    /// An OnExit name.
+    static let onExit = VariableName(rawValue: "OnExit")!
+
 }
 
 // swiftlint:enable force_unwrapping
