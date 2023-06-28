@@ -63,6 +63,9 @@ import XCTest
 /// Test class for `State` extensions.
 final class StateTests: XCTestCase {
 
+    /// The available external variables.
+    let externals = [PortSignal(type: .stdLogic, name: .x, mode: .input)]
+
     /// A `LLFSMModel.State` instance used as test data.
     let state = LLFSMModel.State(
         actions: ["OnEntry": "y <= x;"],
@@ -100,11 +103,84 @@ final class StateTests: XCTestCase {
 
     /// Test `init(state:)` correctly converts the state.
     func testInit() {
-        guard let state = VHDLMachines.State(state: state) else {
+        guard let state = VHDLMachines.State(state: state, externalVariables: externals) else {
             XCTFail("Failed to create state.")
             return
         }
         XCTAssertEqual(state, expected)
+    }
+
+    /// Test `init(state:)` returns `nil` for invalid name.
+    func testInitInvalidName() {
+        let state = LLFSMModel.State(
+            actions: state.actions,
+            externalVariables: state.externalVariables,
+            name: "1Invalid",
+            transitions: state.transitions,
+            variables: state.variables
+        )
+        XCTAssertNil(VHDLMachines.State(state: state, externalVariables: externals))
+    }
+
+    /// Test `init(state:)` returns `nil` for invalid actions.
+    func testInitInvalidActions() {
+        let state = LLFSMModel.State(
+            actions: ["1Invalid": "y <= x;"],
+            externalVariables: state.externalVariables,
+            name: state.name,
+            transitions: state.transitions,
+            variables: state.variables
+        )
+        XCTAssertNil(VHDLMachines.State(state: state, externalVariables: externals))
+    }
+
+    /// Test `init(state:)` returns `nil` for invalid action code.
+    func testInitInvalidActionCode() {
+        let state = LLFSMModel.State(
+            actions: ["OnEntry": "y <= 1Invalid;"],
+            externalVariables: state.externalVariables,
+            name: state.name,
+            transitions: state.transitions,
+            variables: state.variables
+        )
+        XCTAssertNil(VHDLMachines.State(state: state, externalVariables: externals))
+    }
+
+    /// Test `init(state:)` returns `nil` for invalid external variable names.
+    func testInitInvalidExternalVariableNames() {
+        let state = LLFSMModel.State(
+            actions: state.actions,
+            externalVariables: ["1Invalid"],
+            name: state.name,
+            transitions: state.transitions,
+            variables: state.variables
+        )
+        XCTAssertNil(VHDLMachines.State(state: state, externalVariables: externals))
+    }
+
+    /// Test `init(state:)` returns `nil` for external variables that don't exist.
+    func testInitInvalidExternalVariables() {
+        let state = LLFSMModel.State(
+            actions: state.actions,
+            externalVariables: ["y"],
+            name: state.name,
+            transitions: state.transitions,
+            variables: state.variables
+        )
+        XCTAssertNil(VHDLMachines.State(state: state, externalVariables: externals))
+        XCTAssertNil(VHDLMachines.State(state: self.state, externalVariables: []))
+    }
+
+    /// Test `init(state:)` returns `nil` for invalid signals.
+    func testInitInvalidSignals() {
+        let state = LLFSMModel.State(
+            actions: state.actions,
+            externalVariables: state.externalVariables,
+            name: state.name,
+            transitions: state.transitions,
+            variables: [LLFSMModel.Variable(name: "1Invalid", type: "std_logic")]
+        )
+        XCTAssertNil(VHDLMachines.State(state: state, externalVariables: externals))
     }
 
 }

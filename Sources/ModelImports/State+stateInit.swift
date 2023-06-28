@@ -58,9 +58,15 @@ import LLFSMModel
 import VHDLMachines
 import VHDLParsing
 
+/// Add initialiser for `LLFSMModel.State`.
 extension VHDLMachines.State {
 
-    public init?(state: LLFSMModel.State) {
+    /// Create a `VHDLMachines.State` from a `LLFSMModel.State`.
+    /// - Parameters:
+    ///   - state: The state to convert.
+    ///   - externalVariables: The available external variables this state has access too.
+    @inlinable
+    public init?(state: LLFSMModel.State, externalVariables: [PortSignal]) {
         guard let name = VariableName(rawValue: state.name) else {
             return nil
         }
@@ -68,8 +74,12 @@ extension VHDLMachines.State {
         guard signals.count == state.variables.count else {
             return nil
         }
+        let existingExternals = Set(externalVariables.map(\.name))
         let externals = state.externalVariables.compactMap(VariableName.init(rawValue:))
-        guard externals.count == state.externalVariables.count else {
+        guard
+            externals.count == state.externalVariables.count,
+            externals.allSatisfy(existingExternals.contains)
+        else {
             return nil
         }
         let actions: [(VariableName, SynchronousBlock)] = state.actions.compactMap {
