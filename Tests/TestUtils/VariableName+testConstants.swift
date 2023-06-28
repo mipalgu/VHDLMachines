@@ -59,7 +59,7 @@ import VHDLParsing
 // swiftlint:disable force_unwrapping
 
 /// Add test constants.
-extension VariableName {
+public extension VariableName {
 
     static var a: VariableName { VariableName(rawValue: "A")! }
 

@@ -42,6 +42,7 @@ let package = Package(
                 .product(name: "VHDLParsing", package: "VHDLParsing")
             ]
         ),
+        .testTarget(name: "TestUtils", dependencies: ["VHDLParsing"]),
         .testTarget(
             name: "VHDLMachinesTests",
             dependencies: [
@@ -50,7 +51,8 @@ let package = Package(
                 .product(name: "IO", package: "swift_helpers"),
                 .product(name: "Functional", package: "swift_helpers"),
                 .product(name: "GUUnits", package: "GUUnits"),
-                "VHDLParsing"
+                "VHDLParsing",
+                "TestUtils"
             ]
         ),
         .testTarget(
@@ -59,7 +61,8 @@ let package = Package(
                 "ModelImports",
                 "VHDLMachines",
                 .product(name: "LLFSMModel", package: "LLFSMModel"),
-                .product(name: "VHDLParsing", package: "VHDLParsing")
+                .product(name: "VHDLParsing", package: "VHDLParsing"),
+                "TestUtils"
             ]
         )
     ]
