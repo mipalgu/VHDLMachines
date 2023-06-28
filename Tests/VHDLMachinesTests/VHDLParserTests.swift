@@ -57,6 +57,7 @@
 #if os(Linux)
 import IO
 #endif
+import TestUtils
 @testable import VHDLMachines
 import XCTest
 

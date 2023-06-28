@@ -63,7 +63,7 @@ extension State {
     // swiftlint:disable force_unwrapping
 
     /// Test state.
-    static func defaultState(name: VariableName) -> State {
+    public static func defaultState(name: VariableName) -> State {
         VHDLMachines.State(
             name: name,
             actions: [

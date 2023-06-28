@@ -7,6 +7,7 @@
 
 import Foundation
 import IO
+import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
 import XCTest
