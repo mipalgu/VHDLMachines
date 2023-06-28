@@ -97,7 +97,9 @@ extension VHDLMachines.Machine {
         self.init(
             actions: allActions,
             name: name,
-            path: URL(fileURLWithPath: "/tmp/\(name).machine", isDirectory: true),
+            path: URL(
+                fileURLWithPath: "\(FileManager().currentDirectoryPath)/\(name).machine", isDirectory: true
+            ),
             includes: [],
             externalSignals: externalVariables,
             clocks: clocks,
