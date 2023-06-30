@@ -109,8 +109,12 @@ extension LocalSignal: ModelConvertible {
 
 }
 
+/// Add ``ModelConvertible`` conformance.
 extension Parameter: ModelConvertible {
 
+    /// Convert a `LLFSMModel.Variable` into a ``Parameter``.
+    /// - Parameter convert: The variable to convert.
+    @inlinable
     init?(convert: Variable) {
         self.init(parameter: convert)
     }

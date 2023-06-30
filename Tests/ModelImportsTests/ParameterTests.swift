@@ -105,4 +105,9 @@ final class ParameterTests: XCTestCase {
         XCTAssertNil(Parameter(signal: signal))
     }
 
+    /// Test ``ModelConvertible`` conformance.
+    func testConvertInit() {
+        XCTAssertEqual(Parameter(convert: variable), Parameter(parameter: variable))
+    }
+
 }
