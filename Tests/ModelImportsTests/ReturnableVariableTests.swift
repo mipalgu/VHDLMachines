@@ -81,4 +81,9 @@ final class ReturnableVariableTests: XCTestCase {
         XCTAssertNil(ReturnableVariable(variable: Variable(name: "x", type: "std_logics")))
     }
 
+    /// Test ``ModelConvertible`` conformance.
+    func testConvertInit() {
+        XCTAssertEqual(ReturnableVariable(convert: variable), ReturnableVariable(variable: variable))
+    }
+
 }

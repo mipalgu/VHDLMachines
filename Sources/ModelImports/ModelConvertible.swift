@@ -133,8 +133,12 @@ extension PortSignal: ModelConvertible {
 
 }
 
+/// Add ``ModelConvertible`` conformance.
 extension ReturnableVariable: ModelConvertible {
 
+    /// Convert an `LLFSMModel.Variable` into a ``ReturnableVariable``.
+    /// - Parameter convert: The variable to convert.
+    @inlinable
     init?(convert: Variable) {
         self.init(variable: convert)
     }
