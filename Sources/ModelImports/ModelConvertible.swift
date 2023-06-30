@@ -121,7 +121,7 @@ extension Parameter: ModelConvertible {
 
 }
 
-/// Add ``ModelConvertibele`` conformance.
+/// Add ``ModelConvertible`` conformance.
 extension PortSignal: ModelConvertible {
 
     /// Convert a `LLFSMModel.ExternalVariable` into a ``PortSignal``.
