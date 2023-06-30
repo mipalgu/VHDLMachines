@@ -1,4 +1,4 @@
-// ModelConvertible.swift
+// Clock+variableInit.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -54,89 +54,57 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import Foundation
 import LLFSMModel
 import VHDLMachines
 import VHDLParsing
 
-protocol ModelConvertible {
+/// Add `LLFSMModel` conversions.
+extension Clock {
 
-    associatedtype Convertible
+    /// Metadata for the frequency of the clock.
+    @usableFromInline
+    struct ClockType: Codable {
 
-    init?(convert: Convertible)
+        /// The frequency of the clock.
+        let frequency: UInt
 
-}
+        /// The frequency unit of the clock.
+        let unit: FrequencyUnit
 
-extension Array where Element: ModelConvertible {
+    }
 
-    init?<T>(convert: [T]) where T == Element.Convertible {
-        var others = [Element]()
-        for item in convert {
-            guard let other = Element(convert: item) else {
-                return nil
-            }
-            others.append(other)
+    /// Initialize a ``Clock`` from an `LLFSMModel.Variable`. Please not that the type field in the `variable`
+    /// must contain a JSON formatted string with the frequency and unit of the clock. The following format
+    /// should be adhered too:
+    /// ```JSON
+    /// {
+    ///    "frequency": <frequency UInt>,
+    ///    "unit": <Frequency Unit String>
+    /// }
+    /// ```
+    /// - Parameter variable: The variable to convert.
+    /// - SeeAlso: ``FrequencyUnit``.
+    @inlinable
+    public init?(variable: Variable) {
+        let decoder = JSONDecoder()
+        guard
+            let name = VariableName(rawValue: variable.name),
+            let data = variable.type.trimmingCharacters(in: .whitespacesAndNewlines).data(using: .utf8),
+            let type = try? decoder.decode(ClockType.self, from: data)
+        else {
+            return nil
         }
-        self = others
+        self.init(name: name, type: type)
     }
 
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension Clock: ModelConvertible {
-
-    /// Create a new ``Clock`` from a `LLFSMModel.Variable`.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(variable: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension LocalSignal: ModelConvertible {
-
-    /// Create a new ``LocalSignal`` from a `LLFSMModel.Variable`.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(variable: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension Parameter: ModelConvertible {
-
-    /// Convert a `LLFSMModel.Variable` into a ``Parameter``.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(parameter: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension PortSignal: ModelConvertible {
-
-    /// Convert a `LLFSMModel.ExternalVariable` into a ``PortSignal``.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: ExternalVariable) {
-        self.init(variable: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension ReturnableVariable: ModelConvertible {
-
-    /// Convert an `LLFSMModel.Variable` into a ``ReturnableVariable``.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(variable: convert)
+    /// Initialize a ``Clock`` from its name and type.
+    /// - Parameters:
+    ///   - name: The name of the clock.
+    ///   - type: The frequency of the clock.
+    @usableFromInline
+    init(name: VariableName, type: ClockType) {
+        self.init(name: name, frequency: type.frequency, unit: type.unit)
     }
 
 }

@@ -1,4 +1,4 @@
-// ModelConvertible.swift
+// ClockTests.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -55,88 +55,42 @@
 // 
 
 import LLFSMModel
+@testable import ModelImports
 import VHDLMachines
 import VHDLParsing
+import XCTest
 
-protocol ModelConvertible {
+/// Test class for ``Clock`` extensions.
+final class ClockTests: XCTestCase {
 
-    associatedtype Convertible
+    /// A clock variable.
+    let variable = Variable(name: "clk", type: "{\"frequency\":100,\"unit\":\"MHz\"}")
 
-    init?(convert: Convertible)
+    /// An equivalent ``Clock.ClockType``.
+    let type = Clock.ClockType(frequency: 100, unit: .MHz)
 
-}
-
-extension Array where Element: ModelConvertible {
-
-    init?<T>(convert: [T]) where T == Element.Convertible {
-        var others = [Element]()
-        for item in convert {
-            guard let other = Element(convert: item) else {
-                return nil
-            }
-            others.append(other)
-        }
-        self = others
+    /// Test `init(name:,type:)` initialises ``Clock`` correctly.
+    func testTypeInit() {
+        let clock = Clock(name: .clk, type: type)
+        XCTAssertEqual(clock, Clock(name: .clk, frequency: type.frequency, unit: type.unit))
     }
 
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension Clock: ModelConvertible {
-
-    /// Create a new ``Clock`` from a `LLFSMModel.Variable`.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(variable: convert)
+    /// Test `init(variable:)` initialises ``Clock`` correctly.
+    func testInit() {
+        let clock = Clock(variable: variable)
+        XCTAssertEqual(clock, Clock(name: .clk, type: type))
     }
 
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension LocalSignal: ModelConvertible {
-
-    /// Create a new ``LocalSignal`` from a `LLFSMModel.Variable`.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(variable: convert)
+    /// Test `init(variable:)` returns `nil` for invalid variable data.
+    func testInitReturnsNil() {
+        XCTAssertNil(Clock(variable: Variable(name: "1clk", type: "{\"frequency\":100,\"unit\":\"MHz\"}")))
+        XCTAssertNil(Clock(variable: Variable(name: "clk", type: "{\"frequency\":s100,\"unit\":\"MHz\"}")))
+        XCTAssertNil(Clock(variable: Variable(name: "clk", type: "{\"frequency\":100,\"unit\":\"MHzs\"}")))
     }
 
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension Parameter: ModelConvertible {
-
-    /// Convert a `LLFSMModel.Variable` into a ``Parameter``.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(parameter: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension PortSignal: ModelConvertible {
-
-    /// Convert a `LLFSMModel.ExternalVariable` into a ``PortSignal``.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: ExternalVariable) {
-        self.init(variable: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension ReturnableVariable: ModelConvertible {
-
-    /// Convert an `LLFSMModel.Variable` into a ``ReturnableVariable``.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(variable: convert)
+    /// Test ``ModelConvertible`` conformance.
+    func testConvertInit() {
+        XCTAssertEqual(Clock(convert: variable), Clock(variable: variable))
     }
 
 }
