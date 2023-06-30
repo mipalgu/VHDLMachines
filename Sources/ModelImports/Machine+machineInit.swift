@@ -118,9 +118,11 @@ extension VHDLMachines.Machine {
 
 }
 
+/// Add `numberOfTransitions` to `LLFSMModel.Machine`.
 extension LLFSMModel.Machine {
 
-    public var numberOfTransitions: Int {
+    /// The total number of transitions in the machine.
+    @inlinable public var numberOfTransitions: Int {
         self.states.reduce(0) {
             $0 + $1.transitions.count
         }
