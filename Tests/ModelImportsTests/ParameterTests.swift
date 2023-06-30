@@ -1,4 +1,4 @@
-// Parameter+modelInits.swift
+// ParameterTests.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -55,31 +55,52 @@
 // 
 
 import LLFSMModel
+@testable import ModelImports
 import VHDLMachines
 import VHDLParsing
+import XCTest
 
-/// Add `LLFSMModel` conversions.
-extension Parameter {
+/// Test class for ``Parameter`` extensions.
+final class ParameterTests: XCTestCase {
 
-    /// Convert a `LLFSMModel.Variable` into a `Parameter`.
-    /// - Parameter parameter: The variable to convert.
-    @inlinable
-    public init?(parameter: Variable) {
-        guard let signal = LocalSignal(variable: parameter) else {
-            return nil
+    /// A variable used as test data.
+    let variable = Variable(defaultValue: "'1'", name: "x", type: "std_logic")
+
+    /// Test `init(parameter:)` constructs parameter correctly.
+    func testInit() {
+        guard let parameter = Parameter(parameter: variable) else {
+            XCTFail("Failed to create parameter.")
+            return
         }
-        self.init(signal: signal)
+        XCTAssertEqual(parameter.defaultValue, .literal(value: .bit(value: .high)))
+        XCTAssertEqual(parameter.name, .x)
+        XCTAssertEqual(parameter.type, .stdLogic)
+        XCTAssertNil(parameter.comment)
     }
 
-    /// Convert a ``LocalSignal`` into a `Parameter`.
-    /// - Parameter signal: The signal to convert.
-    /// - Warning: The `signal` type must not be an `alias` for this initialiser to work.
-    @inlinable
-    public init?(signal: LocalSignal) {
-        guard case .signal(let type) = signal.type else {
-            return nil
+    /// Test `init(parameter:)` returns `nil` for incorrect variable data.
+    func testInitReturnsNil() {
+        XCTAssertNil(Parameter(parameter: Variable(defaultValue: "", name: "x", type: "std_logic")))
+        XCTAssertNil(Parameter(parameter: Variable(defaultValue: "'1'", name: "1x", type: "std_logic")))
+        XCTAssertNil(Parameter(parameter: Variable(defaultValue: "'1'", name: "x", type: "stds_logic")))
+    }
+
+    /// Test `init(signal:)` construct Parameter correctly.
+    func testSignalInit() {
+        guard let signal = LocalSignal(variable: variable), let parameter = Parameter(signal: signal) else {
+            XCTFail("Failed to create signal.")
+            return
         }
-        self.init(type: type, name: signal.name, defaultValue: signal.defaultValue, comment: nil)
+        XCTAssertEqual(parameter.defaultValue, .literal(value: .bit(value: .high)))
+        XCTAssertEqual(parameter.name, .x)
+        XCTAssertEqual(parameter.type, .stdLogic)
+        XCTAssertNil(parameter.comment)
+    }
+
+    /// Test `init(signal:)` returns `nil` for incorrect signal type.
+    func testSignalInitReturnsNil() {
+        let signal = LocalSignal(type: .alias(name: .y), name: .x)
+        XCTAssertNil(Parameter(signal: signal))
     }
 
 }
