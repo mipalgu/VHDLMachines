@@ -144,8 +144,14 @@ extension Int {
 
 }
 
+/// Add initialiser to create transitions array.
 extension Array where Element == VHDLMachines.Transition {
 
+    /// Create an array of `VHDLMachines.Transition` from an `LLFSMModel.Machine`.
+    /// - Parameters:
+    ///   - states: The converted states from the `machine`.
+    ///   - machine: The machine to dervice the transitions from.
+    @inlinable
     init?(states: [VHDLMachines.State], machine: LLFSMModel.Machine) {
         let transitions = machine.states.flatMap { state in
             state.transitions.compactMap {

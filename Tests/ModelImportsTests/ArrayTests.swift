@@ -100,4 +100,30 @@ final class ArrayTests: XCTestCase {
         XCTAssertEqual(testMachine.transitions, transitions)
     }
 
+    /// Test `init(states:,machine:)` returns nil when a transition is incorrect.
+    func testTransitionInitReturnsNil() {
+        let testMachine = VHDLMachines.Machine.testMachine()
+        let oldMachine = LLFSMModel.Machine.testMachine
+        let oldState = oldMachine.states[0]
+        let newState = LLFSMModel.State(
+            actions: oldState.actions,
+            externalVariables: oldState.externalVariables,
+            name: oldState.name,
+            transitions: oldState.transitions + [LLFSMModel.Transition(target: "Null", condition: "true")],
+            variables: oldState.variables
+        )
+        let newMachine = LLFSMModel.Machine(
+            externalVariables: oldMachine.externalVariables,
+            globalVariables: oldMachine.globalVariables,
+            initialState: oldMachine.initialState,
+            name: oldMachine.name,
+            parameters: oldMachine.parameters,
+            returnables: oldMachine.returnables,
+            states: [newState, oldMachine.states[1], oldMachine.states[2]],
+            suspendedState: oldMachine.suspendedState,
+            variables: oldMachine.variables
+        )
+        XCTAssertNil([VHDLMachines.Transition](states: testMachine.states, machine: newMachine))
+    }
+
 }
