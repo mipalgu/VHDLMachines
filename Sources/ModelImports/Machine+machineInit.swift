@@ -130,8 +130,14 @@ extension LLFSMModel.Machine {
 
 }
 
+/// Add init to find index in states array.
 extension Int {
 
+    /// Find the index of a state in an array of states.
+    /// - Parameters:
+    ///   - state: The name of the state to find.
+    ///   - states: The array containing the state.
+    @inlinable
     init?(state: String, states: [VHDLMachines.State]) {
         guard
             let name = VariableName(rawValue: state),
