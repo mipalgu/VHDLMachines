@@ -121,8 +121,12 @@ extension Parameter: ModelConvertible {
 
 }
 
+/// Add ``ModelConvertibele`` conformance.
 extension PortSignal: ModelConvertible {
 
+    /// Convert a `LLFSMModel.ExternalVariable` into a ``PortSignal``.
+    /// - Parameter convert: The variable to convert.
+    @inlinable
     init?(convert: ExternalVariable) {
         self.init(variable: convert)
     }

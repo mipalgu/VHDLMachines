@@ -119,4 +119,9 @@ final class PortSignalTests: XCTestCase {
         XCTAssertNil(PortSignal(variable: variable))
     }
 
+    /// Test ``ModelConvertible`` conformance.
+    func testConvertInit() {
+        XCTAssertEqual(PortSignal(convert: variable), PortSignal(variable: variable))
+    }
+
 }
