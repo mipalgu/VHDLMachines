@@ -109,4 +109,9 @@ final class LocalSignalTests: XCTestCase {
         XCTAssertNil(LocalSignal(variable: variable))
     }
 
+    /// Test ``ModelConvertible`` conformance.
+    func testConvertInit() {
+        XCTAssertEqual(LocalSignal(convert: variable), LocalSignal(variable: variable))
+    }
+
 }

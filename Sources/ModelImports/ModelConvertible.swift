@@ -97,8 +97,12 @@ extension Clock: ModelConvertible {
 
 }
 
+/// Add ``ModelConvertible`` conformance.
 extension LocalSignal: ModelConvertible {
 
+    /// Create a new ``LocalSignal`` from a `LLFSMModel.Variable`.
+    /// - Parameter convert: The variable to convert.
+    @inlinable
     init?(convert: Variable) {
         self.init(variable: convert)
     }
