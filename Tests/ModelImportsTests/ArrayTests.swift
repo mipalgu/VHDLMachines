@@ -1,4 +1,4 @@
-// ModelConvertible.swift
+// ArrayTests.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -55,95 +55,39 @@
 // 
 
 import LLFSMModel
+@testable import ModelImports
 import VHDLMachines
 import VHDLParsing
+import XCTest
 
-/// Add generic protocol for types that can be converted from other types.
-protocol ModelConvertible {
+/// Test class for `Array` extensions.
+final class ArrayTests: XCTestCase {
 
-    /// The type to convert from.
-    associatedtype Convertible
+    /// An array of `LLFSMModel.Variable`'s to use as test data.
+    let variables = [
+        Variable(defaultValue: "'1'", name: "x", type: "std_logic"),
+        Variable(defaultValue: "'0'", name: "y", type: "std_logic")
+    ]
 
-    /// Initialise Self from a convertible type.
-    /// - Parameter convert: The type to convert.
-    init?(convert: Convertible)
+    /// The expected values from the converted `variables`.
+    let expected = [
+        LocalSignal(
+            type: .stdLogic, name: .x, defaultValue: .literal(value: .bit(value: .high)), comment: nil
+        ),
+        LocalSignal(
+            type: .stdLogic, name: .y, defaultValue: .literal(value: .bit(value: .low)), comment: nil
+        )
+    ]
 
-}
-
-/// Add ``ModelConvertible`` initialiser.
-extension Array where Element: ModelConvertible {
-
-    /// Create a new array from an array of ``ModelConvertible`` conforment types.
-    /// - Parameter convert: The array to convert.
-    init?<T>(convert: [T]) where T == Element.Convertible {
-        var others = [Element]()
-        for item in convert {
-            guard let other = Element(convert: item) else {
-                return nil
-            }
-            others.append(other)
-        }
-        self = others
+    /// Test the `init(convert:)` correctly converts all elements.
+    func testConvertInit() {
+        let signals = [LocalSignal](convert: variables)
+        XCTAssertEqual(signals, expected)
     }
 
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension Clock: ModelConvertible {
-
-    /// Create a new ``Clock`` from a `LLFSMModel.Variable`.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(variable: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension LocalSignal: ModelConvertible {
-
-    /// Create a new ``LocalSignal`` from a `LLFSMModel.Variable`.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(variable: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension Parameter: ModelConvertible {
-
-    /// Convert a `LLFSMModel.Variable` into a ``Parameter``.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(parameter: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension PortSignal: ModelConvertible {
-
-    /// Convert a `LLFSMModel.ExternalVariable` into a ``PortSignal``.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: ExternalVariable) {
-        self.init(variable: convert)
-    }
-
-}
-
-/// Add ``ModelConvertible`` conformance.
-extension ReturnableVariable: ModelConvertible {
-
-    /// Convert an `LLFSMModel.Variable` into a ``ReturnableVariable``.
-    /// - Parameter convert: The variable to convert.
-    @inlinable
-    init?(convert: Variable) {
-        self.init(variable: convert)
+    /// Test `init(convert:)` returns nil for inccorect element.
+    func testConvertInitReturnsNil() {
+        XCTAssertNil([LocalSignal](convert: [variables[0], Variable(name: "1y", type: "std_logic")]))
     }
 
 }
