@@ -87,7 +87,9 @@ extension Machine {
                 transitions: [
                     Transition(target: "Suspended", condition: "z = '1'"),
                     Transition(target: "Suspended", condition: "false"),
-                    Transition(target: "Suspended", condition: "after_ms(50) or after(2) or after_rt(20000)"),
+                    Transition(
+                        target: "Suspended", condition: "after_ms(50.0) or after(2.0) or after_rt(20000.0)"
+                    ),
                     Transition(target: "Suspended", condition: "true")
                 ],
                 variables: [

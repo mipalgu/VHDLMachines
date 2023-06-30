@@ -56,6 +56,7 @@
 
 import LLFSMModel
 @testable import ModelImports
+import TestUtils
 import VHDLMachines
 import VHDLParsing
 import XCTest
@@ -88,6 +89,15 @@ final class ArrayTests: XCTestCase {
     /// Test `init(convert:)` returns nil for inccorect element.
     func testConvertInitReturnsNil() {
         XCTAssertNil([LocalSignal](convert: [variables[0], Variable(name: "1y", type: "std_logic")]))
+    }
+
+    /// Test `init(states:,machine:)` creates transition correctly.
+    func testTransitionInit() {
+        let testMachine = VHDLMachines.Machine.testMachine()
+        let transitions = [VHDLMachines.Transition](
+            states: testMachine.states, machine: LLFSMModel.Machine.testMachine
+        )
+        XCTAssertEqual(testMachine.transitions, transitions)
     }
 
 }
