@@ -1,4 +1,4 @@
-// ReturnableVariable+modelInits.swift
+// ReturnableVariableTests.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -55,22 +55,30 @@
 // 
 
 import LLFSMModel
+@testable import ModelImports
 import VHDLMachines
 import VHDLParsing
+import XCTest
 
-/// Add `LLFSMModel` conversions.
-extension ReturnableVariable {
+/// Test class for ``ReturnableVariable`` extensions.
+final class ReturnableVariableTests: XCTestCase {
 
-    /// Convert an `LLFSMModel.Variable` into a `ReturnableVariable`.
-    /// - Parameter variable: The variable to convert.
-    @inlinable
-    public init?(variable: Variable) {
-        guard
-            let name = VariableName(rawValue: variable.name), let type = SignalType(rawValue: variable.type)
-        else {
-            return nil
-        }
-        self.init(type: type, name: name, comment: nil)
+    /// A variable used as test data.
+    let variable = Variable(defaultValue: "'1'", name: "x", type: "std_logic")
+
+    /// Test `init(variable:)` initialises `ReturnableVariable` correctly.
+    func testInit() {
+        let returnable = ReturnableVariable(variable: variable)
+        XCTAssertEqual(returnable?.name, .x)
+        XCTAssertEqual(returnable?.type, .stdLogic)
+        XCTAssertEqual(returnable?.mode, .output)
+        XCTAssertNil(returnable?.comment)
+    }
+
+    /// Test `init(variable:)` returns `nil` for invalid variable data.
+    func testInitReturnsNil() {
+        XCTAssertNil(ReturnableVariable(variable: Variable(name: "1x", type: "std_logic")))
+        XCTAssertNil(ReturnableVariable(variable: Variable(name: "x", type: "std_logics")))
     }
 
 }
