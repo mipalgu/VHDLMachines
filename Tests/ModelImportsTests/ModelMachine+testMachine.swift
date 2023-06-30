@@ -68,8 +68,8 @@ extension Machine {
             )
         ],
         globalVariables: [
-            Variable(name: "clk", type: "{\"frequency\":50,\"unit\":MHz}"),
-            Variable(name: "clk2", type: "{\"frequency\":20,\"unit\":kHz}")
+            Variable(name: "clk", type: "{\"frequency\":50,\"unit\":\"MHz\"}"),
+            Variable(name: "clk2", type: "{\"frequency\":20,\"unit\":\"kHz\"}")
         ],
         initialState: "Initial",
         name: "TestMachine",
