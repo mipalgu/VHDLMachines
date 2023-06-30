@@ -61,6 +61,9 @@ import VHDLParsing
 /// Add constants.
 extension VariableName {
 
+    /// A `clk` variable.
+    static let clk = VariableName(rawValue: "clk")!
+
     /// The name of the initial state.
     static let initial = VariableName(rawValue: "Initial")!
 
