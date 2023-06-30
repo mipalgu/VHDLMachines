@@ -65,7 +65,9 @@ final class EntityTests: XCTestCase {
     /// Test machine init.
     func testMachineInit() {
         guard
-            var machine = Machine.initial(path: URL(fileURLWithPath: "/tmp/New.machine", isDirectory: false))
+            var machine = Machine.initial(
+                path: URL(fileURLWithPath: "/tmp/NewMachine.machine", isDirectory: false)
+            )
         else {
             XCTFail("Failed to create machine.")
             return
@@ -77,7 +79,7 @@ final class EntityTests: XCTestCase {
             XCTFail("Failed to create entity from machine.")
             return
         }
-        XCTAssertEqual(entity.name, VariableName(rawValue: "New"))
+        XCTAssertEqual(entity.name, VariableName(rawValue: "NewMachine"))
         XCTAssertEqual(
             entity.port, PortBlock(signals: [
                 PortSignal(type: .stdLogic, name: .clk, mode: .input),
