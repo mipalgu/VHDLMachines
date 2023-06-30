@@ -75,6 +75,7 @@ final class ParameterTests: XCTestCase {
         XCTAssertEqual(parameter.defaultValue, .literal(value: .bit(value: .high)))
         XCTAssertEqual(parameter.name, .x)
         XCTAssertEqual(parameter.type, .stdLogic)
+        XCTAssertEqual(parameter.mode, .input)
         XCTAssertNil(parameter.comment)
     }
 
@@ -95,6 +96,7 @@ final class ParameterTests: XCTestCase {
         XCTAssertEqual(parameter.name, .x)
         XCTAssertEqual(parameter.type, .stdLogic)
         XCTAssertNil(parameter.comment)
+        XCTAssertEqual(parameter.mode, .input)
     }
 
     /// Test `init(signal:)` returns `nil` for incorrect signal type.
