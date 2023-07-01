@@ -95,7 +95,9 @@ extension VHDLMachines.State {
         guard actionsDictionary.count == validActions.count else {
             return nil
         }
-        self.init(name: name, actions: actionsDictionary, signals: signals, externalVariables: externals)
+        self.init(
+            name: name, actions: actionsDictionary, signals: signals, externalVariables: externals.sorted()
+        )
     }
 
 }
