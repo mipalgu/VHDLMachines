@@ -65,7 +65,10 @@ extension State {
     ///   - transitions: The transitions for this tate.
     ///   - variables: The variables local to this state.
     init(
-        name: String, actions: [String: String]? = nil, transitions: [Transition] = [], variables: [Variable] = []
+        name: String,
+        actions: [String: String]? = nil,
+        transitions: [Transition] = [],
+        variables: [Variable] = []
     ) {
         let action: [String: String]
         if let actions {
