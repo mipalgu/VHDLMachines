@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
-// Machines
+// ParameterTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,60 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
-#endif
-import TestUtils
-@testable import VHDLMachines
+import LLFSMModel
+@testable import ModelImports
+import VHDLMachines
+import VHDLParsing
 import XCTest
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+/// Test class for ``Parameter`` extensions.
+final class ParameterTests: XCTestCase {
 
-    /// The parser under test.
-    let parser = VHDLParser()
+    /// A variable used as test data.
+    let variable = Variable(defaultValue: "'1'", name: "x", type: "std_logic")
 
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
-
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
-
-    /// Test parse function works correctly.
-    func testParse() throws {
-        guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
-        else {
-            XCTFail("Failed to parse machine.")
+    /// Test `init(parameter:)` constructs parameter correctly.
+    func testInit() {
+        guard let parameter = Parameter(parameter: variable) else {
+            XCTFail("Failed to create parameter.")
             return
         }
-        XCTAssertEqual(machine, factory.pingMachine)
+        XCTAssertEqual(parameter.defaultValue, .literal(value: .bit(value: .high)))
+        XCTAssertEqual(parameter.name, .x)
+        XCTAssertEqual(parameter.type, .stdLogic)
+        XCTAssertEqual(parameter.mode, .input)
+        XCTAssertNil(parameter.comment)
     }
 
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
+    /// Test `init(parameter:)` returns `nil` for incorrect variable data.
+    func testInitReturnsNil() {
+        XCTAssertNil(Parameter(parameter: Variable(defaultValue: "", name: "x", type: "std_logic")))
+        XCTAssertNil(Parameter(parameter: Variable(defaultValue: "'1'", name: "1x", type: "std_logic")))
+        XCTAssertNil(Parameter(parameter: Variable(defaultValue: "'1'", name: "x", type: "stds_logic")))
+    }
+
+    /// Test `init(signal:)` construct Parameter correctly.
+    func testSignalInit() {
+        guard let signal = LocalSignal(variable: variable), let parameter = Parameter(signal: signal) else {
+            XCTFail("Failed to create signal.")
             return
         }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
+        XCTAssertEqual(parameter.defaultValue, .literal(value: .bit(value: .high)))
+        XCTAssertEqual(parameter.name, .x)
+        XCTAssertEqual(parameter.type, .stdLogic)
+        XCTAssertNil(parameter.comment)
+        XCTAssertEqual(parameter.mode, .input)
+    }
+
+    /// Test `init(signal:)` returns `nil` for incorrect signal type.
+    func testSignalInitReturnsNil() {
+        let signal = LocalSignal(type: .alias(name: .y), name: .x)
+        XCTAssertNil(Parameter(signal: signal))
+    }
+
+    /// Test ``ModelConvertible`` conformance.
+    func testConvertInit() {
+        XCTAssertEqual(Parameter(convert: variable), Parameter(parameter: variable))
     }
 
 }

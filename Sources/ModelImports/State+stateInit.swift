@@ -1,5 +1,5 @@
-// State+testState.swift
-// Machines
+// State+stateInit.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,32 +54,50 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import VHDLMachines
+import LLFSMModel
+import VHDLMachines
 import VHDLParsing
 
-/// Add default state test data.
-extension State {
+/// Add initialiser for `LLFSMModel.State`.
+extension VHDLMachines.State {
 
-    // swiftlint:disable force_unwrapping
-
-    /// Test state.
-    static func defaultState(name: VariableName) -> State {
-        VHDLMachines.State(
-            name: name,
-            actions: [
-                VariableName.onEntry: SynchronousBlock(
-                    rawValue: "x <= '1';\nxx <= \"00\"; -- \(name) onEntry"
-                )!,
-                VariableName.onExit: SynchronousBlock(rawValue: "x <= '0'; -- \(name) OnExit")!,
-                VariableName.onResume: SynchronousBlock(rawValue: "x <= '0'; -- \(name) OnResume")!,
-                VariableName.onSuspend: SynchronousBlock(rawValue: "xx <= \"11\"; -- \(name) onSuspend")!,
-                VariableName.internal: SynchronousBlock(rawValue: "x <= '1'; -- \(name) Internal")!
-            ],
-            signals: [],
-            externalVariables: []
+    /// Create a `VHDLMachines.State` from a `LLFSMModel.State`.
+    /// - Parameters:
+    ///   - state: The state to convert.
+    ///   - externalVariables: The available external variables this state has access too.
+    @inlinable
+    public init?(state: LLFSMModel.State, externalVariables: [PortSignal]) {
+        guard let name = VariableName(rawValue: state.name) else {
+            return nil
+        }
+        let signals = state.variables.compactMap(LocalSignal.init(variable:))
+        guard signals.count == state.variables.count else {
+            return nil
+        }
+        let existingExternals = Set(externalVariables.map(\.name))
+        let externals = state.externalVariables.compactMap(VariableName.init(rawValue:))
+        guard
+            externals.count == state.externalVariables.count,
+            externals.allSatisfy(existingExternals.contains)
+        else {
+            return nil
+        }
+        let validActions = state.actions.lazy.filter {
+            !$1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        let actions: [(VariableName, SynchronousBlock)] = validActions.compactMap {
+            guard let name = VariableName(rawValue: $0), let code = SynchronousBlock(rawValue: $1) else {
+                return nil
+            }
+            return (name, code)
+        }
+        let actionsDictionary = Dictionary(uniqueKeysWithValues: actions)
+        guard actionsDictionary.count == validActions.count else {
+            return nil
+        }
+        self.init(
+            name: name, actions: actionsDictionary, signals: signals, externalVariables: externals.sorted()
         )
     }
-
-    // swiftlint:enable force_unwrapping
 
 }

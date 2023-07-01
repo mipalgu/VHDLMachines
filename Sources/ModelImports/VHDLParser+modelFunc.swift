@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
-// Machines
+// VHDLParser+modelFunc.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,29 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import Foundation
 #if os(Linux)
 import IO
 #endif
-import TestUtils
-@testable import VHDLMachines
-import XCTest
+import LLFSMModel
+import VHDLMachines
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+/// Add support for parsing `LLFSMModel` structures.
+extension VHDLParser {
 
-    /// The parser under test.
-    let parser = VHDLParser()
-
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
-
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
-
-    /// Test parse function works correctly.
-    func testParse() throws {
+    /// Parse a `LLFSMModel.Machine` JSON file from a `FileWrapper`.
+    /// - Parameter wrapper: The wrapper representing the JSON file.
+    /// - Returns: The parsed `VHDLMachines.Machine` structure.
+    @inlinable
+    public func parseModel(model wrapper: FileWrapper) -> VHDLMachines.Machine? {
+        let decoder = JSONDecoder()
         guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
+            let data = wrapper.regularFileContents,
+            let model = try? decoder.decode(LLFSMModel.Machine.self, from: data)
         else {
-            XCTFail("Failed to parse machine.")
-            return
+            return nil
         }
-        XCTAssertEqual(machine, factory.pingMachine)
-    }
-
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
-            return
-        }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
+        return VHDLMachines.Machine(machine: model)
     }
 
 }

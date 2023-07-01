@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
-// Machines
+// ModelState+testState.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,41 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
-#endif
-import TestUtils
-@testable import VHDLMachines
-import XCTest
+import LLFSMModel
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+/// Add init for test state.
+extension State {
 
-    /// The parser under test.
-    let parser = VHDLParser()
-
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
-
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
-
-    /// Test parse function works correctly.
-    func testParse() throws {
-        guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
-        else {
-            XCTFail("Failed to parse machine.")
-            return
+    /// Create a test state. This state contains the same actions as the `VHDLMachines.State` test state.
+    /// - Parameters:
+    ///   - name: The name of the state.
+    ///   - transitions: The transitions for this tate.
+    ///   - variables: The variables local to this state.
+    init(
+        name: String,
+        actions: [String: String]? = nil,
+        transitions: [Transition] = [],
+        variables: [Variable] = []
+    ) {
+        let action: [String: String]
+        if let actions {
+            action = actions
+        } else {
+            action = [
+                "OnEntry": "x <= '1';\nxx <= \"00\"; -- \(name) onEntry",
+                "OnExit": "x <= '0'; -- \(name) OnExit",
+                "OnResume": "x <= '0'; -- \(name) OnResume",
+                "OnSuspend": "xx <= \"11\"; -- \(name) onSuspend",
+                "Internal": "x <= '1'; -- \(name) Internal"
+            ]
         }
-        XCTAssertEqual(machine, factory.pingMachine)
-    }
-
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
-            return
-        }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
+        self.init(
+            actions: action,
+            externalVariables: [],
+            name: name,
+            transitions: transitions,
+            variables: variables
+        )
     }
 
 }

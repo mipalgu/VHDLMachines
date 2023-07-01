@@ -55,6 +55,7 @@
 // 
 
 import IO
+import TestUtils
 @testable import VHDLMachines
 import XCTest
 

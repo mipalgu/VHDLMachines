@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
-// Machines
+// ModelMachineTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,30 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
-#endif
-import TestUtils
-@testable import VHDLMachines
+import LLFSMModel
+@testable import ModelImports
 import XCTest
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+/// Test class for `LLFSMModel.Machine` extensions.
+final class ModelMachineTests: XCTestCase {
 
-    /// The parser under test.
-    let parser = VHDLParser()
-
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
-
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
-
-    /// Test parse function works correctly.
-    func testParse() throws {
-        guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
-        else {
-            XCTFail("Failed to parse machine.")
-            return
-        }
-        XCTAssertEqual(machine, factory.pingMachine)
-    }
-
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
-            return
-        }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
+    /// Test `numberOfTransitions` correctly counts transitions.
+    func testNumberOfTransitions() {
+        XCTAssertEqual(Machine.testMachine.numberOfTransitions, 7)
+        XCTAssertEqual(
+            Machine(
+                externalVariables: [],
+                globalVariables: [],
+                initialState: "",
+                name: "",
+                parameters: [],
+                returnables: [],
+                states: [],
+                suspendedState: nil,
+                variables: []
+            ).numberOfTransitions,
+            0
+        )
     }
 
 }

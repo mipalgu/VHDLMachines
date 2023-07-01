@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
+// Variable+testConstants.swift
 // Machines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,63 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
-#endif
-import TestUtils
-@testable import VHDLMachines
-import XCTest
+import VHDLParsing
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+// swiftlint:disable force_unwrapping
 
-    /// The parser under test.
-    let parser = VHDLParser()
+// swiftlint:disable missing_docs
 
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
+/// Add test constants.
+public extension VariableName {
 
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
+    static var a: VariableName { VariableName(rawValue: "A")! }
 
-    /// Test parse function works correctly.
-    func testParse() throws {
-        guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
-        else {
-            XCTFail("Failed to parse machine.")
-            return
-        }
-        XCTAssertEqual(machine, factory.pingMachine)
-    }
+    static var clk2: VariableName { VariableName(rawValue: "clk2")! }
 
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
-            return
-        }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
-    }
+    static var g: VariableName { VariableName(rawValue: "g")! }
+
+    static var initialX: VariableName { VariableName(rawValue: "initialX")! }
+
+    static var p: VariableName { VariableName(rawValue: "p")! }
+
+    static var r: VariableName { VariableName(rawValue: "r")! }
+
+    static var s: VariableName { VariableName(rawValue: "s")! }
+
+    static var x: VariableName { VariableName(rawValue: "x")! }
+
+    static var xx: VariableName { VariableName(rawValue: "xx")! }
+
+    static var xs: VariableName { VariableName(rawValue: "xs")! }
+
+    static var y: VariableName { VariableName(rawValue: "y")! }
+
+    static var z: VariableName { VariableName(rawValue: "z")! }
+
+    static var s0: VariableName { VariableName(rawValue: "S0")! }
+
+    static var s1: VariableName { VariableName(rawValue: "S1")! }
+
+    static var state0: VariableName { VariableName(rawValue: "State0")! }
+
+    static var parX: VariableName { VariableName(rawValue: "parX")! }
+
+    static var ping: VariableName { VariableName(rawValue: "ping")! }
+
+    static var pong: VariableName { VariableName(rawValue: "pong")! }
+
+    static var parXs: VariableName { VariableName(rawValue: "parXs")! }
+
+    static var retX: VariableName { VariableName(rawValue: "retX")! }
+
+    static var retXs: VariableName { VariableName(rawValue: "retXs")! }
+
+    static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
+
+    static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
 
 }
+
+// swiftlint:enable missing_docs
+
+// swiftlint:enable force_unwrapping

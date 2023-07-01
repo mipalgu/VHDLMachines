@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
-// Machines
+// Parameter+modelInits.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,32 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
-#endif
-import TestUtils
-@testable import VHDLMachines
-import XCTest
+import LLFSMModel
+import VHDLMachines
+import VHDLParsing
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+/// Add `LLFSMModel` conversions.
+extension Parameter {
 
-    /// The parser under test.
-    let parser = VHDLParser()
-
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
-
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
-
-    /// Test parse function works correctly.
-    func testParse() throws {
-        guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
-        else {
-            XCTFail("Failed to parse machine.")
-            return
+    /// Convert a `LLFSMModel.Variable` into a `Parameter`.
+    /// - Parameter parameter: The variable to convert.
+    @inlinable
+    public init?(parameter: Variable) {
+        guard let signal = LocalSignal(variable: parameter) else {
+            return nil
         }
-        XCTAssertEqual(machine, factory.pingMachine)
+        self.init(signal: signal)
     }
 
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
-            return
+    /// Convert a ``LocalSignal`` into a `Parameter`.
+    /// - Parameter signal: The signal to convert.
+    /// - Warning: The `signal` type must not be an `alias` for this initialiser to work.
+    @inlinable
+    public init?(signal: LocalSignal) {
+        guard case .signal(let type) = signal.type else {
+            return nil
         }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
+        self.init(type: type, name: signal.name, defaultValue: signal.defaultValue, comment: nil)
     }
 
 }

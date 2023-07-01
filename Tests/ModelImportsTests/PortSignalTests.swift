@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
-// Machines
+// PortSignalTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,74 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
-#endif
+import LLFSMModel
+@testable import ModelImports
 import TestUtils
-@testable import VHDLMachines
+import VHDLParsing
 import XCTest
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+/// Test class for `PortSignal` extensions.
+final class PortSignalTests: XCTestCase {
 
-    /// The parser under test.
-    let parser = VHDLParser()
+    /// A test external variable.
+    let variable = ExternalVariable(defaultValue: "'1'", mode: .input, name: "x", type: "std_logic")
 
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
-
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
-
-    /// Test parse function works correctly.
-    func testParse() throws {
-        guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
-        else {
-            XCTFail("Failed to parse machine.")
+    /// Test that `init(variable:)` can convert the variable correctly.
+    func testInit() {
+        guard let signal = PortSignal(variable: variable) else {
+            XCTFail("Failed to create signal.")
             return
         }
-        XCTAssertEqual(machine, factory.pingMachine)
+        XCTAssertEqual(signal.defaultValue, .literal(value: .bit(value: .high)))
+        XCTAssertEqual(signal.mode, .input)
+        XCTAssertEqual(signal.name, .x)
+        XCTAssertEqual(signal.type, .stdLogic)
+        XCTAssertNil(signal.comment)
     }
 
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
+    /// Test that `init(variable:)` can convert the variable correctly when the default value is `nil`.
+    func testInitWithNilDefaultValue() {
+        let variable = ExternalVariable(
+            defaultValue: nil, mode: variable.mode, name: variable.name, type: variable.type
+        )
+        guard let signal = PortSignal(variable: variable) else {
+            XCTFail("Failed to create signal.")
             return
         }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
+        XCTAssertNil(signal.defaultValue)
+        XCTAssertEqual(signal.mode, .input)
+        XCTAssertEqual(signal.name, .x)
+        XCTAssertEqual(signal.type, .stdLogic)
+        XCTAssertNil(signal.comment)
+    }
+
+    /// Test that `init(variable:)` returns `nil` for invalid name.
+    func testInitWithInvalidName() {
+        let variable = ExternalVariable(
+            defaultValue: variable.defaultValue, mode: variable.mode, name: "1x", type: variable.type
+        )
+        XCTAssertNil(PortSignal(variable: variable))
+    }
+
+    /// Test that `init(variable:)` returns `nil` for invalid type.
+    func testInitWithInvalidType() {
+        let variable = ExternalVariable(
+            defaultValue: variable.defaultValue, mode: variable.mode, name: variable.name, type: "std_logic_"
+        )
+        XCTAssertNil(PortSignal(variable: variable))
+    }
+
+    /// Test that `init(variable:)` returns `nil` for invalid default value.
+    func testInitWithInvalidDefaultValue() {
+        let variable = ExternalVariable(
+            defaultValue: "'1", mode: variable.mode, name: variable.name, type: variable.type
+        )
+        XCTAssertNil(PortSignal(variable: variable))
+    }
+
+    /// Test ``ModelConvertible`` conformance.
+    func testConvertInit() {
+        XCTAssertEqual(PortSignal(convert: variable), PortSignal(variable: variable))
     }
 
 }

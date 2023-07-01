@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
-// Machines
+// Clock+variableInit.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,57 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
-#endif
-import TestUtils
-@testable import VHDLMachines
-import XCTest
+import Foundation
+import LLFSMModel
+import VHDLMachines
+import VHDLParsing
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+/// Add `LLFSMModel` conversions.
+extension Clock {
 
-    /// The parser under test.
-    let parser = VHDLParser()
+    /// Metadata for the frequency of the clock.
+    @usableFromInline
+    struct ClockType: Codable {
 
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
+        /// The frequency of the clock.
+        let frequency: UInt
 
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
+        /// The frequency unit of the clock.
+        let unit: FrequencyUnit
 
-    /// Test parse function works correctly.
-    func testParse() throws {
-        guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
-        else {
-            XCTFail("Failed to parse machine.")
-            return
-        }
-        XCTAssertEqual(machine, factory.pingMachine)
     }
 
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
-            return
+    /// Initialize a ``Clock`` from an `LLFSMModel.Variable`. Please not that the type field in the `variable`
+    /// must contain a JSON formatted string with the frequency and unit of the clock. The following format
+    /// should be adhered too:
+    /// ```JSON
+    /// {
+    ///    "frequency": <frequency UInt>,
+    ///    "unit": <Frequency Unit String>
+    /// }
+    /// ```
+    /// - Parameter variable: The variable to convert.
+    /// - SeeAlso: ``FrequencyUnit``.
+    @inlinable
+    public init?(variable: Variable) {
+        let decoder = JSONDecoder()
+        guard
+            let name = VariableName(rawValue: variable.name),
+            let data = variable.type.trimmingCharacters(in: .whitespacesAndNewlines).data(using: .utf8),
+            let type = try? decoder.decode(ClockType.self, from: data)
+        else {
+            return nil
         }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
+        self.init(name: name, type: type)
+    }
+
+    /// Initialize a ``Clock`` from its name and type.
+    /// - Parameters:
+    ///   - name: The name of the clock.
+    ///   - type: The frequency of the clock.
+    @usableFromInline
+    init(name: VariableName, type: ClockType) {
+        self.init(name: name, frequency: type.frequency, unit: type.unit)
     }
 
 }

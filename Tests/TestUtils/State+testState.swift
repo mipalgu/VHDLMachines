@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
+// State+testState.swift
 // Machines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,32 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
-#endif
-import TestUtils
 @testable import VHDLMachines
-import XCTest
+import VHDLParsing
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+/// Add default state test data.
+extension State {
 
-    /// The parser under test.
-    let parser = VHDLParser()
+    // swiftlint:disable force_unwrapping
 
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
-
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
-
-    /// Test parse function works correctly.
-    func testParse() throws {
-        guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
-        else {
-            XCTFail("Failed to parse machine.")
-            return
-        }
-        XCTAssertEqual(machine, factory.pingMachine)
+    /// Test state.
+    public static func defaultState(name: VariableName) -> State {
+        VHDLMachines.State(
+            name: name,
+            actions: [
+                VariableName.onEntry: SynchronousBlock(
+                    rawValue: "x <= '1';\nxx <= \"00\"; -- \(name) onEntry"
+                )!,
+                VariableName.onExit: SynchronousBlock(rawValue: "x <= '0'; -- \(name) OnExit")!,
+                VariableName.onResume: SynchronousBlock(rawValue: "x <= '0'; -- \(name) OnResume")!,
+                VariableName.onSuspend: SynchronousBlock(rawValue: "xx <= \"11\"; -- \(name) onSuspend")!,
+                VariableName.internal: SynchronousBlock(rawValue: "x <= '1'; -- \(name) Internal")!
+            ],
+            signals: [],
+            externalVariables: []
+        )
     }
 
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
-            return
-        }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
-    }
+    // swiftlint:enable force_unwrapping
 
 }

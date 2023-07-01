@@ -1,8 +1,8 @@
-// VHDLParserTests.swift
-// Machines
+// ClockTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2022 Morgan McColl. All rights reserved.
+// Copyright © 2023 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -54,45 +54,43 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
-#endif
-import TestUtils
-@testable import VHDLMachines
+import LLFSMModel
+@testable import ModelImports
+import VHDLMachines
+import VHDLParsing
 import XCTest
 
-/// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+/// Test class for ``Clock`` extensions.
+final class ClockTests: XCTestCase {
 
-    /// The parser under test.
-    let parser = VHDLParser()
+    /// A clock variable.
+    let variable = Variable(name: "clk", type: "{\"frequency\":100,\"unit\":\"MHz\"}")
 
-    /// A factory to generate test machines.
-    let factory = PingPongArrangement()
+    /// An equivalent ``Clock.ClockType``.
+    let type = Clock.ClockType(frequency: 100, unit: .MHz)
 
-    /// A generator to generate test machine FileWrappers.
-    let generator = VHDLGenerator()
-
-    /// Test parse function works correctly.
-    func testParse() throws {
-        guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
-            let machine = parser.parse(wrapper: machineWrapper)
-        else {
-            XCTFail("Failed to parse machine.")
-            return
-        }
-        XCTAssertEqual(machine, factory.pingMachine)
+    /// Test `init(name:,type:)` initialises ``Clock`` correctly.
+    func testTypeInit() {
+        let clock = Clock(name: .clk, type: type)
+        XCTAssertEqual(clock, Clock(name: .clk, frequency: type.frequency, unit: type.unit))
     }
 
-    /// Test parse function returns nil for invalid data.
-    func testEmptyWrapper() {
-        guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
-            return
-        }
-        let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
+    /// Test `init(variable:)` initialises ``Clock`` correctly.
+    func testInit() {
+        let clock = Clock(variable: variable)
+        XCTAssertEqual(clock, Clock(name: .clk, type: type))
+    }
+
+    /// Test `init(variable:)` returns `nil` for invalid variable data.
+    func testInitReturnsNil() {
+        XCTAssertNil(Clock(variable: Variable(name: "1clk", type: "{\"frequency\":100,\"unit\":\"MHz\"}")))
+        XCTAssertNil(Clock(variable: Variable(name: "clk", type: "{\"frequency\":s100,\"unit\":\"MHz\"}")))
+        XCTAssertNil(Clock(variable: Variable(name: "clk", type: "{\"frequency\":100,\"unit\":\"MHzs\"}")))
+    }
+
+    /// Test ``ModelConvertible`` conformance.
+    func testConvertInit() {
+        XCTAssertEqual(Clock(convert: variable), Clock(variable: variable))
     }
 
 }

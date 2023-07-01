@@ -1,5 +1,5 @@
-// Variable+testConstants.swift
-// Machines
+// ModelConvertible.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
@@ -54,59 +54,96 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import LLFSMModel
+import VHDLMachines
 import VHDLParsing
 
-// swiftlint:disable force_unwrapping
+/// Add generic protocol for types that can be converted from other types.
+protocol ModelConvertible {
 
-/// Add test constants.
-extension VariableName {
+    /// The type to convert from.
+    associatedtype Convertible
 
-    static var a: VariableName { VariableName(rawValue: "A")! }
-
-    static var clk2: VariableName { VariableName(rawValue: "clk2")! }
-
-    static var g: VariableName { VariableName(rawValue: "g")! }
-
-    static var initialX: VariableName { VariableName(rawValue: "initialX")! }
-
-    static var p: VariableName { VariableName(rawValue: "p")! }
-
-    static var r: VariableName { VariableName(rawValue: "r")! }
-
-    static var s: VariableName { VariableName(rawValue: "s")! }
-
-    static var x: VariableName { VariableName(rawValue: "x")! }
-
-    static var xx: VariableName { VariableName(rawValue: "xx")! }
-
-    static var xs: VariableName { VariableName(rawValue: "xs")! }
-
-    static var y: VariableName { VariableName(rawValue: "y")! }
-
-    static var z: VariableName { VariableName(rawValue: "z")! }
-
-    static var s0: VariableName { VariableName(rawValue: "S0")! }
-
-    static var s1: VariableName { VariableName(rawValue: "S1")! }
-
-    static var state0: VariableName { VariableName(rawValue: "State0")! }
-
-    static var parX: VariableName { VariableName(rawValue: "parX")! }
-
-    static var ping: VariableName { VariableName(rawValue: "ping")! }
-
-    static var pong: VariableName { VariableName(rawValue: "pong")! }
-
-    static var parXs: VariableName { VariableName(rawValue: "parXs")! }
-
-    static var retX: VariableName { VariableName(rawValue: "retX")! }
-
-    static var retXs: VariableName { VariableName(rawValue: "retXs")! }
-
-    static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
-
-    static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
+    /// Initialise Self from a convertible type.
+    /// - Parameter convert: The type to convert.
+    init?(convert: Convertible)
 
 }
 
-// swiftlint:enable force_unwrapping
+/// Add ``ModelConvertible`` initialiser.
+extension Array where Element: ModelConvertible {
+
+    /// Create a new array from an array of ``ModelConvertible`` conforment types.
+    /// - Parameter convert: The array to convert.
+    init?<T>(convert: [T]) where T == Element.Convertible {
+        var others = [Element]()
+        for item in convert {
+            guard let other = Element(convert: item) else {
+                return nil
+            }
+            others.append(other)
+        }
+        self = others
+    }
+
+}
+
+/// Add ``ModelConvertible`` conformance.
+extension Clock: ModelConvertible {
+
+    /// Create a new ``Clock`` from a `LLFSMModel.Variable`.
+    /// - Parameter convert: The variable to convert.
+    @inlinable
+    init?(convert: Variable) {
+        self.init(variable: convert)
+    }
+
+}
+
+/// Add ``ModelConvertible`` conformance.
+extension LocalSignal: ModelConvertible {
+
+    /// Create a new ``LocalSignal`` from a `LLFSMModel.Variable`.
+    /// - Parameter convert: The variable to convert.
+    @inlinable
+    init?(convert: Variable) {
+        self.init(variable: convert)
+    }
+
+}
+
+/// Add ``ModelConvertible`` conformance.
+extension Parameter: ModelConvertible {
+
+    /// Convert a `LLFSMModel.Variable` into a ``Parameter``.
+    /// - Parameter convert: The variable to convert.
+    @inlinable
+    init?(convert: Variable) {
+        self.init(parameter: convert)
+    }
+
+}
+
+/// Add ``ModelConvertible`` conformance.
+extension PortSignal: ModelConvertible {
+
+    /// Convert a `LLFSMModel.ExternalVariable` into a ``PortSignal``.
+    /// - Parameter convert: The variable to convert.
+    @inlinable
+    init?(convert: ExternalVariable) {
+        self.init(variable: convert)
+    }
+
+}
+
+/// Add ``ModelConvertible`` conformance.
+extension ReturnableVariable: ModelConvertible {
+
+    /// Convert an `LLFSMModel.Variable` into a ``ReturnableVariable``.
+    /// - Parameter convert: The variable to convert.
+    @inlinable
+    init?(convert: Variable) {
+        self.init(variable: convert)
+    }
+
+}

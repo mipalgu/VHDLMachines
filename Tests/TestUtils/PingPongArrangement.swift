@@ -59,19 +59,19 @@ import Foundation
 import VHDLParsing
 
 /// A factory for creating a PingPong arrangement.
-struct PingPongArrangement {
+public struct PingPongArrangement {
 
     /// The path to the package root.
-    let packageRootPath = URL(fileURLWithPath: #file)
+    public let packageRootPath = URL(fileURLWithPath: #file)
         .pathComponents.prefix { $0 != "Tests" }.joined(separator: "/").dropFirst()
 
     /// The path to the machines folder.
-    var machinesFolder: String {
+    public var machinesFolder: String {
         String(packageRootPath) + "/Tests/VHDLMachinesTests/machines"
     }
 
     /// The path to the machines folder.
-    var machinePath: URL {
+    public var machinePath: URL {
         URL(fileURLWithPath: machinesFolder, isDirectory: true)
     }
 
@@ -79,49 +79,49 @@ struct PingPongArrangement {
     private let encoder = JSONEncoder()
 
     /// The path to the arrangement.
-    var arrangementPath: URL {
+    public var arrangementPath: URL {
         URL(fileURLWithPath: machinesFolder + "/PingPongArrangement.json", isDirectory: false)
     }
 
     /// The path to the ping machine folder.
-    var pingMachinePath: URL {
+    public var pingMachinePath: URL {
         URL(fileURLWithPath: machinesFolder + "/PingMachine.machine", isDirectory: true)
     }
 
     /// The path to the pong machine folder.
-    var pongMachinePath: URL {
+    public var pongMachinePath: URL {
         URL(fileURLWithPath: machinesFolder + "/PongMachine.machine", isDirectory: true)
     }
 
     /// The path to the ping machine.
-    var pingPath: URL {
+    public var pingPath: URL {
         URL(fileURLWithPath: machinesFolder + "/PingMachine.machine/machine.json", isDirectory: false)
     }
 
     /// The path to the pong machine.
-    var pongPath: URL {
+    public var pongPath: URL {
         URL(fileURLWithPath: machinesFolder + "/PongMachine.machine/machine.json", isDirectory: false)
     }
 
     // swiftlint:disable force_unwrapping
 
     /// The ping states actions.
-    let pingActions: [ActionName: SynchronousBlock] = [
+    public let pingActions: [ActionName: SynchronousBlock] = [
         VariableName.onExit: SynchronousBlock(rawValue: "ping <= '1';")!
     ]
 
     /// The pong states actions.
-    let pongActions: [ActionName: SynchronousBlock] = [
+    public let pongActions: [ActionName: SynchronousBlock] = [
         VariableName.onExit: SynchronousBlock(rawValue: "pong <= '1';")!
     ]
 
     /// The action order.
-    let actionOrder: [[ActionName]] = [
+    public let actionOrder: [[ActionName]] = [
         [VariableName.onEntry], [VariableName.internal, VariableName.onExit]
     ]
 
     /// The Ping state.
-    var pingState: State {
+    public var pingState: State {
         State(
             name: VariableName(rawValue: "Ping")!,
             actions: pingActions,
@@ -131,7 +131,7 @@ struct PingPongArrangement {
     }
 
     /// The Pong state.
-    var pongState: State {
+    public var pongState: State {
         State(
             name: VariableName(rawValue: "Pong")!,
             actions: pongActions,
@@ -141,27 +141,27 @@ struct PingPongArrangement {
     }
 
     /// The ping Signals.
-    let pingSignals = [
+    public let pingSignals = [
         PortSignal(type: .stdLogic, name: VariableName(rawValue: "ping")!, mode: .output),
         PortSignal(type: .stdLogic, name: VariableName(rawValue: "pong")!, mode: .input)
     ]
 
     /// The pong Signals.
-    let pongSignals = [
+    public let pongSignals = [
         PortSignal(type: .stdLogic, name: VariableName(rawValue: "ping")!, mode: .input),
         PortSignal(type: .stdLogic, name: VariableName(rawValue: "pong")!, mode: .output)
     ]
 
     /// The clocks.
-    let clocks = [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)]
+    public let clocks = [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)]
 
     /// The ping states transition.
-    let pingTransition = Transition(
+    public let pingTransition = Transition(
         condition: .conditional(condition: .literal(value: true)), source: 0, target: 1
     )
 
     /// The ping wait states transition.
-    let pingWaitTransition = Transition(
+    public let pingWaitTransition = Transition(
         condition: .conditional(condition: .comparison(value: .equality(
             lhs: .reference(variable: .variable(name: VariableName(rawValue: "pong")!)),
             rhs: .literal(value: .bit(value: .high))
@@ -171,12 +171,12 @@ struct PingPongArrangement {
     )
 
     /// The pong states transition.
-    let pongTransition = Transition(
+    public let pongTransition = Transition(
         condition: .conditional(condition: .literal(value: true)), source: 1, target: 0
     )
 
     /// The pong wait states transition.
-    let pongWaitTransition = Transition(
+    public let pongWaitTransition = Transition(
         condition: .conditional(condition: .comparison(value: .equality(
             lhs: .reference(variable: .variable(name: VariableName(rawValue: "ping")!)),
             rhs: .literal(value: .bit(value: .high))
@@ -186,14 +186,14 @@ struct PingPongArrangement {
     )
 
     /// The includes.
-    let includes: [Include] = [
+    public let includes: [Include] = [
         .library(value: "IEEE"),
         .include(value: "IEEE.STD_LOGIC_1164.ALL"),
         .include(value: "IEEE.NUMERIC_STD.ALL")
     ]
 
     /// The ping machine.
-    var pingMachine: Machine {
+    public var pingMachine: Machine {
         Machine(
             actions: [.onEntry, .onExit, .internal],
             name: VariableName(rawValue: "PingMachine")!,
@@ -215,7 +215,7 @@ struct PingPongArrangement {
     }
 
     /// The pong machine.
-    var pongMachine: Machine {
+    public var pongMachine: Machine {
         Machine(
             actions: [.onEntry, .onExit, .internal],
             name: VariableName(rawValue: "PongMachine")!,
@@ -237,7 +237,7 @@ struct PingPongArrangement {
     }
 
     /// The arrangement.
-    var arrangement: Arrangement {
+    public var arrangement: Arrangement {
         Arrangement(
             machines: [
                 VariableName(rawValue: "PingMachine")!: pingPath,
@@ -252,7 +252,7 @@ struct PingPongArrangement {
     }
 
     /// The VHDL code for the Ping machine.
-    let pingCode = """
+    public let pingCode = """
     library IEEE;
     use IEEE.STD_LOGIC_1164.ALL;
     use IEEE.NUMERIC_STD.ALL;
@@ -341,12 +341,15 @@ struct PingPongArrangement {
 
     """
 
+    /// Default initialiser.
+    public init() {}
+
     /// Create a check state.
     /// - Parameters:
     ///   - externalVariables: The variables to check.
     ///   - reset: What to reset.
     /// - Returns: The check state.
-    func checkState(externalVariables: [VariableName], reset: String) -> State {
+    public func checkState(externalVariables: [VariableName], reset: String) -> State {
         State(
             name: VariableName(rawValue: "Check")!,
             actions: emptyActions(reset: reset),
@@ -361,7 +364,7 @@ struct PingPongArrangement {
     /// - Parameters:
     ///   - path: The path to write to.
     ///   - value: The value to write.
-    func write<T>(to path: URL, _ value: T) throws where T: Encodable {
+    public func write<T>(to path: URL, _ value: T) throws where T: Encodable {
         encoder.outputFormatting = .prettyPrinted
         let data = try encoder.encode(value)
         try data.write(to: path)
@@ -370,7 +373,7 @@ struct PingPongArrangement {
     /// Actions with a reset in the onExit.
     /// - Parameter reset: The reset.
     /// - Returns: The actions.
-    func emptyActions(reset: String) -> [ActionName: SynchronousBlock] {
+    public func emptyActions(reset: String) -> [ActionName: SynchronousBlock] {
         [
             // swiftlint:disable:next force_unwrapping
             VariableName.onExit: SynchronousBlock(rawValue: "\(reset) <= '0';")!
