@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  exec-mac-ci-release:
+  exec-mac13-ci-release:
     runs-on: macos-13
 
     steps:

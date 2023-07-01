@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  exec-mac-ci-debug:
+  exec-mac13-ci-debug:
     runs-on: macos-13
 
     steps:
