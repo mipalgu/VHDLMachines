@@ -59,8 +59,13 @@ import LLFSMModel
 import VHDLMachines
 import VHDLParsing
 
+/// Add `LLFSMModel` conversions.
 extension VHDLMachines.Machine {
 
+    // swiftlint:disable function_body_length
+
+    /// Convert an `LLFSMModel.Machine` into a `VHDLMachines.Machine`.
+    /// - Parameter machine: The machine to convert.
     public init?(machine: LLFSMModel.Machine) {
         guard
             let name = VariableName(rawValue: machine.name),
@@ -119,6 +124,8 @@ extension VHDLMachines.Machine {
             suspendedState: suspendedState
         )
     }
+
+    // swiftlint:enable function_body_length
 
 }
 

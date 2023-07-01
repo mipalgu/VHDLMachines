@@ -118,6 +118,61 @@ final class MachineTests: XCTestCase {
             return
         }
         XCTAssertEqual(newMachine, expected)
+        expected.parameterSignals = []
+        expected.returnableSignals = []
+        expected.isParameterised = false
+        expected.suspendedState = nil
+        XCTAssertEqual(
+            VHDLMachines.Machine(machine: LLFSMModel.Machine(
+                externalVariables: model.externalVariables,
+                globalVariables: model.globalVariables,
+                initialState: model.initialState,
+                name: model.name,
+                parameters: [],
+                returnables: [],
+                states: model.states,
+                suspendedState: nil,
+                variables: model.variables
+            )),
+            expected
+        )
+    }
+
+    /// Test that `init(machine:)` returns nil for invalid data.
+    func testInitFails() {
+        XCTAssertNil(VHDLMachines.Machine(machine: LLFSMModel.Machine(
+                externalVariables: model.externalVariables,
+                globalVariables: model.globalVariables,
+                initialState: "NullState",
+                name: model.name,
+                parameters: model.parameters,
+                returnables: model.returnables,
+                states: model.states,
+                suspendedState: model.suspendedState,
+                variables: model.variables
+        )))
+        XCTAssertNil(VHDLMachines.Machine(machine: LLFSMModel.Machine(
+                externalVariables: model.externalVariables,
+                globalVariables: model.globalVariables,
+                initialState: "Initial",
+                name: "",
+                parameters: model.parameters,
+                returnables: model.returnables,
+                states: model.states,
+                suspendedState: model.suspendedState,
+                variables: model.variables
+        )))
+        XCTAssertNil(VHDLMachines.Machine(machine: LLFSMModel.Machine(
+                externalVariables: model.externalVariables,
+                globalVariables: model.globalVariables,
+                initialState: model.initialState,
+                name: model.name,
+                parameters: model.parameters,
+                returnables: model.returnables,
+                states: model.states,
+                suspendedState: "NullState",
+                variables: model.variables
+        )))
     }
 
 }
