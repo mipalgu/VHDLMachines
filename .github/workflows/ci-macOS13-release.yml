@@ -1,4 +1,4 @@
-name: MacOS Monterey Swift Release CI
+name: MacOS Ventura Swift Release CI
 
 on:
   push:
