@@ -100,7 +100,11 @@ extension VHDLMachines.Machine {
             path: URL(
                 fileURLWithPath: "\(FileManager().currentDirectoryPath)/\(name).machine", isDirectory: true
             ),
-            includes: [],
+            includes: [
+                .library(value: "IEEE"),
+                .include(value: "IEEE.std_logic_1164.ALL"),
+                .include(value: "IEEE.math_real.ALL")
+            ],
             externalSignals: externalVariables,
             clocks: clocks,
             drivingClock: 0,
