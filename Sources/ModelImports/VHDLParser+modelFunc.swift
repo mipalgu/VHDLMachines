@@ -61,8 +61,13 @@ import IO
 import LLFSMModel
 import VHDLMachines
 
+/// Add support for parsing `LLFSMModel` structures.
 extension VHDLParser {
 
+    /// Parse a `LLFSMModel.Machine` JSON file from a `FileWrapper`.
+    /// - Parameter wrapper: The wrapper representing the JSON file.
+    /// - Returns: The parsed `VHDLMachines.Machine` structure.
+    @inlinable
     public func parseModel(model wrapper: FileWrapper) -> VHDLMachines.Machine? {
         let decoder = JSONDecoder()
         guard

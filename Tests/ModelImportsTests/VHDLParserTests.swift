@@ -131,4 +131,14 @@ final class VHDLParserTests: XCTestCase {
         XCTAssertEqual(machine, expectedMachine)
     }
 
+    /// Test parser returns nil for invalid model.
+    func testInvalidModel() {
+        guard let model = "{}".data(using: .utf8) else {
+            XCTFail("Failed to create model!")
+            return
+        }
+        let wrapper = FileWrapper(regularFileWithContents: model)
+        XCTAssertNil(parser.parseModel(model: wrapper))
+    }
+
 }
