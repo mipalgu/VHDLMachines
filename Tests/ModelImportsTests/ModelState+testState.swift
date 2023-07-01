@@ -64,15 +64,23 @@ extension State {
     ///   - name: The name of the state.
     ///   - transitions: The transitions for this tate.
     ///   - variables: The variables local to this state.
-    init(name: String, transitions: [Transition] = [], variables: [Variable] = []) {
-        self.init(
-            actions: [
+    init(
+        name: String, actions: [String: String]? = nil, transitions: [Transition] = [], variables: [Variable] = []
+    ) {
+        let action: [String: String]
+        if let actions {
+            action = actions
+        } else {
+            action = [
                 "OnEntry": "x <= '1';\nxx <= \"00\"; -- \(name) onEntry",
                 "OnExit": "x <= '0'; -- \(name) OnExit",
                 "OnResume": "x <= '0'; -- \(name) OnResume",
                 "OnSuspend": "xx <= \"11\"; -- \(name) onSuspend",
                 "Internal": "x <= '1'; -- \(name) Internal"
-            ],
+            ]
+        }
+        self.init(
+            actions: action,
             externalVariables: [],
             name: name,
             transitions: transitions,

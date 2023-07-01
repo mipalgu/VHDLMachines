@@ -84,6 +84,13 @@ extension Machine {
         states: [
             State(
                 name: "Initial",
+                actions: [
+                    "OnEntry": "z <= '0';",
+                    "OnExit": "x <= '0'; -- Initial OnExit",
+                    "OnResume": "x <= '0'; -- Initial OnResume",
+                    "OnSuspend": "xx <= \"11\"; -- Initial onSuspend",
+                    "Internal": "x <= '1'; -- Initial Internal"
+                ],
                 transitions: [
                     Transition(target: "Suspended", condition: "z = '1'"),
                     Transition(target: "Suspended", condition: "false"),
