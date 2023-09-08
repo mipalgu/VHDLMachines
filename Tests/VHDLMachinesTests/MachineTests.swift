@@ -70,8 +70,6 @@ final class MachineTests: XCTestCase {
         VariableName(rawValue: "M0")!
     }
 
-    // swiftlint:enable force_unwrapping
-
     /// The path to the machine.
     var path: URL {
         URL(fileURLWithPath: "/path/to/M0")
@@ -80,10 +78,12 @@ final class MachineTests: XCTestCase {
     /// The includes for the machine.
     var includes: [Include] {
         [
-            .include(value: "IEEE.STD_LOGIC_1164.ALL"),
-            .include(value: "IEEE.NUMERIC_STD.ALL")
+            .include(statement: UseStatement(rawValue: "IEEE.STD_LOGIC_1164.ALL")!),
+            .include(statement: UseStatement(rawValue: "IEEE.NUMERIC_STD.ALL")!)
         ]
     }
+
+    // swiftlint:enable force_unwrapping
 
     /// The external signals for the machine.
     var externalSignals: [PortSignal] {
@@ -203,7 +203,8 @@ final class MachineTests: XCTestCase {
     /// The architecture body for the machine.
     var architectureBody: AsynchronousBlock {
         .statement(statement: .assignment(
-            name: .variable(name: .s), value: .literal(value: .bit(value: .high))
+            name: .variable(reference: .variable(name: .s)),
+            value: .expression(value: .literal(value: .bit(value: .high)))
         ))
     }
 
@@ -287,7 +288,7 @@ final class MachineTests: XCTestCase {
     func testGettersAndSetters() {
         let newMachineName = VariableName(rawValue: "M3")!
         let newPath = URL(fileURLWithPath: "/path/to/M3")
-        let newIncludes = [Include.include(value: "IEEE.STD_LOGIC_1164.ALL")]
+        let newIncludes = [Include.include(statement: UseStatement(rawValue: "IEEE.STD_LOGIC_1164.ALL")!)]
         let newExternalSignals = [
             PortSignal(
                 type: .stdLogic,
@@ -345,7 +346,8 @@ final class MachineTests: XCTestCase {
             ))
         ]
         let newArchitectureBody = AsynchronousBlock.statement(statement: .assignment(
-            name: .variable(name: .g), value: .literal(value: .bit(value: .low))
+            name: .variable(reference: .variable(name: .g)),
+            value: .expression(value: .literal(value: .bit(value: .low)))
         ))
         machine.name = newMachineName
         machine.path = newPath
@@ -390,9 +392,9 @@ final class MachineTests: XCTestCase {
             name: VariableName(rawValue: "NewMachine")!,
             path: path,
             includes: [
-                .library(value: "IEEE"),
-                .include(value: "IEEE.std_logic_1164.All"),
-                .include(value: "IEEE.math_real.All")
+                .library(value: VariableName(rawValue: "IEEE")!),
+                .include(statement: UseStatement(rawValue: "IEEE.std_logic_1164.All")!),
+                .include(statement: UseStatement(rawValue: "IEEE.math_real.All")!)
             ],
             externalSignals: [],
             clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],

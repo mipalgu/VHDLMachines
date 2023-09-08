@@ -73,7 +73,9 @@ final class SynchronousBlockTests: XCTestCase {
             result,
             .ifStatement(block: .ifStatement(
                 condition: .conditional(condition: .edge(
-                    value: .rising(expression: .reference(variable: .variable(name: .clk)))
+                    value: .rising(expression: .reference(
+                        variable: .variable(reference: .variable(name: .clk))
+                    ))
                 )),
                 ifBlock: .caseStatement(block: statement)
             ))

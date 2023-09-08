@@ -62,10 +62,10 @@ import XCTest
 final class ForLoopInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// A `y` variable.
-    let y = Expression.reference(variable: .variable(name: .y))
+    let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     // swiftlint:disable force_unwrapping
 
@@ -76,7 +76,7 @@ final class ForLoopInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// Test replace init replaces the correct variables in range.
@@ -101,7 +101,9 @@ final class ForLoopInitTests: XCTestCase {
         let original = ForLoop(
             iterator: .z,
             range: range,
-            body: .statement(statement: .assignment(name: .variable(name: .y), value: x))
+            body: .statement(statement: .assignment(
+                name: .variable(reference: .variable(name: .y)), value: x
+            ))
         )
         let result = ForLoop(loop: original, replacing: .x, with: newX)
         XCTAssertEqual(
@@ -109,7 +111,9 @@ final class ForLoopInitTests: XCTestCase {
             ForLoop(
                 iterator: .z,
                 range: range,
-                body: .statement(statement: .assignment(name: .variable(name: .y), value: expNewX))
+                body: .statement(statement: .assignment(
+                    name: .variable(reference: .variable(name: .y)), value: expNewX
+                ))
             )
         )
     }

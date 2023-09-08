@@ -62,10 +62,10 @@ import XCTest
 final class SynchronousBlockInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// A `y` variable.
-    let y = Expression.reference(variable: .variable(name: .y))
+    let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     // swiftlint:disable force_unwrapping
 
@@ -76,19 +76,21 @@ final class SynchronousBlockInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// Test that all blocks are replaced correctly.
     func testBlock() {
         let original = SynchronousBlock.blocks(blocks: [
-            .statement(statement: .assignment(name: .variable(name: .x), value: y)),
-            .statement(statement: .assignment(name: .variable(name: .y), value: x))
+            .statement(statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)),
+            .statement(statement: .assignment(name: .variable(reference: .variable(name: .y)), value: x))
         ])
         let result = SynchronousBlock(block: original, replacing: .x, with: newX)
         XCTAssertEqual(result, SynchronousBlock.blocks(blocks: [
-            .statement(statement: .assignment(name: .variable(name: newX), value: y)),
-            .statement(statement: .assignment(name: .variable(name: .y), value: expNewX))
+            .statement(statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)),
+            .statement(statement: .assignment(
+                name: .variable(reference: .variable(name: .y)), value: expNewX
+            ))
         ]))
     }
 
@@ -121,7 +123,8 @@ final class SynchronousBlockInitTests: XCTestCase {
         )
         let result = SynchronousBlock(block: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, SynchronousBlock.ifStatement(
+            result,
+            SynchronousBlock.ifStatement(
                 block: .ifStatement(condition: expNewX, ifBlock: .statement(statement: .null))
             )
         )
@@ -129,10 +132,15 @@ final class SynchronousBlockInitTests: XCTestCase {
 
     /// Test statement.
     func testStatement() {
-        let original = SynchronousBlock.statement(statement: .assignment(name: .variable(name: .x), value: y))
+        let original = SynchronousBlock.statement(
+            statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)
+        )
         let result = SynchronousBlock(block: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, SynchronousBlock.statement(statement: .assignment(name: .variable(name: newX), value: y))
+            result,
+            SynchronousBlock.statement(
+                statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
+            )
         )
     }
 

@@ -164,7 +164,7 @@ final class ArchitectureHeadTests: XCTestCase {
             .definition(value: .signal(value: LocalSignal(
                 type: internalStateType,
                 name: .internalState,
-                defaultValue: .reference(variable: .variable(name: .readSnapshot)),
+                defaultValue: .reference(variable: .variable(reference: .variable(name: .readSnapshot))),
                 comment: nil
             ))),
             .comment(value: Comment(rawValue: "-- State Representation Bits")!),
@@ -195,17 +195,17 @@ final class ArchitectureHeadTests: XCTestCase {
             .definition(value: .signal(value: LocalSignal(
                 type: stateType,
                 name: .currentState,
-                defaultValue: .reference(variable: .variable(
+                defaultValue: .reference(variable: .variable(reference: .variable(
                     name: VariableName(rawValue: "STATE_\(VariableName.suspendedState)")!
-                )),
+                ))),
                 comment: nil
             ))),
             .definition(value: .signal(value: LocalSignal(
                 type: stateType,
                 name: .targetState,
-                defaultValue: .reference(variable: .variable(
+                defaultValue: .reference(variable: .variable(reference: .variable(
                     name: VariableName(rawValue: "STATE_\(VariableName.suspendedState)")!
-                )),
+                ))),
                 comment: nil
             ))),
             .definition(value: .signal(value: LocalSignal(
@@ -219,9 +219,9 @@ final class ArchitectureHeadTests: XCTestCase {
             .definition(value: .signal(value: LocalSignal(
                 type: stateType,
                 name: .suspendedFrom,
-                defaultValue: .reference(variable: .variable(
+                defaultValue: .reference(variable: .variable(reference: .variable(
                     name: VariableName(rawValue: "STATE_\(VariableName.initial)")!
-                )),
+                ))),
                 comment: nil
             ))),
             .comment(value: Comment(rawValue: "-- Suspension Commands")!),
@@ -275,7 +275,7 @@ final class ArchitectureHeadTests: XCTestCase {
                 type: .real,
                 value: .binary(operation: .multiplication(
                     lhs: .literal(value: .decimal(value: 5.0)),
-                    rhs: .reference(variable: .variable(name: .clockPeriod))
+                    rhs: .reference(variable: .variable(reference: .variable(name: .clockPeriod)))
                 ))
             )!)),
             .definition(value: .constant(value: ConstantSignal(
@@ -283,7 +283,7 @@ final class ArchitectureHeadTests: XCTestCase {
                 type: .real,
                 value: .binary(operation: .division(
                     lhs: .literal(value: .decimal(value: 1.0)),
-                    rhs: .reference(variable: .variable(name: .ringletLength))
+                    rhs: .reference(variable: .variable(reference: .variable(name: .ringletLength)))
                 ))
             )!)),
             .definition(value: .constant(value: ConstantSignal(
@@ -291,7 +291,7 @@ final class ArchitectureHeadTests: XCTestCase {
                 type: .real,
                 value: .binary(operation: .multiplication(
                     lhs: .literal(value: .decimal(value: 1000.0)),
-                    rhs: .reference(variable: .variable(name: .ringletPerPs))
+                    rhs: .reference(variable: .variable(reference: .variable(name: .ringletPerPs)))
                 ))
             )!)),
             .definition(value: .constant(value: ConstantSignal(
@@ -299,7 +299,7 @@ final class ArchitectureHeadTests: XCTestCase {
                 type: .real,
                 value: .binary(operation: .multiplication(
                     lhs: .literal(value: .decimal(value: 1_000_000.0)),
-                    rhs: .reference(variable: .variable(name: .ringletPerPs))
+                    rhs: .reference(variable: .variable(reference: .variable(name: .ringletPerPs)))
                 ))
             )!)),
             .definition(value: .constant(value: ConstantSignal(
@@ -307,7 +307,7 @@ final class ArchitectureHeadTests: XCTestCase {
                 type: .real,
                 value: .binary(operation: .multiplication(
                     lhs: .literal(value: .decimal(value: 1_000_000_000.0)),
-                    rhs: .reference(variable: .variable(name: .ringletPerPs))
+                    rhs: .reference(variable: .variable(reference: .variable(name: .ringletPerPs)))
                 ))
             )!)),
             .definition(value: .constant(value: ConstantSignal(
@@ -315,7 +315,7 @@ final class ArchitectureHeadTests: XCTestCase {
                 type: .real,
                 value: .binary(operation: .multiplication(
                     lhs: .literal(value: .decimal(value: 1_000_000_000_000.0)),
-                    rhs: .reference(variable: .variable(name: .ringletPerPs))
+                    rhs: .reference(variable: .variable(reference: .variable(name: .ringletPerPs)))
                 ))
             )!)),
             .comment(value: Comment(rawValue: "-- Snapshot of External Signals and Variables")!),

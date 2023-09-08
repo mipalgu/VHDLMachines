@@ -75,7 +75,7 @@ final class PortSignalTests: XCTestCase {
         XCTAssertEqual(signal.defaultValue, .literal(value: .bit(value: .high)))
         XCTAssertEqual(signal.mode, .input)
         XCTAssertEqual(signal.name, .x)
-        XCTAssertEqual(signal.type, .stdLogic)
+        XCTAssertEqual(signal.type, .signal(type: .stdLogic))
         XCTAssertNil(signal.comment)
     }
 
@@ -91,7 +91,7 @@ final class PortSignalTests: XCTestCase {
         XCTAssertNil(signal.defaultValue)
         XCTAssertEqual(signal.mode, .input)
         XCTAssertEqual(signal.name, .x)
-        XCTAssertEqual(signal.type, .stdLogic)
+        XCTAssertEqual(signal.type, .signal(type: .stdLogic))
         XCTAssertNil(signal.comment)
     }
 

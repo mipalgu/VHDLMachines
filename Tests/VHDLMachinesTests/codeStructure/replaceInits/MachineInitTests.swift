@@ -62,10 +62,10 @@ import XCTest
 final class MachineInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// A `y` variable.
-    let y = Expression.reference(variable: .variable(name: .y))
+    let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     // swiftlint:disable force_unwrapping
 
@@ -79,12 +79,12 @@ final class MachineInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// `newY` as an expression.
     var expNewY: Expression {
-        .reference(variable: .variable(name: newY))
+        .reference(variable: .variable(reference: .variable(name: newY)))
     }
 
     /// Test that all states are replaced correctly.
@@ -96,19 +96,19 @@ final class MachineInitTests: XCTestCase {
         machine.states[0].signals = [LocalSignal(type: .stdLogic, name: .x)]
         machine.states[1].signals = [LocalSignal(type: .stdLogic, name: .y)]
         machine.states[0].actions[.onEntry] = .statement(
-            statement: .assignment(name: .variable(name: .x), value: y)
+            statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)
         )
         machine.states[1].actions[.onEntry] = .statement(
-            statement: .assignment(name: .variable(name: .x), value: y)
+            statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)
         )
         machine.states = [machine.states[0], machine.states[1]]
         var expected = machine
         let result = Machine(replacingStateRefsIn: machine)
         expected.states[0].actions[.onEntry] = .statement(
-            statement: .assignment(name: .variable(name: newX), value: y)
+            statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
         )
         expected.states[1].actions[.onEntry] = .statement(
-            statement: .assignment(name: .variable(name: .x), value: expNewY)
+            statement: .assignment(name: .variable(reference: .variable(name: .x)), value: expNewY)
         )
         expected.transitions = [Transition(condition: .variable(name: newX), source: 0, target: 1)]
         XCTAssertEqual(result, expected)

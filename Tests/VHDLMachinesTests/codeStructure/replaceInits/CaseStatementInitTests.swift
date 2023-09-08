@@ -62,10 +62,10 @@ import XCTest
 final class CaseStatementInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// A `y` variable.
-    let y = Expression.reference(variable: .variable(name: .y))
+    let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     // swiftlint:disable force_unwrapping
 
@@ -76,7 +76,7 @@ final class CaseStatementInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// Test that the condition is replaced correctly.
@@ -93,7 +93,9 @@ final class CaseStatementInitTests: XCTestCase {
             WhenCase(condition: .expression(expression: x), code: .statement(statement: .null)),
             WhenCase(
                 condition: .expression(expression: y),
-                code: .statement(statement: .assignment(name: .variable(name: .y), value: x))
+                code: .statement(statement: .assignment(
+                    name: .variable(reference: .variable(name: .y)), value: x
+                ))
             )
         ]
         let original = CaseStatement(condition: y, cases: cases)
@@ -102,7 +104,9 @@ final class CaseStatementInitTests: XCTestCase {
             WhenCase(condition: .expression(expression: expNewX), code: .statement(statement: .null)),
             WhenCase(
                 condition: .expression(expression: y),
-                code: .statement(statement: .assignment(name: .variable(name: .y), value: expNewX))
+                code: .statement(statement: .assignment(
+                    name: .variable(reference: .variable(name: .y)), value: expNewX
+                ))
             )
         ]))
     }

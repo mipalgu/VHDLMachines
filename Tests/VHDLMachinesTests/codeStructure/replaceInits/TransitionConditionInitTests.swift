@@ -62,10 +62,10 @@ import XCTest
 final class TransitionConditionInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// A `y` variable.
-    let y = Expression.reference(variable: .variable(name: .y))
+    let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     /// An `x` variable.
     let xC = TransitionCondition.variable(name: .x)
@@ -82,7 +82,7 @@ final class TransitionConditionInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// `newX` as a ``TransitionCondition``.

@@ -80,7 +80,8 @@ final class StateTests: XCTestCase {
         name: .initial,
         actions: [
             .onEntry: .statement(statement: .assignment(
-                name: .variable(name: .y), value: .reference(variable: .variable(name: .x))
+                name: .variable(reference: .variable(name: .y)),
+                value: .reference(variable: .variable(reference: .variable(name: .x)))
             ))
         ],
         signals: [LocalSignal(type: .stdLogic, name: .y)],
@@ -93,7 +94,8 @@ final class StateTests: XCTestCase {
             name: .initial,
             actions: [
                 .onEntry: .statement(statement: .assignment(
-                    name: .variable(name: .y), value: .reference(variable: .variable(name: .x))
+                    name: .variable(reference: .variable(name: .y)),
+                    value: .reference(variable: .variable(reference: .variable(name: .x)))
                 ))
             ],
             signals: [LocalSignal(type: .stdLogic, name: .y)],
@@ -198,7 +200,8 @@ final class StateTests: XCTestCase {
         }
         expected.actions = [
             .onExit: .statement(statement: .assignment(
-                name: .variable(name: .y), value: .reference(variable: .variable(name: .x))
+                name: .variable(reference: .variable(name: .y)),
+                value: .reference(variable: .variable(reference: .variable(name: .x)))
             ))
         ]
         XCTAssertEqual(state, expected)

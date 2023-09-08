@@ -62,10 +62,10 @@ import XCTest
 final class IfBlockInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// A `y` variable.
-    let y = Expression.reference(variable: .variable(name: .y))
+    let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     // swiftlint:disable force_unwrapping
 
@@ -76,7 +76,7 @@ final class IfBlockInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// Test simple statement condition.
@@ -89,14 +89,19 @@ final class IfBlockInitTests: XCTestCase {
     /// Test statement block.
     func testStatementBlock() {
         let original = IfBlock.ifStatement(
-            condition: y, ifBlock: .statement(statement: .assignment(name: .variable(name: .x), value: y))
+            condition: y,
+            ifBlock: .statement(statement: .assignment(
+                name: .variable(reference: .variable(name: .x)), value: y
+            ))
         )
         let result = IfBlock(block: original, replacing: .x, with: newX)
         XCTAssertEqual(
             result,
             IfBlock.ifStatement(
                 condition: y,
-                ifBlock: .statement(statement: .assignment(name: .variable(name: newX), value: y))
+                ifBlock: .statement(statement: .assignment(
+                    name: .variable(reference: .variable(name: newX)), value: y
+                ))
             )
         )
     }
@@ -121,7 +126,9 @@ final class IfBlockInitTests: XCTestCase {
     func testIfElseStatement() {
         let original = IfBlock.ifElse(
             condition: y,
-            ifBlock: .statement(statement: .assignment(name: .variable(name: .x), value: y)),
+            ifBlock: .statement(statement: .assignment(
+                name: .variable(reference: .variable(name: .x)), value: y
+            )),
             elseBlock: .statement(statement: .null)
         )
         let result = IfBlock(block: original, replacing: .x, with: newX)
@@ -129,7 +136,9 @@ final class IfBlockInitTests: XCTestCase {
             result,
             IfBlock.ifElse(
                 condition: y,
-                ifBlock: .statement(statement: .assignment(name: .variable(name: newX), value: y)),
+                ifBlock: .statement(
+                    statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
+                ),
                 elseBlock: .statement(statement: .null)
             )
         )
@@ -140,7 +149,9 @@ final class IfBlockInitTests: XCTestCase {
         let original = IfBlock.ifElse(
             condition: y,
             ifBlock: .statement(statement: .null),
-            elseBlock: .statement(statement: .assignment(name: .variable(name: .x), value: y))
+            elseBlock: .statement(
+                statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)
+            )
         )
         let result = IfBlock(block: original, replacing: .x, with: newX)
         XCTAssertEqual(
@@ -148,7 +159,9 @@ final class IfBlockInitTests: XCTestCase {
             IfBlock.ifElse(
                 condition: y,
                 ifBlock: .statement(statement: .null),
-                elseBlock: .statement(statement: .assignment(name: .variable(name: newX), value: y))
+                elseBlock: .statement(
+                    statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
+                )
             )
         )
     }
