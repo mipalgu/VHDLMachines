@@ -76,8 +76,8 @@ extension Machine {
             path: directory.appendingPathComponent("TestMachine.machine", isDirectory: true),
             includes: [
                 .library(value: VariableName(rawValue: "IEEE")!),
-                .include(statement: UseStatement(rawValue: "IEEE.std_logic_1164.ALL")!),
-                .include(statement: UseStatement(rawValue: "IEEE.math_real.ALL")!)
+                .include(statement: UseStatement(rawValue: "use IEEE.std_logic_1164.ALL;")!),
+                .include(statement: UseStatement(rawValue: "use IEEE.math_real.ALL;")!)
             ],
             externalSignals: [
                 PortSignal(

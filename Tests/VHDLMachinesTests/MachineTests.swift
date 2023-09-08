@@ -78,8 +78,8 @@ final class MachineTests: XCTestCase {
     /// The includes for the machine.
     var includes: [Include] {
         [
-            .include(statement: UseStatement(rawValue: "IEEE.STD_LOGIC_1164.ALL")!),
-            .include(statement: UseStatement(rawValue: "IEEE.NUMERIC_STD.ALL")!)
+            .include(statement: UseStatement(rawValue: "use IEEE.STD_LOGIC_1164.ALL;")!),
+            .include(statement: UseStatement(rawValue: "use IEEE.NUMERIC_STD.ALL;")!)
         ]
     }
 
@@ -288,7 +288,9 @@ final class MachineTests: XCTestCase {
     func testGettersAndSetters() {
         let newMachineName = VariableName(rawValue: "M3")!
         let newPath = URL(fileURLWithPath: "/path/to/M3")
-        let newIncludes = [Include.include(statement: UseStatement(rawValue: "IEEE.STD_LOGIC_1164.ALL")!)]
+        let newIncludes = [
+            Include.include(statement: UseStatement(rawValue: "use IEEE.STD_LOGIC_1164.ALL;")!)
+        ]
         let newExternalSignals = [
             PortSignal(
                 type: .stdLogic,
@@ -393,8 +395,8 @@ final class MachineTests: XCTestCase {
             path: path,
             includes: [
                 .library(value: VariableName(rawValue: "IEEE")!),
-                .include(statement: UseStatement(rawValue: "IEEE.std_logic_1164.All")!),
-                .include(statement: UseStatement(rawValue: "IEEE.math_real.All")!)
+                .include(statement: UseStatement(rawValue: "use IEEE.std_logic_1164.All;")!),
+                .include(statement: UseStatement(rawValue: "use IEEE.math_real.All;")!)
             ],
             externalSignals: [],
             clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],

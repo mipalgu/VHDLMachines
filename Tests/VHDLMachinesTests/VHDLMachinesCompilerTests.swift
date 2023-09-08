@@ -173,8 +173,8 @@ class VHDLMachinesCompilerTests: XCTestCase {
     /// The vhdl code for the test machine.
     private let vhdl = """
         library IEEE;
-        use IEEE.std_logic_1164.ALL;
-        use IEEE.math_real.ALL;
+        use IEEE.std_logic_1164.all;
+        use IEEE.math_real.all;
 
         entity TestMachine is
             port(

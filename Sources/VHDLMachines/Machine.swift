@@ -157,8 +157,8 @@ public struct Machine: Codable, Equatable, Hashable {
             let nameComponent = path.lastPathComponent.components(separatedBy: ".machine").first,
             let name = VariableName(rawValue: nameComponent),
             let ieee = VariableName(rawValue: "IEEE"),
-            let stdLogicImport = UseStatement(rawValue: "IEEE.std_logic_1164.all"),
-            let mathRealImport = UseStatement(rawValue: "IEEE.math_real.all")
+            let stdLogicImport = UseStatement(rawValue: "use IEEE.std_logic_1164.all;"),
+            let mathRealImport = UseStatement(rawValue: "use IEEE.math_real.all;")
         else {
             return nil
         }
