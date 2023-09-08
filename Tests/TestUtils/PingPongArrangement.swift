@@ -163,7 +163,7 @@ public struct PingPongArrangement {
     /// The ping wait states transition.
     public let pingWaitTransition = Transition(
         condition: .conditional(condition: .comparison(value: .equality(
-            lhs: .reference(variable: .variable(name: VariableName(rawValue: "pong")!)),
+            lhs: .reference(variable: .variable(reference: .variable(name: VariableName(rawValue: "pong")!))),
             rhs: .literal(value: .bit(value: .high))
         ))),
         source: 1,
@@ -178,7 +178,7 @@ public struct PingPongArrangement {
     /// The pong wait states transition.
     public let pongWaitTransition = Transition(
         condition: .conditional(condition: .comparison(value: .equality(
-            lhs: .reference(variable: .variable(name: VariableName(rawValue: "ping")!)),
+            lhs: .reference(variable: .variable(reference: .variable(name: VariableName(rawValue: "ping")!))),
             rhs: .literal(value: .bit(value: .high))
         ))),
         source: 0,
@@ -187,9 +187,9 @@ public struct PingPongArrangement {
 
     /// The includes.
     public let includes: [Include] = [
-        .library(value: "IEEE"),
-        .include(value: "IEEE.STD_LOGIC_1164.ALL"),
-        .include(value: "IEEE.NUMERIC_STD.ALL")
+        .library(value: VariableName(rawValue: "IEEE")!),
+        .include(statement: UseStatement(rawValue: "IEEE.STD_LOGIC_1164.ALL")!),
+        .include(statement: UseStatement(rawValue: "IEEE.NUMERIC_STD.ALL")!)
     ]
 
     /// The ping machine.

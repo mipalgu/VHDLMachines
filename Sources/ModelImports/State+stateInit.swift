@@ -54,6 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import Foundation
 import LLFSMModel
 import VHDLMachines
 import VHDLParsing

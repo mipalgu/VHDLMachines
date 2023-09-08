@@ -68,16 +68,16 @@ extension Machine {
     public static func testMachine(directory: URL = PingPongArrangement().machinePath) -> Machine {
         var initialState = State.defaultState(name: .initial)
         initialState.actions[.onEntry] = .statement(statement: .assignment(
-            name: .variable(name: .z), value: .literal(value: .bit(value: .low))
+            name: .variable(reference: .variable(name: .z)), value: .literal(value: .bit(value: .low))
         ))
         var machine = VHDLMachines.Machine(
             actions: [.onEntry, .internal, .onExit, .onResume, .onSuspend],
             name: VariableName(rawValue: "TestMachine")!,
             path: directory.appendingPathComponent("TestMachine.machine", isDirectory: true),
             includes: [
-                .library(value: "IEEE"),
-                .include(value: "IEEE.std_logic_1164.ALL"),
-                .include(value: "IEEE.math_real.ALL")
+                .library(value: VariableName(rawValue: "IEEE")!),
+                .include(statement: UseStatement(rawValue: "IEEE.std_logic_1164.ALL")!),
+                .include(statement: UseStatement(rawValue: "IEEE.math_real.ALL")!)
             ],
             externalSignals: [
                 PortSignal(
@@ -168,7 +168,7 @@ extension Machine {
             transitions: [
                 VHDLMachines.Transition(
                     condition: .conditional(condition: .comparison(value: .equality(
-                        lhs: .reference(variable: .variable(name: .z)),
+                        lhs: .reference(variable: .variable(reference: .variable(name: .z))),
                         rhs: .literal(value: .bit(value: .high))
                     ))),
                     source: 0,
@@ -204,7 +204,7 @@ extension Machine {
                     // "xx = \"11\""
                     condition: .conditional(condition: .comparison(
                         value: .equality(
-                            lhs: .reference(variable: .variable(name: .xx)),
+                            lhs: .reference(variable: .variable(reference: .variable(name: .xx))),
                             rhs: .literal(value: .vector(
                                 value: .bits(value: BitVector(values: [.high, .high]))
                             ))
@@ -217,7 +217,7 @@ extension Machine {
                     // // "x = '1'"
                     condition: .conditional(condition: .comparison(
                         value: .equality(
-                            lhs: .reference(variable: .variable(name: .x)),
+                            lhs: .reference(variable: .variable(reference: .variable(name: .x))),
                             rhs: .literal(value: .bit(value: .high))
                         )
                     )),
