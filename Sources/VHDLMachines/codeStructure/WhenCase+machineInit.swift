@@ -100,7 +100,7 @@ extension WhenCase {
             return nil
         }
         self.init(
-            condition: .expression(expression: .reference(variable: .variable(name: .name(for: state)))),
+            condition: .expression(expression: .reference(variable: .variable(reference: .variable(name: .name(for: state))))),
             code: code
         )
     }
@@ -115,7 +115,7 @@ extension WhenCase {
             return nil
         }
         let condition = WhenCondition.expression(
-            expression: .reference(variable: .variable(name: .name(for: state)))
+            expression: .reference(variable: .variable(reference: .variable(name: .name(for: state))))
         )
         self.init(condition: condition, code: block)
     }
