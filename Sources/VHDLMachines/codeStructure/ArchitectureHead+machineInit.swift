@@ -102,7 +102,7 @@ extension ArchitectureHead {
                 lower: .literal(value: .integer(value: 0))
             ))),
             name: .internalState,
-            defaultValue: .reference(variable: .variable(name: .readSnapshot)),
+            defaultValue: .reference(variable: .variable(reference: .variable(name: .readSnapshot))),
             comment: nil
         )
         let stateRepresentation = machine.states.enumerated()

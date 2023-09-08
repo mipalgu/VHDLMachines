@@ -106,7 +106,7 @@ extension ConstantSignal {
             type: .real,
             value: .binary(operation: .multiplication(
                 lhs: .literal(value: .decimal(value: 5.0)),
-                rhs: .reference(variable: .variable(name: .clockPeriod))
+                rhs: .reference(variable: .variable(reference: .variable(name: .clockPeriod)))
             ))
         )!,
         ConstantSignal(
@@ -114,7 +114,7 @@ extension ConstantSignal {
             type: .real,
             value: .binary(operation: .division(
                 lhs: .literal(value: .decimal(value: 1.0)),
-                rhs: .reference(variable: .variable(name: .ringletLength))
+                rhs: .reference(variable: .variable(reference: .variable(name: .ringletLength)))
             ))
         )!,
         ConstantSignal(
@@ -122,7 +122,7 @@ extension ConstantSignal {
             type: .real,
             value: .binary(operation: .multiplication(
                 lhs: .literal(value: .decimal(value: 1000.0)),
-                rhs: .reference(variable: .variable(name: .ringletPerPs))
+                rhs: .reference(variable: .variable(reference: .variable(name: .ringletPerPs)))
             ))
         )!,
         ConstantSignal(
@@ -130,7 +130,7 @@ extension ConstantSignal {
             type: .real,
             value: .binary(operation: .multiplication(
                 lhs: .literal(value: .decimal(value: 1_000_000.0)),
-                rhs: .reference(variable: .variable(name: .ringletPerPs))
+                rhs: .reference(variable: .variable(reference: .variable(name: .ringletPerPs)))
             ))
         )!,
         ConstantSignal(
@@ -138,7 +138,7 @@ extension ConstantSignal {
             type: .real,
             value: .binary(operation: .multiplication(
                 lhs: .literal(value: .decimal(value: 1_000_000_000.0)),
-                rhs: .reference(variable: .variable(name: .ringletPerPs))
+                rhs: .reference(variable: .variable(reference: .variable(name: .ringletPerPs)))
             ))
         )!,
         ConstantSignal(
@@ -146,7 +146,7 @@ extension ConstantSignal {
             type: .real,
             value: .binary(operation: .multiplication(
                 lhs: .literal(value: .decimal(value: 1_000_000_000_000.0)),
-                rhs: .reference(variable: .variable(name: .ringletPerPs))
+                rhs: .reference(variable: .variable(reference: .variable(name: .ringletPerPs)))
             ))
         )!
     ]

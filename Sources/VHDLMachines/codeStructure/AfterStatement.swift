@@ -54,6 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import Foundation
 import VHDLParsing
 
 /// An after statement found commonly on `LLFSM` transitions. The after statements represents a boolean
@@ -213,7 +214,8 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
             case .comparison(let expression) = conditional,
             case .greaterThanOrEqual(let lhs, let rhs) = expression,
             case .reference(let ref) = lhs,
-            case .variable(let name) = ref,
+            case .variable(let directRef) = ref,
+            case .variable(let name) = directRef,
             name == .ringletCounter,
             case .cast(let castOperation) = rhs,
             case .integer(let castExpression) = castOperation,
@@ -235,7 +237,8 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
             case .cast(let realCast) = lhs,
             case .real(let realExpression) = realCast,
             case .reference(let ref) = rhs,
-            case .variable(let name) = ref,
+            case .variable(let directRef) = ref,
+            case .variable(let name) = directRef,
             let period = Period(rawValue: name)
         else {
             return nil

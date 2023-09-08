@@ -1,4 +1,4 @@
-// VariableReference+replaceInit.swift
+// FunctionImplementation+replaceInit.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -56,26 +56,33 @@
 
 import VHDLParsing
 
-/// Add replace initialiser.
-extension VariableReference {
+extension FunctionImplementation {
 
-    /// Replaces a `variable` within a `VariableReference` with a new `value`.
-    /// - Parameters:
-    ///   - reference: The reference containing `variable`.
-    ///   - variable: The variable to replace in `reference`.
-    ///   - value: The new value to replace `variable` with.
-    @usableFromInline
-    init(reference: VariableReference, replacing variable: VariableName, with value: VariableName) {
-        switch reference {
-        case .indexed(let name, let index):
-            guard name == variable else {
-                self = reference
-                return
-            }
-            self = .indexed(name: value, index: index)
-        case .variable(let ref):
-            self = .variable(reference: DirectReference(reference: ref, replacing: variable, with: value))
+    init?(function: FunctionImplementation, replacing variable: VariableName, with value: VariableName) {
+        let newArguments = function.arguments.compactMap {
+            ArgumentDefinition(definition: $0, replacing: variable, with: value)
         }
+        guard
+            function.arguments.count == newArguments.count,
+            let newBody = SynchronousBlock(block: function.body, replacing: variable, with: value)
+        else {
+            return nil
+        }
+        self.init(
+            name: function.name, arguments: newArguments, returnTube: function.returnType, body: newBody
+        )
+    }
+
+}
+
+extension ArgumentDefinition {
+
+    init?(definition: ArgumentDefinition, replacing variable: VariableName, with value: VariableName) {
+        self.init(
+            name: definition.name == variable ? value : definition.name,
+            type: definition.type,
+            defaultValue: definition.defaultValue
+        )
     }
 
 }

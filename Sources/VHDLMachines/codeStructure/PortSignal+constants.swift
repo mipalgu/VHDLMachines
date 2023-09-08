@@ -24,14 +24,16 @@ extension PortSignal {
     /// The code that updates the snapshot from the external variable.
     var read: Statement {
         Statement.assignment(
-            name: .variable(name: snapshot.name), value: .reference(variable: .variable(name: externalName))
+            name: .variable(reference: .variable(name: snapshot.name)),
+            value: .reference(variable: .variable(reference: .variable(name: externalName)))
         )
     }
 
     /// The code that updates the external variable from the snapshot.
     var write: Statement {
         Statement.assignment(
-            name: .variable(name: externalName), value: .reference(variable: .variable(name: snapshot.name))
+            name: .variable(reference: .variable(name: externalName)),
+            value: .reference(variable: .variable(reference: .variable(name: snapshot.name)))
         )
     }
 

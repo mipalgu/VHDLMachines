@@ -1,4 +1,4 @@
-// VariableReference+replaceInit.swift
+// DirectReference+replaceInit.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -56,26 +56,30 @@
 
 import VHDLParsing
 
-/// Add replace initialiser.
-extension VariableReference {
+extension DirectReference {
 
-    /// Replaces a `variable` within a `VariableReference` with a new `value`.
-    /// - Parameters:
-    ///   - reference: The reference containing `variable`.
-    ///   - variable: The variable to replace in `reference`.
-    ///   - value: The new value to replace `variable` with.
-    @usableFromInline
-    init(reference: VariableReference, replacing variable: VariableName, with value: VariableName) {
+    init(reference: DirectReference, replacing variable: VariableName, with value: VariableName) {
         switch reference {
-        case .indexed(let name, let index):
+        case .member(let access):
+            self = .member(access: MemberAccess(access: access, replacing: variable, with: value))
+        case .variable(let name):
             guard name == variable else {
                 self = reference
                 return
             }
-            self = .indexed(name: value, index: index)
-        case .variable(let ref):
-            self = .variable(reference: DirectReference(reference: ref, replacing: variable, with: value))
+            self = .variable(name: value)
         }
+    }
+
+}
+
+extension MemberAccess {
+
+    init(access: MemberAccess, replacing variable: VariableName, with value: VariableName) {
+        self.init(
+            record: access.record == variable ? value : access.record,
+            member: DirectReference(reference: access.member, replacing: variable, with: value)
+        )
     }
 
 }

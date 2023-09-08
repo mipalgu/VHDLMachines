@@ -70,7 +70,7 @@ extension LocalSignal {
         )
         let stateType = SignalType.ranged(type: .stdLogicVector(size: range))
         let initialState = Expression.reference(
-            variable: .variable(name: VariableName.name(for: states[machine.initialState]))
+            variable: .variable(reference: .variable(name: .name(for: states[machine.initialState])))
         )
         guard let size = range.size else {
             return nil
@@ -110,7 +110,7 @@ extension LocalSignal {
             ]
         }
         let suspendedState = Expression.reference(
-            variable: .variable(name: VariableName.name(for: states[suspendedStateIndex]))
+            variable: .variable(reference: .variable(name: .name(for: states[suspendedStateIndex])))
         )
         let defaultState = machine.isParameterised ? suspendedState : initialState
         return [

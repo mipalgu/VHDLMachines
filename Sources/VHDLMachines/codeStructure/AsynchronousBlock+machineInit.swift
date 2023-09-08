@@ -110,10 +110,21 @@ extension AsynchronousBlock {
             }
             self = .process(block: newProcess)
         case .statement(let statement):
-            guard let newStatement = Statement(statement: statement, replacing: variable, with: value) else {
+            guard
+                let newStatement = AsynchronousStatement(
+                    statement: statement, replacing: variable, with: value
+                )
+            else {
                 return nil
             }
             self = .statement(statement: newStatement)
+        case .function(let function):
+            guard
+                let newFunction = FunctionImplementation(function: function, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .function(block: newFunction)
         }
     }
 

@@ -78,7 +78,8 @@ extension CaseStatement {
             return nil
         }
         self.init(
-            condition: .reference(variable: .variable(name: .internalState)), cases: cases + [.othersNull]
+            condition: .reference(variable: .variable(reference: .variable(name: .internalState))),
+            cases: cases + [.othersNull]
         )
     }
 

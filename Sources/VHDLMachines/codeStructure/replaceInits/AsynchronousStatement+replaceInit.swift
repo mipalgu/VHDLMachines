@@ -1,4 +1,4 @@
-// Statement+replaceInit.swift
+// AsynchronousStatement+replaceInit.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -56,35 +56,98 @@
 
 import VHDLParsing
 
-/// Add replace initialiser.
-extension Statement {
+extension AsynchronousStatement {
 
-    /// Replace all occurances of `variable` in `statement` with a new `value`.
-    /// - Parameters:
-    ///   - statement: The statement containing the `variable`'s to replace.
-    ///   - variable: The variable to replace.
-    ///   - value: The new value to replace the `variable` with.
-    @usableFromInline
-    init?(statement: Statement, replacing variable: VariableName, with value: VariableName) {
+    init?(statement: AsynchronousStatement, replacing variable: VariableName, with value: VariableName) {
         switch statement {
         case .assignment(let name, let expression):
             let newName = VariableReference(reference: name, replacing: variable, with: value)
             guard
-                let newExpression = Expression(expression: expression, replacing: variable, with: value)
+                let newExpression = AsynchronousExpression(
+                    expression: expression, replacing: variable, with: value
+                )
             else {
                 return nil
             }
             self = .assignment(name: newName, value: newExpression)
-        case .comment, .null, .exit:
+        case .comment:
             self = statement
-        case .returns(let expression):
+        }
+    }
+
+}
+
+extension AsynchronousExpression {
+
+    init?(expression: AsynchronousExpression, replacing variable: VariableName, with value: VariableName) {
+        switch expression {
+        case .expression(let expression):
             guard
                 let newExpression = Expression(expression: expression, replacing: variable, with: value)
             else {
                 return nil
             }
-            self = .returns(value: newExpression)
+            self = .expression(value: newExpression)
+        case .whenBlock(let block):
+            guard let newBlock = WhenBlock(block: block, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .whenBlock(value: newBlock)
         }
+    }
+
+}
+
+extension WhenBlock {
+
+    init?(block: WhenBlock, replacing variable: VariableName, with value: VariableName) {
+        switch block {
+        case .when(let statement):
+            guard
+                let newStatement = WhenStatement(statement: statement, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .when(statement: newStatement)
+        case .whenElse(let statement):
+            guard
+                let newStatement = WhenElseStatement(statement: statement, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .whenElse(statement: newStatement)
+        }
+    }
+
+}
+
+extension WhenStatement {
+
+    init?(statement: WhenStatement, replacing variable: VariableName, with value: VariableName) {
+        guard
+            let newCondition = Expression(expression: statement.condition, replacing: variable, with: value),
+            let newValue = Expression(expression: statement.value, replacing: variable, with: value)
+        else {
+            return nil
+        }
+        self.init(condition: newCondition, value: newValue)
+    }
+
+}
+
+extension WhenElseStatement {
+
+    init?(statement: WhenElseStatement, replacing variable: VariableName, with value: VariableName) {
+        guard
+            let newCondition = Expression(expression: statement.condition, replacing: variable, with: value),
+            let newValue = Expression(expression: statement.value, replacing: variable, with: value),
+            let newElse = AsynchronousExpression(
+                expression: statement.elseBlock, replacing: variable, with: value
+            )
+        else {
+            return nil
+        }
+        self.init(value: newValue, condition: newCondition, elseBlock: newElse)
     }
 
 }
