@@ -65,11 +65,14 @@ extension VariableReference {
     ///   - variable: The variable to replace in `reference`.
     ///   - value: The new value to replace `variable` with.
     @usableFromInline
-    init(reference: VariableReference, replacing variable: VariableName, with value: VariableName) {
+    init?(reference: VariableReference, replacing variable: VariableName, with value: VariableName) {
         switch reference {
         case .indexed(let name, let index):
+            guard let newIndex = VectorIndex(index: index, replacing: variable, with: value) else {
+                return nil
+            }
             guard name == variable else {
-                self = reference
+                self = .indexed(name: name, index: newIndex)
                 return
             }
             self = .indexed(name: value, index: index)

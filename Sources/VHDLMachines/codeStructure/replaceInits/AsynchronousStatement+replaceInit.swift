@@ -61,8 +61,8 @@ extension AsynchronousStatement {
     init?(statement: AsynchronousStatement, replacing variable: VariableName, with value: VariableName) {
         switch statement {
         case .assignment(let name, let expression):
-            let newName = VariableReference(reference: name, replacing: variable, with: value)
             guard
+                let newName = VariableReference(reference: name, replacing: variable, with: value),
                 let newExpression = AsynchronousExpression(
                     expression: expression, replacing: variable, with: value
                 )

@@ -1,4 +1,4 @@
-// Expression+replaceInit.swift
+// VectorIndex+replaceInit.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -56,62 +56,25 @@
 
 import VHDLParsing
 
-/// Add replace initialiser.
-extension Expression {
+extension VectorIndex {
 
-    /// Replace all occurances of a `variable` in `expression` with a new `value`.
-    /// - Parameters:
-    ///   - expression: The expression containing the `variable`'s to replace.
-    ///   - variable: The variable to replace.
-    ///   - value: The new `value` to replace the `variable` with.
-    @usableFromInline
-    init?(expression: Expression, replacing variable: VariableName, with value: VariableName) {
-        switch expression {
-        case .binary(let operation):
-            guard
-                let newOperation = BinaryOperation(operation: operation, replacing: variable, with: value)
-            else {
+    init?(index: VectorIndex, replacing variable: VariableName, with value: VariableName) {
+        switch index {
+        case .index(let expression):
+            guard let newIndex = Expression(expression: expression, replacing: variable, with: value) else {
                 return nil
             }
-            self = .binary(operation: newOperation)
-        case .cast(let cast):
-            guard let newCast = CastOperation(operation: cast, replacing: variable, with: value) else {
+            self = .index(value: newIndex)
+            return
+        case .others:
+            self = .others
+            return
+        case .range(let size):
+            guard let newSize = VectorSize(size: size, replacing: variable, with: value) else {
                 return nil
             }
-            self = .cast(operation: newCast)
-        case .conditional(let condition):
-            guard let newCondition = ConditionalExpression(
-                expression: condition, replacing: variable, with: value
-            ) else {
-                return nil
-            }
-            self = .conditional(condition: newCondition)
-        case .functionCall(let call):
-            guard let newCall = FunctionCall(call: call, replacing: variable, with: value) else {
-                return nil
-            }
-            self = .functionCall(call: newCall)
-        case .literal:
-            self = expression
-        case .logical(let operation):
-            guard let newOperation = BooleanExpression(
-                expression: operation, replacing: variable, with: value
-            ) else {
-                return nil
-            }
-            self = .logical(operation: newOperation)
-        case .precedence(let expression):
-            guard let newValue = Expression(expression: expression, replacing: variable, with: value) else {
-                return nil
-            }
-            self = .precedence(value: newValue)
-        case .reference(let reference):
-            guard
-                let newReference = VariableReference(reference: reference, replacing: variable, with: value)
-            else {
-                return nil
-            }
-            self = .reference(variable: newReference)
+            self = .range(value: newSize)
+            return
         }
     }
 

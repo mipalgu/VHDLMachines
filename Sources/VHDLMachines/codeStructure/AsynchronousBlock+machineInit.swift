@@ -154,7 +154,9 @@ extension ComponentInstantiation {
         } else {
             generic = nil
         }
-        let port = PortMap(map: component.port, replacing: variable, with: value)
+        guard let port = PortMap(map: component.port, replacing: variable, with: value) else {
+            return nil
+        }
         self.init(label: component.label, name: component.name, port: port, generic: generic)
     }
 
@@ -162,9 +164,12 @@ extension ComponentInstantiation {
 
 extension PortMap {
 
-    init(map: PortMap, replacing variable: VariableName, with value: VariableName) {
-        let newVariables = map.variables.map {
+    init?(map: PortMap, replacing variable: VariableName, with value: VariableName) {
+        let newVariables = map.variables.compactMap {
             VariableMap(map: $0, replacing: variable, with: value)
+        }
+        guard newVariables.count == map.variables.count else {
+            return nil
         }
         self.init(variables: newVariables)
     }
@@ -173,8 +178,10 @@ extension PortMap {
 
 extension VariableMap {
 
-    init(map: VariableMap, replacing variable: VariableName, with value: VariableName) {
-        let newRhs = VariableAssignment(assignment: map.rhs, replacing: variable, with: value)
+    init?(map: VariableMap, replacing variable: VariableName, with value: VariableName) {
+        guard let newRhs = VariableAssignment(assignment: map.rhs, replacing: variable, with: value) else {
+            return nil
+        }
         self.init(lhs: map.lhs, rhs: newRhs)
     }
 
@@ -182,10 +189,12 @@ extension VariableMap {
 
 extension VariableAssignment {
 
-    init(assignment: VariableAssignment, replacing variable: VariableName, with value: VariableName) {
+    init?(assignment: VariableAssignment, replacing variable: VariableName, with value: VariableName) {
         switch assignment {
         case .reference(let ref):
-            let newVariable = VariableReference(reference: ref, replacing: variable, with: value)
+            guard let newVariable = VariableReference(reference: ref, replacing: variable, with: value) else {
+                return nil
+            }
             self = .reference(variable: newVariable)
         case .literal, .open:
             self = assignment
