@@ -56,8 +56,15 @@
 
 import VHDLParsing
 
+/// Add replace init.
 extension FunctionImplementation {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - function: The function containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(function: FunctionImplementation, replacing variable: VariableName, with value: VariableName) {
         let newArguments = function.arguments.compactMap {
             ArgumentDefinition(definition: $0, replacing: variable, with: value)
@@ -79,8 +86,15 @@ extension FunctionImplementation {
 
 }
 
+/// Add replace init.
 extension ArgumentDefinition {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - definition: The definition containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(definition: ArgumentDefinition, replacing variable: VariableName, with value: VariableName) {
         guard let newType = Type(type: definition.type, replacing: variable, with: value) else {
             return nil
@@ -105,8 +119,15 @@ extension ArgumentDefinition {
 
 }
 
+/// Add replace init.
 extension Type {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - type: The type containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(type: Type, replacing variable: VariableName, with value: VariableName) {
         switch type {
         case .alias(let name):

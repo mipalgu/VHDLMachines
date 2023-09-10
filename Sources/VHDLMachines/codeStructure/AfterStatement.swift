@@ -140,7 +140,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
         /// Create a new period from the `after` command.
         /// - Parameter after: The `after` command, e.g. `after`, `after_ps`, `after_ns`, `after_us`,
         /// `after_ms`, `after_rt`.
-        @usableFromInline
+        @inlinable
         init?(after: String) {
             guard after.lowercased().hasPrefix("after"), after.count >= 5 else {
                 return nil

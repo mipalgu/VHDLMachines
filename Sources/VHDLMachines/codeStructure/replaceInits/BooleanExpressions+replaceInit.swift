@@ -66,7 +66,7 @@ extension BooleanExpression {
     ///   - expression: The expression to replace.
     ///   - variable: The variable to replace in `expression`.
     ///   - value: The new value to replace `variable` with.
-    @usableFromInline
+    @inlinable
     init?(expression: BooleanExpression, replacing variable: VariableName, with value: VariableName) {
         switch expression {
         case .and(let lhs, let rhs):

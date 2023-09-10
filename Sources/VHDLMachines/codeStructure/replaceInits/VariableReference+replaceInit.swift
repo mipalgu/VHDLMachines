@@ -64,7 +64,7 @@ extension VariableReference {
     ///   - reference: The reference containing `variable`.
     ///   - variable: The variable to replace in `reference`.
     ///   - value: The new value to replace `variable` with.
-    @usableFromInline
+    @inlinable
     init?(reference: VariableReference, replacing variable: VariableName, with value: VariableName) {
         switch reference {
         case .indexed(let name, let index):

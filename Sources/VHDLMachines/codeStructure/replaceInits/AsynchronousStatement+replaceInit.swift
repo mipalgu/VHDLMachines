@@ -56,8 +56,15 @@
 
 import VHDLParsing
 
+/// Add replace inits.
 extension AsynchronousStatement {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - statement: The statement containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(statement: AsynchronousStatement, replacing variable: VariableName, with value: VariableName) {
         switch statement {
         case .assignment(let name, let expression):
@@ -77,8 +84,15 @@ extension AsynchronousStatement {
 
 }
 
+/// Add replace inits.
 extension AsynchronousExpression {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - expression: The expression containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(expression: AsynchronousExpression, replacing variable: VariableName, with value: VariableName) {
         switch expression {
         case .expression(let expression):
@@ -98,8 +112,15 @@ extension AsynchronousExpression {
 
 }
 
+/// Add replace inits.
 extension WhenBlock {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - block: The block containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(block: WhenBlock, replacing variable: VariableName, with value: VariableName) {
         switch block {
         case .when(let statement):
@@ -121,8 +142,15 @@ extension WhenBlock {
 
 }
 
+/// Add replace inits.
 extension WhenStatement {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - statement: The statement containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(statement: WhenStatement, replacing variable: VariableName, with value: VariableName) {
         guard
             let newCondition = Expression(expression: statement.condition, replacing: variable, with: value),
@@ -135,8 +163,15 @@ extension WhenStatement {
 
 }
 
+/// Add replace inits.
 extension WhenElseStatement {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - statement: The statement containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(statement: WhenElseStatement, replacing variable: VariableName, with value: VariableName) {
         guard
             let newCondition = Expression(expression: statement.condition, replacing: variable, with: value),

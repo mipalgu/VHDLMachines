@@ -65,7 +65,7 @@ extension Transition {
     /// - Parameters:
     ///   - transition: The transition to convert.
     ///   - machine: The machine containing the state variables.
-    @usableFromInline
+    @inlinable
     init?(replacingStateRefsIn transition: Transition, in machine: Machine) {
         guard transition.source >= 0 && transition.source < machine.states.count else {
             return nil

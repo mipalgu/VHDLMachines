@@ -64,7 +64,7 @@ extension SynchronousBlock {
     ///   - block: The block containing the `variable`'s to replace.
     ///   - variable: The variable to replace.
     ///   - value: The new value to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(block: SynchronousBlock, replacing variable: VariableName, with value: VariableName) {
         switch block {
         case .blocks(let blocks):

@@ -46,7 +46,7 @@ public struct VHDLCompiler {
     /// Generate the VHDL source code for a machine.
     /// - Parameter machine: The machine to compile.
     /// - Returns: The VHDL source code.
-    @usableFromInline
+    @inlinable
     func generateVHDLFile(_ machine: Machine) -> String? {
         guard let representation = MachineRepresentation(machine: machine) else {
             return nil

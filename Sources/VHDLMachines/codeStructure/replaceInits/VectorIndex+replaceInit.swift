@@ -56,8 +56,15 @@
 
 import VHDLParsing
 
+/// Add replace init.
 extension VectorIndex {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - index: The index containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(index: VectorIndex, replacing variable: VariableName, with value: VariableName) {
         switch index {
         case .index(let expression):

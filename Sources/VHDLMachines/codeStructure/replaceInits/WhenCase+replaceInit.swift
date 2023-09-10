@@ -64,7 +64,7 @@ extension WhenCase {
     ///   - whenCase: The `WhenCase` containing the `variable`'s to replace.
     ///   - variable: The `variable` to replace.
     ///   - value: The `value` to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(whenCase: WhenCase, replacing variable: VariableName, with value: VariableName) {
         guard
             let newCondition = WhenCondition(condition: whenCase.condition, replacing: variable, with: value),

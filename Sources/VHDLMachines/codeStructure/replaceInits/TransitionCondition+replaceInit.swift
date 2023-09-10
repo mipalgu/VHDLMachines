@@ -66,7 +66,7 @@ extension TransitionCondition {
     ///   - condition: The condition containing the `variable`'s to replace.
     ///   - variable: The variable to replace.
     ///   - value: The new value to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(condition: TransitionCondition, replacing variable: VariableName, with value: VariableName) {
         switch condition {
         case .after(let statement):

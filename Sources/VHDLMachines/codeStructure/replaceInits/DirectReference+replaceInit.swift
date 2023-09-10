@@ -56,8 +56,15 @@
 
 import VHDLParsing
 
+/// Add replace init.
 extension DirectReference {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - reference: The reference containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init(reference: DirectReference, replacing variable: VariableName, with value: VariableName) {
         switch reference {
         case .member(let access):
@@ -73,8 +80,15 @@ extension DirectReference {
 
 }
 
+/// Add replace init.
 extension MemberAccess {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - access: The access containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init(access: MemberAccess, replacing variable: VariableName, with value: VariableName) {
         self.init(
             record: access.record == variable ? value : access.record,

@@ -60,7 +60,7 @@ extension Machine {
     /// Create a new machine where the state code has been replaced with an encoding for state variables. This
     /// init parses the code within each state and generates new code that encodes the state variables.
     /// - Parameter machine: The machine to replace the state code in.
-    @usableFromInline
+    @inlinable
     init?(replacingStateRefsIn machine: Machine) {
         let newStates: [State] = machine.states.compactMap { State(replacingStateVariablesIn: $0) }
         guard newStates.count == machine.states.count else {

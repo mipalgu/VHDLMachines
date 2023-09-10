@@ -64,7 +64,7 @@ extension ConstantSignal {
     // swiftlint:disable force_unwrapping
 
     /// The suspension commands.
-    static let commands = [
+    @usableFromInline static let commands = [
         ConstantSignal(
             name: .nullCommand,
             type: .ranged(type: .stdLogicVector(size: .downto(
@@ -100,7 +100,7 @@ extension ConstantSignal {
     ]
 
     /// The ringlet constants.
-    static let ringletConstants: [ConstantSignal] = [
+    @usableFromInline static let ringletConstants: [ConstantSignal] = [
         ConstantSignal(
             name: .ringletLength,
             type: .real,
@@ -158,7 +158,7 @@ extension ConstantSignal {
     ///   - state: The state to convert.
     ///   - bitsRequired: The bits required for all the states to be covered.
     ///   - index: The index of this `state` in the states array of the machine.
-    @usableFromInline
+    @inlinable
     init?(state: State, bitsRequired: Int, index: Int) {
         guard bitsRequired > 0, index >= 0 else {
             return nil
@@ -183,7 +183,7 @@ extension ConstantSignal {
     /// - Returns: The constant declaration for the state actions.
     /// - Note: This method also includes the reserved actions `NoOnEntry`, `CheckTransition`, `ReadSnapshot`
     /// and `WriteSnapshot`.
-    @usableFromInline
+    @inlinable
     static func constants(for actions: [VariableName]) -> [ConstantSignal]? {
         let actionNamesArray = [
             .noOnEntry, .checkTransition, VariableName.readSnapshot, .writeSnapshot
@@ -221,7 +221,7 @@ extension ConstantSignal {
     /// Create a constant `VHDL` literal that represents a clocks period as a `real` value in picoseconds.
     /// - Parameter period: The period to convert.
     /// - Returns: The constant signal.
-    @usableFromInline
+    @inlinable
     static func clockPeriod(period: Time) -> ConstantSignal? {
         guard
             let comment = Comment(rawValue: "-- ps"),

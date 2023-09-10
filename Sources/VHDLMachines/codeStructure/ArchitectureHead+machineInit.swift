@@ -64,7 +64,7 @@ extension ArchitectureHead {
 
     /// Create an architecture head for a machine.
     /// - Parameter machine: The machine to create the head for.
-    @usableFromInline
+    @inlinable
     init?(machine: Machine) {
         var actionNames = machine.actions
         if !machine.isSuspensible {
