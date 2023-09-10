@@ -64,12 +64,16 @@ extension FunctionImplementation {
         }
         guard
             function.arguments.count == newArguments.count,
-            let newBody = SynchronousBlock(block: function.body, replacing: variable, with: value)
+            let newBody = SynchronousBlock(block: function.body, replacing: variable, with: value),
+            let newReturn = Type(type: function.returnType, replacing: variable, with: value)
         else {
             return nil
         }
         self.init(
-            name: function.name, arguments: newArguments, returnTube: function.returnType, body: newBody
+            name: function.name == variable ? value : function.name,
+            arguments: newArguments,
+            returnTube: newReturn,
+            body: newBody
         )
     }
 
@@ -78,11 +82,44 @@ extension FunctionImplementation {
 extension ArgumentDefinition {
 
     init?(definition: ArgumentDefinition, replacing variable: VariableName, with value: VariableName) {
+        guard let newType = Type(type: definition.type, replacing: variable, with: value) else {
+            return nil
+        }
+        guard let defaultValue = definition.defaultValue else {
+            self.init(
+                name: definition.name == variable ? value : definition.name,
+                type: newType,
+                defaultValue: nil
+            )
+            return
+        }
+        guard let newValue = Expression(expression: defaultValue, replacing: variable, with: value) else {
+            return nil
+        }
         self.init(
             name: definition.name == variable ? value : definition.name,
-            type: definition.type,
-            defaultValue: definition.defaultValue
+            type: newType,
+            defaultValue: newValue
         )
+    }
+
+}
+
+extension Type {
+
+    init?(type: Type, replacing variable: VariableName, with value: VariableName) {
+        switch type {
+        case .alias(let name):
+            guard name == variable else {
+                self = type
+                return
+            }
+            self = .alias(name: value)
+            return
+        case .signal:
+            self = type
+            return
+        }
     }
 
 }
