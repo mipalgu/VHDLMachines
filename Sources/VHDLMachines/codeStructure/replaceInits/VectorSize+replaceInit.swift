@@ -64,7 +64,7 @@ extension VectorSize {
     ///   - size: The size containing the `variable`'s to replace.
     ///   - variable: The `variable` to replace.
     ///   - value: The `value` to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(size: VectorSize, replacing variable: VariableName, with value: VariableName) {
         switch size {
         case .downto(let upper, let lower):

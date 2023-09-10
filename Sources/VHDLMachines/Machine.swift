@@ -144,6 +144,8 @@ public struct Machine: Codable, Equatable, Hashable {
         self.architectureBody = architectureBody
     }
 
+    // swiftlint:disable function_body_length
+
     /// Creates an initial machine that will be located at `path`. The initial machine contains an Initial and
     /// Suspended state with the default actions (OnEntry, OnExit, Internal, OnResume, OnSuspend). This new
     /// machine is not parameterised, but does include the suspension semantics.
@@ -153,7 +155,10 @@ public struct Machine: Codable, Equatable, Hashable {
     public static func initial(path: URL) -> Machine? {
         guard
             let nameComponent = path.lastPathComponent.components(separatedBy: ".machine").first,
-            let name = VariableName(rawValue: nameComponent)
+            let name = VariableName(rawValue: nameComponent),
+            let ieee = VariableName(rawValue: "IEEE"),
+            let stdLogicImport = UseStatement(rawValue: "use IEEE.std_logic_1164.all;"),
+            let mathRealImport = UseStatement(rawValue: "use IEEE.math_real.all;")
         else {
             return nil
         }
@@ -169,9 +174,9 @@ public struct Machine: Codable, Equatable, Hashable {
             name: name,
             path: path,
             includes: [
-                .library(value: "IEEE"),
-                .include(value: "IEEE.std_logic_1164.All"),
-                .include(value: "IEEE.math_real.All")
+                .library(value: ieee),
+                .include(statement: stdLogicImport),
+                .include(statement: mathRealImport)
             ],
             externalSignals: [],
             clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
@@ -200,5 +205,7 @@ public struct Machine: Codable, Equatable, Hashable {
             suspendedState: 1
         )
     }
+
+    // swiftlint:enable function_body_length
 
 }

@@ -64,7 +64,7 @@ extension IfBlock {
     ///   - block: The block containing all `variable`'s to replace.
     ///   - variable: The variable to replace.
     ///   - value: The new value to replace `variable` with.
-    @usableFromInline
+    @inlinable
     init?(block: IfBlock, replacing variable: VariableName, with value: VariableName) {
         switch block {
         case .ifElse(let condition, let ifBlock, let elseBlock):

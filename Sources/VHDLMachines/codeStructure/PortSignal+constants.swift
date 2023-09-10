@@ -12,26 +12,28 @@ import VHDLParsing
 extension PortSignal {
 
     /// The external variable name for this signal.
-    var externalName: VariableName {
+    @inlinable var externalName: VariableName {
         VariableName.name(for: self)
     }
 
     /// The snapshot of this signal.
-    var snapshot: LocalSignal {
+    @inlinable var snapshot: LocalSignal {
         LocalSignal(type: type, name: name, defaultValue: nil, comment: nil)
     }
 
     /// The code that updates the snapshot from the external variable.
-    var read: Statement {
+    @inlinable var read: Statement {
         Statement.assignment(
-            name: .variable(name: snapshot.name), value: .reference(variable: .variable(name: externalName))
+            name: .variable(reference: .variable(name: snapshot.name)),
+            value: .reference(variable: .variable(reference: .variable(name: externalName)))
         )
     }
 
     /// The code that updates the external variable from the snapshot.
-    var write: Statement {
+    @inlinable var write: Statement {
         Statement.assignment(
-            name: .variable(name: externalName), value: .reference(variable: .variable(name: snapshot.name))
+            name: .variable(reference: .variable(name: externalName)),
+            value: .reference(variable: .variable(reference: .variable(name: snapshot.name)))
         )
     }
 

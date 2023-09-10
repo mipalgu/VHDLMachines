@@ -79,13 +79,15 @@ final class PortSignalTests: XCTestCase {
         XCTAssertEqual(
             signal.read,
             .assignment(
-                name: .variable(name: .x), value: .reference(variable: .variable(name: signal.externalName))
+                name: .variable(reference: .variable(name: .x)),
+                value: .reference(variable: .variable(reference: .variable(name: signal.externalName)))
             )
         )
         XCTAssertEqual(
             signal.write,
             .assignment(
-                name: .variable(name: signal.externalName), value: .reference(variable: .variable(name: .x))
+                name: .variable(reference: .variable(name: signal.externalName)),
+                value: .reference(variable: .variable(reference: .variable(name: .x)))
             )
         )
     }
@@ -96,7 +98,7 @@ final class PortSignalTests: XCTestCase {
         let signal = PortSignal(clock: clock)
         XCTAssertEqual(signal.name, .clk)
         XCTAssertEqual(signal.mode, .input)
-        XCTAssertEqual(signal.type, .stdLogic)
+        XCTAssertEqual(signal.type, .signal(type: .stdLogic))
         XCTAssertNil(signal.defaultValue)
         XCTAssertNil(signal.comment)
     }

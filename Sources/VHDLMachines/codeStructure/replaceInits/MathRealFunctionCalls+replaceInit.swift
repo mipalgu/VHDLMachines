@@ -66,7 +66,7 @@ extension MathRealFunctionCalls {
     ///   - function: The function containing the `variable` to replace.
     ///   - variable: The `variable` to replace.
     ///   - value: The `value` to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(function: MathRealFunctionCalls, replacing variable: VariableName, with value: VariableName) {
         switch function {
         case .ceil(let expression):

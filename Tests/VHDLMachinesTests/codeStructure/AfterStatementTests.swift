@@ -62,7 +62,7 @@ import XCTest
 final class AfterStatementTests: XCTestCase {
 
     /// A variable `x`.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// The ringletCounter raw value.
     let ringletCounter = VariableName.ringletCounter.rawValue
@@ -199,11 +199,11 @@ final class AfterStatementTests: XCTestCase {
         XCTAssertEqual(
             statement.expression,
             .precedence(value: .conditional(condition: .comparison(value: .greaterThanOrEqual(
-                lhs: .reference(variable: .variable(name: .ringletCounter)),
+                lhs: .reference(variable: .variable(reference: .variable(name: .ringletCounter))),
                 rhs: .cast(operation: .integer(expression: .functionCall(call: .mathReal(function: .ceil(
                     expression: .binary(operation: .multiplication(
                         lhs: .cast(operation: .real(expression: .literal(value: .integer(value: 10)))),
-                        rhs: .reference(variable: .variable(name: .ringletPerUs))
+                        rhs: .reference(variable: .variable(reference: .variable(name: .ringletPerUs)))
                     ))
                 )))))
             ))))
@@ -212,7 +212,7 @@ final class AfterStatementTests: XCTestCase {
         XCTAssertEqual(
             ringletStatement.expression,
             .precedence(value: .conditional(condition: .comparison(value: .greaterThanOrEqual(
-                lhs: .reference(variable: .variable(name: .ringletCounter)),
+                lhs: .reference(variable: .variable(reference: .variable(name: .ringletCounter))),
                 rhs: .cast(operation: .integer(expression: .functionCall(call: .mathReal(function: .ceil(
                     expression: .cast(operation: .real(expression: .literal(value: .integer(value: 5))))
                 )))))

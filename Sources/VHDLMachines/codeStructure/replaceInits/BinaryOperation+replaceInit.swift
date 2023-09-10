@@ -64,7 +64,7 @@ extension BinaryOperation {
     ///   - operation: The operation containing the `variables`'s to replace.
     ///   - variable: The `variable` to replace.
     ///   - value: The new `value` to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(operation: BinaryOperation, replacing variable: VariableName, with value: VariableName) {
         switch operation {
         case .addition(let lhs, let rhs):

@@ -62,7 +62,6 @@ extension AsynchronousBlock {
     /// Create the top-level asynchronous block that will represent the entire architecture body of a machine.
     /// This block represents all of the logic of the machine.
     /// - Parameter machine: The machine to generate the block from.
-    @usableFromInline
     init?(machine: Machine) {
         guard
             machine.drivingClock >= 0,
@@ -87,6 +86,12 @@ extension AsynchronousBlock {
         ])
     }
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - block: The block containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(block: AsynchronousBlock, replacing variable: VariableName, with value: VariableName) {
         switch block {
         case .blocks(let blocks):
@@ -110,17 +115,35 @@ extension AsynchronousBlock {
             }
             self = .process(block: newProcess)
         case .statement(let statement):
-            guard let newStatement = Statement(statement: statement, replacing: variable, with: value) else {
+            guard
+                let newStatement = AsynchronousStatement(
+                    statement: statement, replacing: variable, with: value
+                )
+            else {
                 return nil
             }
             self = .statement(statement: newStatement)
+        case .function(let function):
+            guard
+                let newFunction = FunctionImplementation(function: function, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .function(block: newFunction)
         }
     }
 
 }
 
+/// Add replace init.
 extension ProcessBlock {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - process: The process containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(process: ProcessBlock, replacing variable: VariableName, with value: VariableName) {
         guard let newCode = SynchronousBlock(block: process.code, replacing: variable, with: value) else {
             return nil
@@ -131,8 +154,15 @@ extension ProcessBlock {
 
 }
 
+/// Add replace init.
 extension ComponentInstantiation {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - component: The component containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(component: ComponentInstantiation, replacing variable: VariableName, with value: VariableName) {
         let generic: GenericMap?
         if let gen = component.generic {
@@ -143,38 +173,68 @@ extension ComponentInstantiation {
         } else {
             generic = nil
         }
-        let port = PortMap(map: component.port, replacing: variable, with: value)
+        guard let port = PortMap(map: component.port, replacing: variable, with: value) else {
+            return nil
+        }
         self.init(label: component.label, name: component.name, port: port, generic: generic)
     }
 
 }
 
+/// Add replace init.
 extension PortMap {
 
-    init(map: PortMap, replacing variable: VariableName, with value: VariableName) {
-        let newVariables = map.variables.map {
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - map: The map containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
+    init?(map: PortMap, replacing variable: VariableName, with value: VariableName) {
+        let newVariables = map.variables.compactMap {
             VariableMap(map: $0, replacing: variable, with: value)
+        }
+        guard newVariables.count == map.variables.count else {
+            return nil
         }
         self.init(variables: newVariables)
     }
 
 }
 
+/// Add replace init.
 extension VariableMap {
 
-    init(map: VariableMap, replacing variable: VariableName, with value: VariableName) {
-        let newRhs = VariableAssignment(assignment: map.rhs, replacing: variable, with: value)
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - map: The map containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
+    init?(map: VariableMap, replacing variable: VariableName, with value: VariableName) {
+        guard let newRhs = VariableAssignment(assignment: map.rhs, replacing: variable, with: value) else {
+            return nil
+        }
         self.init(lhs: map.lhs, rhs: newRhs)
     }
 
 }
 
+/// Add replace init.
 extension VariableAssignment {
 
-    init(assignment: VariableAssignment, replacing variable: VariableName, with value: VariableName) {
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - assignment: The assignment containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
+    init?(assignment: VariableAssignment, replacing variable: VariableName, with value: VariableName) {
         switch assignment {
         case .reference(let ref):
-            let newVariable = VariableReference(reference: ref, replacing: variable, with: value)
+            guard let newVariable = VariableReference(reference: ref, replacing: variable, with: value) else {
+                return nil
+            }
             self = .reference(variable: newVariable)
         case .literal, .open:
             self = assignment
@@ -183,8 +243,15 @@ extension VariableAssignment {
 
 }
 
+/// Add replace init.
 extension GenericMap {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - map: The map containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(map: GenericMap, replacing variable: VariableName, with value: VariableName) {
         let newVariables = map.variables.compactMap {
             GenericVariableMap(map: $0, replacing: variable, with: value)
@@ -197,8 +264,15 @@ extension GenericMap {
 
 }
 
+/// Add replace init.
 extension GenericVariableMap {
 
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - map: The map containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
     init?(map: GenericVariableMap, replacing variable: VariableName, with value: VariableName) {
         guard let newRhs = Expression(expression: map.rhs, replacing: variable, with: value) else {
             return nil

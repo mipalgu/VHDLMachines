@@ -62,10 +62,10 @@ import XCTest
 final class StateInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// A `y` variable.
-    let y = Expression.reference(variable: .variable(name: .y))
+    let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     // swiftlint:disable force_unwrapping
 
@@ -79,12 +79,12 @@ final class StateInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// `newY` as an expression.
     var expNewY: Expression {
-        .reference(variable: .variable(name: newY))
+        .reference(variable: .variable(reference: .variable(name: newY)))
     }
 
     /// Test init replaces variables correctly.
@@ -94,21 +94,25 @@ final class StateInitTests: XCTestCase {
         state.signals = [LocalSignal(type: .stdLogic, name: .x), LocalSignal(type: .stdLogic, name: .y)]
         var expected = state
         state.actions[.onEntry] = .blocks(blocks: [
-            .statement(statement: .assignment(name: .variable(name: .x), value: y)),
+            .statement(statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)),
             .statement(statement: .assignment(
-                name: .variable(name: .z), value: .literal(value: .boolean(value: true))
+                name: .variable(reference: .variable(name: .z)),
+                value: .literal(value: .boolean(value: true))
             )),
             .statement(statement: .assignment(
-                name: .variable(name: .y), value: .literal(value: .logic(value: .high))
+                name: .variable(reference: .variable(name: .y)), value: .literal(value: .logic(value: .high))
             ))
         ])
         expected.actions[.onEntry] = .blocks(blocks: [
-            .statement(statement: .assignment(name: .variable(name: newX), value: expNewY)),
             .statement(statement: .assignment(
-                name: .variable(name: .z), value: .literal(value: .boolean(value: true))
+                name: .variable(reference: .variable(name: newX)), value: expNewY
             )),
             .statement(statement: .assignment(
-                name: .variable(name: newY), value: .literal(value: .logic(value: .high))
+                name: .variable(reference: .variable(name: .z)), value: .literal(value: .boolean(value: true))
+            )),
+            .statement(statement: .assignment(
+                name: .variable(reference: .variable(name: newY)),
+                value: .literal(value: .logic(value: .high))
             ))
         ])
         let result = State(replacingStateVariablesIn: state)

@@ -64,7 +64,7 @@ extension AfterStatement {
     ///   - statement: The statement containing the `variable`'s to be replaced.
     ///   - variable: The variable to be replaced.
     ///   - value: The new value to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(statement: AfterStatement, replacing variable: VariableName, with value: VariableName) {
         guard let newAmount = Expression(
             expression: statement.amount, replacing: variable, with: value

@@ -62,10 +62,10 @@ import XCTest
 final class WhenCaseInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// A `y` variable.
-    let y = Expression.reference(variable: .variable(name: .y))
+    let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     // swiftlint:disable force_unwrapping
 
@@ -76,12 +76,14 @@ final class WhenCaseInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// Test that the condition gets changed.
     func testCondition() {
-        let code = SynchronousBlock.statement(statement: .assignment(name: .variable(name: .z), value: y))
+        let code = SynchronousBlock.statement(
+            statement: .assignment(name: .variable(reference: .variable(name: .z)), value: y)
+        )
         let original = WhenCase(condition: .expression(expression: x), code: code)
         let result = WhenCase(whenCase: original, replacing: .x, with: newX)
         XCTAssertEqual(result, WhenCase(condition: .expression(expression: expNewX), code: code))
@@ -89,7 +91,9 @@ final class WhenCaseInitTests: XCTestCase {
 
     /// Test that the code gets changed.
     func testCode() {
-        let code = SynchronousBlock.statement(statement: .assignment(name: .variable(name: .x), value: y))
+        let code = SynchronousBlock.statement(
+            statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)
+        )
         let original = WhenCase(condition: .expression(expression: y), code: code)
         let result = WhenCase(whenCase: original, replacing: .x, with: newX)
         XCTAssertEqual(
@@ -97,7 +101,7 @@ final class WhenCaseInitTests: XCTestCase {
             WhenCase(
                 condition: .expression(expression: y),
                 code: SynchronousBlock.statement(statement: .assignment(
-                    name: .variable(name: newX), value: y
+                    name: .variable(reference: .variable(name: newX)), value: y
                 ))
             )
         )

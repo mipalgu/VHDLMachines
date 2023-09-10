@@ -1,4 +1,4 @@
-// State+stateInit.swift
+// DirectReference+replaceInit.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -54,50 +54,45 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Foundation
-import LLFSMModel
-import VHDLMachines
 import VHDLParsing
 
-/// Add initialiser for `LLFSMModel.State`.
-extension VHDLMachines.State {
+/// Add replace init.
+extension DirectReference {
 
-    /// Create a `VHDLMachines.State` from a `LLFSMModel.State`.
+    /// Replace the variable with the value.
     /// - Parameters:
-    ///   - state: The state to convert.
-    ///   - externalVariables: The available external variables this state has access too.
+    ///   - reference: The reference containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
     @inlinable
-    public init?(state: LLFSMModel.State, externalVariables: [PortSignal]) {
-        guard let name = VariableName(rawValue: state.name) else {
-            return nil
-        }
-        let signals = state.variables.compactMap(LocalSignal.init(variable:))
-        guard signals.count == state.variables.count else {
-            return nil
-        }
-        let existingExternals = Set(externalVariables.map(\.name))
-        let externals = state.externalVariables.compactMap(VariableName.init(rawValue:))
-        guard
-            externals.count == state.externalVariables.count,
-            externals.allSatisfy(existingExternals.contains)
-        else {
-            return nil
-        }
-        let validActions = state.actions.lazy.filter {
-            !$1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }
-        let actions: [(VariableName, SynchronousBlock)] = validActions.compactMap {
-            guard let name = VariableName(rawValue: $0), let code = SynchronousBlock(rawValue: $1) else {
-                return nil
+    init(reference: DirectReference, replacing variable: VariableName, with value: VariableName) {
+        switch reference {
+        case .member(let access):
+            self = .member(access: MemberAccess(access: access, replacing: variable, with: value))
+        case .variable(let name):
+            guard name == variable else {
+                self = reference
+                return
             }
-            return (name, code)
+            self = .variable(name: value)
         }
-        let actionsDictionary = Dictionary(uniqueKeysWithValues: actions)
-        guard actionsDictionary.count == validActions.count else {
-            return nil
-        }
+    }
+
+}
+
+/// Add replace init.
+extension MemberAccess {
+
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - access: The access containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
+    init(access: MemberAccess, replacing variable: VariableName, with value: VariableName) {
         self.init(
-            name: name, actions: actionsDictionary, signals: signals, externalVariables: externals.sorted()
+            record: access.record == variable ? value : access.record,
+            member: DirectReference(reference: access.member, replacing: variable, with: value)
         )
     }
 

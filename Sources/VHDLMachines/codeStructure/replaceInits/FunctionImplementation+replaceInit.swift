@@ -1,4 +1,4 @@
-// State+stateInit.swift
+// FunctionImplementation+replaceInit.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -54,51 +54,93 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Foundation
-import LLFSMModel
-import VHDLMachines
 import VHDLParsing
 
-/// Add initialiser for `LLFSMModel.State`.
-extension VHDLMachines.State {
+/// Add replace init.
+extension FunctionImplementation {
 
-    /// Create a `VHDLMachines.State` from a `LLFSMModel.State`.
+    /// Replace the variable with the value.
     /// - Parameters:
-    ///   - state: The state to convert.
-    ///   - externalVariables: The available external variables this state has access too.
+    ///   - function: The function containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
     @inlinable
-    public init?(state: LLFSMModel.State, externalVariables: [PortSignal]) {
-        guard let name = VariableName(rawValue: state.name) else {
-            return nil
+    init?(function: FunctionImplementation, replacing variable: VariableName, with value: VariableName) {
+        let newArguments = function.arguments.compactMap {
+            ArgumentDefinition(definition: $0, replacing: variable, with: value)
         }
-        let signals = state.variables.compactMap(LocalSignal.init(variable:))
-        guard signals.count == state.variables.count else {
-            return nil
-        }
-        let existingExternals = Set(externalVariables.map(\.name))
-        let externals = state.externalVariables.compactMap(VariableName.init(rawValue:))
         guard
-            externals.count == state.externalVariables.count,
-            externals.allSatisfy(existingExternals.contains)
+            function.arguments.count == newArguments.count,
+            let newBody = SynchronousBlock(block: function.body, replacing: variable, with: value),
+            let newReturn = Type(type: function.returnType, replacing: variable, with: value)
         else {
             return nil
         }
-        let validActions = state.actions.lazy.filter {
-            !$1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        self.init(
+            name: function.name == variable ? value : function.name,
+            arguments: newArguments,
+            returnTube: newReturn,
+            body: newBody
+        )
+    }
+
+}
+
+/// Add replace init.
+extension ArgumentDefinition {
+
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - definition: The definition containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
+    init?(definition: ArgumentDefinition, replacing variable: VariableName, with value: VariableName) {
+        guard let newType = Type(type: definition.type, replacing: variable, with: value) else {
+            return nil
         }
-        let actions: [(VariableName, SynchronousBlock)] = validActions.compactMap {
-            guard let name = VariableName(rawValue: $0), let code = SynchronousBlock(rawValue: $1) else {
-                return nil
-            }
-            return (name, code)
+        guard let defaultValue = definition.defaultValue else {
+            self.init(
+                name: definition.name == variable ? value : definition.name,
+                type: newType,
+                defaultValue: nil
+            )
+            return
         }
-        let actionsDictionary = Dictionary(uniqueKeysWithValues: actions)
-        guard actionsDictionary.count == validActions.count else {
+        guard let newValue = Expression(expression: defaultValue, replacing: variable, with: value) else {
             return nil
         }
         self.init(
-            name: name, actions: actionsDictionary, signals: signals, externalVariables: externals.sorted()
+            name: definition.name == variable ? value : definition.name,
+            type: newType,
+            defaultValue: newValue
         )
+    }
+
+}
+
+/// Add replace init.
+extension Type {
+
+    /// Replace the variable with the value.
+    /// - Parameters:
+    ///   - type: The type containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
+    @inlinable
+    init?(type: Type, replacing variable: VariableName, with value: VariableName) {
+        switch type {
+        case .alias(let name):
+            guard name == variable else {
+                self = type
+                return
+            }
+            self = .alias(name: value)
+            return
+        case .signal:
+            self = type
+            return
+        }
     }
 
 }

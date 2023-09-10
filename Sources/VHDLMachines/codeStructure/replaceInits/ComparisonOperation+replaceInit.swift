@@ -64,7 +64,7 @@ extension ComparisonOperation {
     ///   - operation: The operation containing the `variable`'s to be replaced.
     ///   - variable: The `variable` to replace.
     ///   - value: The new `value` to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(operation: ComparisonOperation, replacing variable: VariableName, with value: VariableName) {
         switch operation {
         case .equality(let lhs, let rhs):

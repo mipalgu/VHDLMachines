@@ -64,7 +64,7 @@ extension Expression {
     ///   - expression: The expression containing the `variable`'s to replace.
     ///   - variable: The variable to replace.
     ///   - value: The new `value` to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(expression: Expression, replacing variable: VariableName, with value: VariableName) {
         switch expression {
         case .binary(let operation):
@@ -106,9 +106,12 @@ extension Expression {
             }
             self = .precedence(value: newValue)
         case .reference(let reference):
-            self = .reference(variable: VariableReference(
-                reference: reference, replacing: variable, with: value
-            ))
+            guard
+                let newReference = VariableReference(reference: reference, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .reference(variable: newReference)
         }
     }
 

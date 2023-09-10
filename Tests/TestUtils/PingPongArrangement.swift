@@ -163,7 +163,7 @@ public struct PingPongArrangement {
     /// The ping wait states transition.
     public let pingWaitTransition = Transition(
         condition: .conditional(condition: .comparison(value: .equality(
-            lhs: .reference(variable: .variable(name: VariableName(rawValue: "pong")!)),
+            lhs: .reference(variable: .variable(reference: .variable(name: VariableName(rawValue: "pong")!))),
             rhs: .literal(value: .bit(value: .high))
         ))),
         source: 1,
@@ -178,7 +178,7 @@ public struct PingPongArrangement {
     /// The pong wait states transition.
     public let pongWaitTransition = Transition(
         condition: .conditional(condition: .comparison(value: .equality(
-            lhs: .reference(variable: .variable(name: VariableName(rawValue: "ping")!)),
+            lhs: .reference(variable: .variable(reference: .variable(name: VariableName(rawValue: "ping")!))),
             rhs: .literal(value: .bit(value: .high))
         ))),
         source: 0,
@@ -186,11 +186,16 @@ public struct PingPongArrangement {
     )
 
     /// The includes.
-    public let includes: [Include] = [
-        .library(value: "IEEE"),
-        .include(value: "IEEE.STD_LOGIC_1164.ALL"),
-        .include(value: "IEEE.NUMERIC_STD.ALL")
-    ]
+    public let includes: [Include] = {
+        guard let stdLogicImport = UseStatement(rawValue: "use IEEE.STD_LOGIC_1164.ALL;") else {
+            fatalError("Failed")
+        }
+        return [
+            .library(value: VariableName(rawValue: "IEEE")!),
+            .include(statement: stdLogicImport),
+            .include(statement: UseStatement(rawValue: "use IEEE.NUMERIC_STD.ALL;")!)
+        ]
+    }()
 
     /// The ping machine.
     public var pingMachine: Machine {
@@ -254,8 +259,8 @@ public struct PingPongArrangement {
     /// The VHDL code for the Ping machine.
     public let pingCode = """
     library IEEE;
-    use IEEE.STD_LOGIC_1164.ALL;
-    use IEEE.NUMERIC_STD.ALL;
+    use IEEE.STD_LOGIC_1164.all;
+    use IEEE.NUMERIC_STD.all;
 
     entity PingMachine is
         port(

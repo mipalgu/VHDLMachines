@@ -61,7 +61,7 @@ extension Entity {
 
     /// Create the entity declaration for a machine.
     /// - Parameter machine: The machine to convert.
-    @usableFromInline
+    @inlinable
     init?(machine: Machine) {
         let clocks = machine.clocks.map { PortSignal(clock: $0) }
         var signals: [PortSignal] = clocks + machine.externalSignals.map {

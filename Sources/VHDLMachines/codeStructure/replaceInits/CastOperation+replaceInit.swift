@@ -67,7 +67,7 @@ extension CastOperation {
     ///   - operation: The operation containing the `variable`'s to replace.
     ///   - variable: The variable to replace.
     ///   - value: The new value to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(operation: CastOperation, replacing variable: VariableName, with value: VariableName) {
         switch operation {
         case .bit(let expression):

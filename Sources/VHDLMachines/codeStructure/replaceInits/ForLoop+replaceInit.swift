@@ -64,7 +64,7 @@ extension ForLoop {
     ///   - loop: The loop containing the `variable`'s to replace.
     ///   - variable: The variable to replace.
     ///   - value: The new value to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(loop: ForLoop, replacing variable: VariableName, with value: VariableName) {
         guard
             let newRange = VectorSize(size: loop.range, replacing: variable, with: value),

@@ -64,19 +64,26 @@ extension Statement {
     ///   - statement: The statement containing the `variable`'s to replace.
     ///   - variable: The variable to replace.
     ///   - value: The new value to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(statement: Statement, replacing variable: VariableName, with value: VariableName) {
         switch statement {
         case .assignment(let name, let expression):
-            let newName = VariableReference(reference: name, replacing: variable, with: value)
             guard
+                let newName = VariableReference(reference: name, replacing: variable, with: value),
                 let newExpression = Expression(expression: expression, replacing: variable, with: value)
             else {
                 return nil
             }
             self = .assignment(name: newName, value: newExpression)
-        case .comment, .null:
+        case .comment, .null, .exit:
             self = statement
+        case .returns(let expression):
+            guard
+                let newExpression = Expression(expression: expression, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .returns(value: newExpression)
         }
     }
 

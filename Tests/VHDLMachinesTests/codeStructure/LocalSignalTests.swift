@@ -92,7 +92,7 @@ final class LocalSignalTests: XCTestCase {
                     type: type,
                     name: .currentState,
                     defaultValue: .reference(
-                        variable: .variable(name: VariableName.name(for: suspendedState))
+                        variable: .variable(reference: .variable(name: .name(for: suspendedState)))
                     ),
                     comment: nil
                 ),
@@ -100,7 +100,7 @@ final class LocalSignalTests: XCTestCase {
                     type: type,
                     name: .targetState,
                     defaultValue: .reference(
-                        variable: .variable(name: VariableName.name(for: suspendedState))
+                        variable: .variable(reference: .variable(name: .name(for: suspendedState)))
                     ),
                     comment: nil
                 ),
@@ -115,7 +115,9 @@ final class LocalSignalTests: XCTestCase {
                 LocalSignal(
                     type: type,
                     name: .suspendedFrom,
-                    defaultValue: .reference(variable: .variable(name: VariableName.name(for: initialState))),
+                    defaultValue: .reference(variable: .variable(
+                        reference: .variable(name: .name(for: initialState))
+                    )),
                     comment: nil
                 )
             ]

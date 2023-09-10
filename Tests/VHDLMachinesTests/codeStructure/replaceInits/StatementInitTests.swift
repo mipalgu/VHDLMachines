@@ -62,10 +62,10 @@ import XCTest
 final class StatementInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     /// A `y` variable.
-    let y = Expression.reference(variable: .variable(name: .y))
+    let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     // swiftlint:disable force_unwrapping
 
@@ -76,21 +76,25 @@ final class StatementInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// Test `assignment` name is replaced.
     func testAssignmentName() {
-        let original = Statement.assignment(name: .variable(name: .x), value: y)
+        let original = Statement.assignment(name: .variable(reference: .variable(name: .x)), value: y)
         let result = Statement(statement: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, Statement.assignment(name: .variable(name: newX), value: y))
+        XCTAssertEqual(
+            result, Statement.assignment(name: .variable(reference: .variable(name: newX)), value: y)
+        )
     }
 
     /// Test `assignment` value is replaced.
     func testAssignmentValue() {
-        let original = Statement.assignment(name: .variable(name: .y), value: x)
+        let original = Statement.assignment(name: .variable(reference: .variable(name: .y)), value: x)
         let result = Statement(statement: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, Statement.assignment(name: .variable(name: .y), value: expNewX))
+        XCTAssertEqual(
+            result, Statement.assignment(name: .variable(reference: .variable(name: .y)), value: expNewX)
+        )
     }
 
     /// Test `comment` does nothing.

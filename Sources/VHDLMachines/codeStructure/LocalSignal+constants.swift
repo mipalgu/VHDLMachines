@@ -11,7 +11,7 @@ import VHDLParsing
 extension LocalSignal {
 
     /// The ringlet counter variable.
-    static let ringletCounter = LocalSignal(
+    @usableFromInline static let ringletCounter = LocalSignal(
         type: .natural,
         name: .ringletCounter,
         defaultValue: .literal(value: .integer(value: 0)),
@@ -29,21 +29,21 @@ extension LocalSignal {
 
     /// Create a local snapshot for an external variable.
     /// - Parameter signal: The signal to convert into a snapshot.
-    @usableFromInline
+    @inlinable
     init(snapshot signal: PortSignal) {
         self.init(type: signal.type, name: signal.name, defaultValue: nil, comment: nil)
     }
 
     /// Create a local snapshot for a parameter.
     /// - Parameter parameter: The parameter to convert into a snapshot.
-    @usableFromInline
+    @inlinable
     init(snapshot parameter: Parameter) {
         self.init(type: parameter.type, name: parameter.name, defaultValue: nil, comment: nil)
     }
 
     /// Create a local snapshot for an output parameter.
     /// - Parameter output: The output parameter to convert into a snapshot.
-    @usableFromInline
+    @inlinable
     init(snapshot output: ReturnableVariable) {
         self.init(type: output.type, name: output.name, defaultValue: nil, comment: nil)
     }
@@ -53,7 +53,7 @@ extension LocalSignal {
     /// Create the signals that track the internal states of the machine.
     /// - Parameter machine: The machine to create the trackers for.
     /// - Returns: The signals that track which state is executing.
-    @usableFromInline
+    @inlinable
     static func stateTrackers(machine: Machine) -> [LocalSignal]? {
         let states = machine.states
         guard
@@ -70,7 +70,7 @@ extension LocalSignal {
         )
         let stateType = SignalType.ranged(type: .stdLogicVector(size: range))
         let initialState = Expression.reference(
-            variable: .variable(name: VariableName.name(for: states[machine.initialState]))
+            variable: .variable(reference: .variable(name: .name(for: states[machine.initialState])))
         )
         guard let size = range.size else {
             return nil
@@ -110,7 +110,7 @@ extension LocalSignal {
             ]
         }
         let suspendedState = Expression.reference(
-            variable: .variable(name: VariableName.name(for: states[suspendedStateIndex]))
+            variable: .variable(reference: .variable(name: .name(for: states[suspendedStateIndex])))
         )
         let defaultState = machine.isParameterised ? suspendedState : initialState
         return [

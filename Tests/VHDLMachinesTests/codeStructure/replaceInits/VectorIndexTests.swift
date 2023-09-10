@@ -1,4 +1,4 @@
-// State+stateInit.swift
+// VectorIndexTests.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -54,51 +54,25 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Foundation
-import LLFSMModel
-import VHDLMachines
+@testable import VHDLMachines
 import VHDLParsing
+import XCTest
 
-/// Add initialiser for `LLFSMModel.State`.
-extension VHDLMachines.State {
+/// Test class for `VectorIndex` extensions.
+final class VectorIndexTests: XCTestCase {
 
-    /// Create a `VHDLMachines.State` from a `LLFSMModel.State`.
-    /// - Parameters:
-    ///   - state: The state to convert.
-    ///   - externalVariables: The available external variables this state has access too.
-    @inlinable
-    public init?(state: LLFSMModel.State, externalVariables: [PortSignal]) {
-        guard let name = VariableName(rawValue: state.name) else {
-            return nil
-        }
-        let signals = state.variables.compactMap(LocalSignal.init(variable:))
-        guard signals.count == state.variables.count else {
-            return nil
-        }
-        let existingExternals = Set(externalVariables.map(\.name))
-        let externals = state.externalVariables.compactMap(VariableName.init(rawValue:))
-        guard
-            externals.count == state.externalVariables.count,
-            externals.allSatisfy(existingExternals.contains)
-        else {
-            return nil
-        }
-        let validActions = state.actions.lazy.filter {
-            !$1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }
-        let actions: [(VariableName, SynchronousBlock)] = validActions.compactMap {
-            guard let name = VariableName(rawValue: $0), let code = SynchronousBlock(rawValue: $1) else {
-                return nil
-            }
-            return (name, code)
-        }
-        let actionsDictionary = Dictionary(uniqueKeysWithValues: actions)
-        guard actionsDictionary.count == validActions.count else {
-            return nil
-        }
-        self.init(
-            name: name, actions: actionsDictionary, signals: signals, externalVariables: externals.sorted()
+    /// Test replace init.
+    func testReplaceInit() {
+        let original = VectorIndex.index(
+            value: .reference(variable: .variable(reference: .variable(name: .x)))
         )
+        let replaceX = VectorIndex(index: original, replacing: .x, with: .xs)
+        let expected = VectorIndex.index(
+            value: .reference(variable: .variable(reference: .variable(name: .xs)))
+        )
+        XCTAssertEqual(replaceX, expected)
+        XCTAssertEqual(original, VectorIndex(index: original, replacing: .y, with: .clk))
+        XCTAssertEqual(VectorIndex.others, VectorIndex(index: .others, replacing: .y, with: .clk))
     }
 
 }

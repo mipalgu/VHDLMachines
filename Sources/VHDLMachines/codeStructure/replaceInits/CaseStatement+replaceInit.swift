@@ -64,7 +64,7 @@ extension CaseStatement {
     ///   - statement: The statement containing the `variable`'s to replace.
     ///   - variable: The variable to replace.
     ///   - value: The new value to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(statement: CaseStatement, replacing variable: VariableName, with value: VariableName) {
         let newCases = statement.cases.compactMap {
             WhenCase(whenCase: $0, replacing: variable, with: value)

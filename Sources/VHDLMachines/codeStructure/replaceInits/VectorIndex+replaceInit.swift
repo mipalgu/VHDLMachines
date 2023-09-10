@@ -1,4 +1,4 @@
-// State+stateInit.swift
+// VectorIndex+replaceInit.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -54,51 +54,35 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Foundation
-import LLFSMModel
-import VHDLMachines
 import VHDLParsing
 
-/// Add initialiser for `LLFSMModel.State`.
-extension VHDLMachines.State {
+/// Add replace init.
+extension VectorIndex {
 
-    /// Create a `VHDLMachines.State` from a `LLFSMModel.State`.
+    /// Replace the variable with the value.
     /// - Parameters:
-    ///   - state: The state to convert.
-    ///   - externalVariables: The available external variables this state has access too.
+    ///   - index: The index containing the variable to replace.
+    ///   - variable: The variable to replace.
+    ///   - value: The value to replace the variable with.
     @inlinable
-    public init?(state: LLFSMModel.State, externalVariables: [PortSignal]) {
-        guard let name = VariableName(rawValue: state.name) else {
-            return nil
-        }
-        let signals = state.variables.compactMap(LocalSignal.init(variable:))
-        guard signals.count == state.variables.count else {
-            return nil
-        }
-        let existingExternals = Set(externalVariables.map(\.name))
-        let externals = state.externalVariables.compactMap(VariableName.init(rawValue:))
-        guard
-            externals.count == state.externalVariables.count,
-            externals.allSatisfy(existingExternals.contains)
-        else {
-            return nil
-        }
-        let validActions = state.actions.lazy.filter {
-            !$1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }
-        let actions: [(VariableName, SynchronousBlock)] = validActions.compactMap {
-            guard let name = VariableName(rawValue: $0), let code = SynchronousBlock(rawValue: $1) else {
+    init?(index: VectorIndex, replacing variable: VariableName, with value: VariableName) {
+        switch index {
+        case .index(let expression):
+            guard let newIndex = Expression(expression: expression, replacing: variable, with: value) else {
                 return nil
             }
-            return (name, code)
+            self = .index(value: newIndex)
+            return
+        case .others:
+            self = .others
+            return
+        case .range(let size):
+            guard let newSize = VectorSize(size: size, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .range(value: newSize)
+            return
         }
-        let actionsDictionary = Dictionary(uniqueKeysWithValues: actions)
-        guard actionsDictionary.count == validActions.count else {
-            return nil
-        }
-        self.init(
-            name: name, actions: actionsDictionary, signals: signals, externalVariables: externals.sorted()
-        )
     }
 
 }

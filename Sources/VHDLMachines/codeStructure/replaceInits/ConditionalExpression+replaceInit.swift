@@ -64,7 +64,7 @@ extension ConditionalExpression {
     ///   - expression: The expression containing the `variable`'s to replace.
     ///   - variable: The `variable` to replace.
     ///   - value: The `value` to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(expression: ConditionalExpression, replacing variable: VariableName, with value: VariableName) {
         switch expression {
         case .comparison(let operation):

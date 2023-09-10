@@ -75,7 +75,10 @@ extension VHDLMachines.Machine {
             let clocks = [Clock](convert: machine.globalVariables),
             !clocks.isEmpty,
             let parameters = [Parameter](convert: machine.parameters),
-            let returnables = [ReturnableVariable](convert: machine.returnables)
+            let returnables = [ReturnableVariable](convert: machine.returnables),
+            let ieee = VariableName(rawValue: "IEEE"),
+            let stdLogicImport = UseStatement(rawValue: "use IEEE.std_logic_1164.all;"),
+            let mathRealImport = UseStatement(rawValue: "use IEEE.math_real.all;")
         else {
             return nil
         }
@@ -106,9 +109,9 @@ extension VHDLMachines.Machine {
                 fileURLWithPath: "\(FileManager().currentDirectoryPath)/\(name).machine", isDirectory: true
             ),
             includes: [
-                .library(value: "IEEE"),
-                .include(value: "IEEE.std_logic_1164.ALL"),
-                .include(value: "IEEE.math_real.ALL")
+                .library(value: ieee),
+                .include(statement: stdLogicImport),
+                .include(statement: mathRealImport)
             ],
             externalSignals: externalVariables,
             clocks: clocks,

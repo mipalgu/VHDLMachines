@@ -62,7 +62,7 @@ import XCTest
 final class EdgeConditionInitTests: XCTestCase {
 
     /// An `x` variable.
-    let x = Expression.reference(variable: .variable(name: .x))
+    let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
     // swiftlint:disable force_unwrapping
 
@@ -73,7 +73,7 @@ final class EdgeConditionInitTests: XCTestCase {
 
     /// `newX` as an expression.
     var expNewX: Expression {
-        .reference(variable: .variable(name: newX))
+        .reference(variable: .variable(reference: .variable(name: newX)))
     }
 
     /// Test the `rising` case.

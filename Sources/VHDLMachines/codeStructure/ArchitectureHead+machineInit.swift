@@ -64,7 +64,7 @@ extension ArchitectureHead {
 
     /// Create an architecture head for a machine.
     /// - Parameter machine: The machine to create the head for.
-    @usableFromInline
+    @inlinable
     init?(machine: Machine) {
         var actionNames = machine.actions
         if !machine.isSuspensible {
@@ -102,7 +102,7 @@ extension ArchitectureHead {
                 lower: .literal(value: .integer(value: 0))
             ))),
             name: .internalState,
-            defaultValue: .reference(variable: .variable(name: .readSnapshot)),
+            defaultValue: .reference(variable: .variable(reference: .variable(name: .readSnapshot))),
             comment: nil
         )
         let stateRepresentation = machine.states.enumerated()

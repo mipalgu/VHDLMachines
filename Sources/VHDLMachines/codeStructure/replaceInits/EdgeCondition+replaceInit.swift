@@ -64,7 +64,7 @@ extension EdgeCondition {
     ///   - condition: The condition containing the `variable` to replace.
     ///   - variable: The `variable` to replace.
     ///   - value: The `value` to replace the `variable` with.
-    @usableFromInline
+    @inlinable
     init?(condition: EdgeCondition, replacing variable: VariableName, with value: VariableName) {
         switch condition {
         case .rising(let expression):

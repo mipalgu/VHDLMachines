@@ -70,15 +70,15 @@ final class VariableReferenceInitTests: XCTestCase {
 
     /// Test `variable` case.
     func testVariable() {
-        let x = VariableReference.variable(name: .x)
+        let x = VariableReference.variable(reference: .variable(name: .x))
         let result = VariableReference(reference: x, replacing: .x, with: newX)
-        let expected = VariableReference.variable(name: newX)
+        let expected = VariableReference.variable(reference: .variable(name: newX))
         XCTAssertEqual(result, expected)
     }
 
     /// Test `variable` case when variable doesn't match.
     func testInvalidVariable() {
-        let x = VariableReference.variable(name: .x)
+        let x = VariableReference.variable(reference: .variable(name: .x))
         let result = VariableReference(reference: x, replacing: .y, with: newX)
         XCTAssertEqual(result, x)
     }
