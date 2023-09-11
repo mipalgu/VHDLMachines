@@ -105,8 +105,14 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
         let variables = Set(machineAndExternals)
         guard
             variables.count == machineAndExternals.count,
-            machine.states.allSatisfy({ state in
-                state.signals.allSatisfy {
+            machine.states.allSatisfy({ (state: State) -> Bool in
+                let disallowedVariables = Set(machine.externalSignals.map(\.name).filter {
+                    !state.externalVariables.contains($0)
+                })
+                let isntUsingBadVariables = state.actions.allSatisfy { (_, block: SynchronousBlock) -> Bool in
+                    block.allVariables.intersection(disallowedVariables).isEmpty
+                }
+                return isntUsingBadVariables && state.signals.allSatisfy {
                     !variables.contains($0.name) &&
                     !variables.contains(
                         // swiftlint:disable:next force_unwrapping
