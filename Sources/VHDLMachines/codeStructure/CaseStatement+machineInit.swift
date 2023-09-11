@@ -103,7 +103,7 @@ extension CaseStatement {
                 return nil
             }
             let condition = WhenCondition.expression(
-                expression: .reference(variable: .variable(reference: .variable(name: $0.name)))
+                expression: .reference(variable: .variable(reference: .variable(name: .name(for: $0))))
             )
             guard statements.count != 1 else {
                 return WhenCase(condition: condition, code: statements[0])
@@ -139,7 +139,7 @@ extension CaseStatement {
                 return nil
             }
             let condition = WhenCondition.expression(
-                expression: .reference(variable: .variable(reference: .variable(name: $0.name)))
+                expression: .reference(variable: .variable(reference: .variable(name: .name(for: $0))))
             )
             guard statements.count != 1 else {
                 return WhenCase(condition: condition, code: statements[0])

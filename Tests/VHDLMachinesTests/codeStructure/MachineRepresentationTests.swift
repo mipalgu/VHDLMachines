@@ -96,7 +96,11 @@ final class MachineRepresentationTests: XCTestCase {
         }
         machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
         machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNotNil(MachineRepresentation(machine: machine))
+        let representation = MachineRepresentation(machine: machine)
+        XCTAssertNotNil(representation)
+        representation?.architectureBody.rawValue.components(separatedBy: .newlines).forEach {
+            print($0)
+        }
         machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
         XCTAssertNil(MachineRepresentation(machine: machine))
     }
