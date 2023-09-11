@@ -76,7 +76,7 @@ extension State {
                 VariableName.internal: SynchronousBlock(rawValue: "x <= '1'; -- \(name) Internal")!
             ],
             signals: [],
-            externalVariables: []
+            externalVariables: [.x, .xx]
         )
     }
 
