@@ -329,6 +329,8 @@ public struct PingPongArrangement {
                         case currentState is
                             when STATE_Check =>
                                 pong <= EXTERNAL_pong;
+                            when STATE_Ping =>
+                                pong <= EXTERNAL_pong;
                             when others =>
                                 null;
                         end case;
