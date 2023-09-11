@@ -83,4 +83,76 @@ extension CaseStatement {
         )
     }
 
+    init?(readSnapshotsFor machine: Machine) {
+        let variables = Set(machine.externalSignals.filter { $0.mode != .output }.map(\.name))
+        let states = machine.states.filter {
+            !$0.externalVariables.filter { variable in variables.contains(variable) }.isEmpty
+        }
+        let cases: [WhenCase] = states.compactMap {
+            let snapshots = $0.externalVariables.filter { variable in variables.contains(variable) }
+            let statements: [SynchronousBlock] = snapshots.compactMap {
+                guard let externalName = VariableName(rawValue: "EXTERNAL_\($0.rawValue)") else {
+                    return nil
+                }
+                return SynchronousBlock.statement(statement: .assignment(
+                    name: .variable(reference: .variable(name: $0)),
+                    value: .reference(variable: .variable(reference: .variable(name: externalName)))
+                ))
+            }
+            guard statements.count == snapshots.count else {
+                return nil
+            }
+            let condition = WhenCondition.expression(
+                expression: .reference(variable: .variable(reference: .variable(name: $0.name)))
+            )
+            guard statements.count != 1 else {
+                return WhenCase(condition: condition, code: statements[0])
+            }
+            return WhenCase(condition: condition, code: .blocks(blocks: statements))
+        }
+        guard cases.count == states.count else {
+            return nil
+        }
+        self.init(
+            condition: .reference(variable: .variable(reference: .variable(name: .currentState))),
+            cases: cases + [.othersNull]
+        )
+    }
+
+    init?(writeSnapshotsFor machine: Machine) {
+        let variables = Set(machine.externalSignals.filter { $0.mode != .input }.map(\.name))
+        let states = machine.states.filter {
+            !$0.externalVariables.filter { variable in variables.contains(variable) }.isEmpty
+        }
+        let cases: [WhenCase] = states.compactMap {
+            let snapshots = $0.externalVariables.filter { variable in variables.contains(variable) }
+            let statements: [SynchronousBlock] = snapshots.compactMap {
+                guard let externalName = VariableName(rawValue: "EXTERNAL_\($0.rawValue)") else {
+                    return nil
+                }
+                return SynchronousBlock.statement(statement: .assignment(
+                    name: .variable(reference: .variable(name: externalName)),
+                    value: .reference(variable: .variable(reference: .variable(name: $0)))
+                ))
+            }
+            guard statements.count == snapshots.count else {
+                return nil
+            }
+            let condition = WhenCondition.expression(
+                expression: .reference(variable: .variable(reference: .variable(name: $0.name)))
+            )
+            guard statements.count != 1 else {
+                return WhenCase(condition: condition, code: statements[0])
+            }
+            return WhenCase(condition: condition, code: .blocks(blocks: statements))
+        }
+        guard cases.count == states.count else {
+            return nil
+        }
+        self.init(
+            condition: .reference(variable: .variable(reference: .variable(name: .currentState))),
+            cases: cases + [.othersNull]
+        )
+    }
+
 }

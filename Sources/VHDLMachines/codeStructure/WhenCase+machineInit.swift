@@ -421,14 +421,10 @@ extension WhenCase {
             expression: .reference(variable: .variable(reference: .variable(name: .readSnapshot)))
         )
         let initialState = machine.states[machine.initialState]
-        let snapshots = machine.externalSignals.filter { $0.mode != .output }.map {
-            SynchronousBlock.statement(
-                statement: .assignment(
-                    name: .variable(reference: .variable(name: $0.name)),
-                    value: .reference(variable: .variable(reference: .variable(name: .name(for: $0))))
-                )
-            )
+        guard let snapshotsCase = CaseStatement(readSnapshotsFor: machine) else {
+            return nil
         }
+        let snapshots = [SynchronousBlock.caseStatement(block: snapshotsCase)]
         // OnEntry semantics. Only perform OnEntry when previousRinglet != currentState.
         let onEntryBlock = IfBlock.ifElse(
             condition: .conditional(condition: .comparison(
@@ -790,12 +786,10 @@ extension WhenCase {
     /// Create the `writeSnapshot` case for a machine.
     /// - Parameter machine: The machine to create the case for.
     private init?(writeSnapshotMachine machine: Machine) {
-        let snapshots = machine.externalSignals.filter { $0.mode != .input }.map {
-            SynchronousBlock.statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .name(for: $0))),
-                value: .reference(variable: .variable(reference: .variable(name: $0.name)))
-            ))
+        guard let snapshotCase = CaseStatement(writeSnapshotsFor: machine) else {
+            return nil
         }
+        let snapshots = [SynchronousBlock.caseStatement(block: snapshotCase)]
         var blocks = snapshots + [
             .statement(statement: .assignment(
                 name: .variable(reference: .variable(name: .internalState)),
