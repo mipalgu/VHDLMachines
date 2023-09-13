@@ -83,7 +83,6 @@ extension Machine {
         ],
         states: [
             State(
-                name: "Initial",
                 actions: [
                     "OnEntry": "z <= '0';",
                     "OnExit": "x <= '0'; -- Initial OnExit",
@@ -91,6 +90,8 @@ extension Machine {
                     "OnSuspend": "xx <= \"11\"; -- Initial onSuspend",
                     "Internal": "x <= '1'; -- Initial Internal"
                 ],
+                externalVariables: ["x", "xx"],
+                name: "Initial",
                 transitions: [
                     Transition(target: "Suspended", condition: "z = '1'"),
                     Transition(target: "Suspended", condition: "false"),
@@ -105,14 +106,35 @@ extension Machine {
                 ]
             ),
             State(
+                actions: [
+                    "OnEntry": "x <= '1';\nxx <= \"00\"; -- Suspended onEntry",
+                    "OnExit": "x <= '0'; -- Suspended OnExit",
+                    "OnResume": "x <= '0'; -- Suspended OnResume",
+                    "OnSuspend": "xx <= \"11\"; -- Suspended onSuspend",
+                    "Internal": "x <= '1'; -- Suspended Internal"
+                ],
+                externalVariables: ["x", "xx"],
                 name: "Suspended",
                 transitions: [
                     Transition(target: "State0", condition: "xx = \"11\""),
                     Transition(target: "State0", condition: "x = '1'"),
                     Transition(target: "Initial", condition: "true")
-                ]
+                ],
+                variables: []
             ),
-            State(name: "State0")
+            State(
+                actions: [
+                    "OnEntry": "x <= '1';\nxx <= \"00\"; -- State0 onEntry",
+                    "OnExit": "x <= '0'; -- State0 OnExit",
+                    "OnResume": "x <= '0'; -- State0 OnResume",
+                    "OnSuspend": "xx <= \"11\"; -- State0 onSuspend",
+                    "Internal": "x <= '1'; -- State0 Internal"
+                ],
+                externalVariables: ["x", "xx"],
+                name: "State0",
+                transitions: [],
+                variables: []
+            ),
         ],
         suspendedState: "Suspended",
         variables: [
