@@ -86,7 +86,7 @@ extension CaseStatement {
     init?(readSnapshotsFor machine: Machine) {
         let variables = Set(machine.externalSignals.filter { $0.mode != .output }.map(\.name))
         let states = machine.states.filter {
-            !$0.externalVariables.filter { variable in variables.contains(variable) }.isEmpty
+            $0.externalVariables.contains { variable in variables.contains(variable) }
         }
         let cases: [WhenCase] = states.compactMap {
             let snapshots = $0.externalVariables.filter { variable in variables.contains(variable) }
@@ -122,7 +122,7 @@ extension CaseStatement {
     init?(writeSnapshotsFor machine: Machine) {
         let variables = Set(machine.externalSignals.filter { $0.mode != .input }.map(\.name))
         let states = machine.states.filter {
-            !$0.externalVariables.filter { variable in variables.contains(variable) }.isEmpty
+            $0.externalVariables.contains { variable in variables.contains(variable) }
         }
         let cases: [WhenCase] = states.compactMap {
             let snapshots = $0.externalVariables.filter { variable in variables.contains(variable) }

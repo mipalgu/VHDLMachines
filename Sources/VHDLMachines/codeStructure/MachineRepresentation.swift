@@ -110,7 +110,7 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
                     !state.externalVariables.contains($0)
                 })
                 let isntUsingBadVariables = state.actions.allSatisfy { (_, block: SynchronousBlock) -> Bool in
-                    block.allVariables.intersection(disallowedVariables).isEmpty
+                    block.allVariables.isDisjoint(with: disallowedVariables)
                 }
                 return isntUsingBadVariables && state.signals.allSatisfy {
                     !variables.contains($0.name) &&

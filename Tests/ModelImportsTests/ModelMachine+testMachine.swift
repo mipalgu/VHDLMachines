@@ -134,7 +134,7 @@ extension Machine {
                 name: "State0",
                 transitions: [],
                 variables: []
-            ),
+            )
         ],
         suspendedState: "Suspended",
         variables: [

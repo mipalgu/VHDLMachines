@@ -56,12 +56,14 @@
 
 import VHDLParsing
 
+/// Add `allVariables`.
 extension SynchronousBlock {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .blocks(let blocks):
-            return blocks.reduce(Set<VariableName>()) { $0.union($1.allVariables) }
+            return blocks.reduce(into: Set<VariableName>()) { $0 = $0.union($1.allVariables) }
         case .caseStatement(let block):
             return block.allVariables
         case .forLoop(let loop):
@@ -75,9 +77,11 @@ extension SynchronousBlock {
 
 }
 
+/// Add `allVariables`.
 extension Statement {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .assignment(let name, let value):
             return value.allVariables.union(name.allVariables)
@@ -90,9 +94,11 @@ extension Statement {
 
 }
 
+/// Add `allVariables`.
 extension IfBlock {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .ifElse(let condition, let ifBlock, let elseBlock):
             return condition.allVariables.union(ifBlock.allVariables).union(elseBlock.allVariables)
@@ -103,33 +109,41 @@ extension IfBlock {
 
 }
 
+/// Add `allVariables`.
 extension ForLoop {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         self.body.allVariables.union([self.iterator]).union(self.range.allVariables)
     }
 
 }
 
+/// Add `allVariables`.
 extension CaseStatement {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         self.cases.reduce(self.condition.allVariables) { $0.union($1.allVariables) }
     }
 
 }
 
+/// Add `allVariables`.
 extension WhenCase {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         self.code.allVariables.union(self.condition.allVariables)
     }
 
 }
 
+/// Add `allVariables`.
 extension WhenCondition {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .expression(let expression):
             return expression.allVariables
@@ -138,15 +152,17 @@ extension WhenCondition {
         case .range(let size):
             return size.allVariables
         case .selection(let expressions):
-            return expressions.reduce(Set<VariableName>()) { $0.union($1.allVariables) }
+            return expressions.reduce(into: Set<VariableName>()) { $0 = $0.union($1.allVariables) }
         }
     }
 
 }
 
+/// Add `allVariables`.
 extension Expression {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .binary(let operation):
             return operation.allVariables
@@ -169,9 +185,11 @@ extension Expression {
 
 }
 
+/// Add `allVariables`.
 extension VariableReference {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .indexed(let name, let index):
             return index.allVariables.union([name])
@@ -182,9 +200,11 @@ extension VariableReference {
 
 }
 
+/// Add `allVariables`.
 extension DirectReference {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .member(let access):
             return access.allVariables
@@ -195,17 +215,21 @@ extension DirectReference {
 
 }
 
+/// Add `allVariables`.
 extension MemberAccess {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         self.member.allVariables.union([self.record])
     }
 
 }
 
+/// Add `allVariables`.
 extension VectorIndex {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .index(let value):
             return value.allVariables
@@ -218,17 +242,21 @@ extension VectorIndex {
 
 }
 
+/// Add `allVariables`.
 extension VectorSize {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         self.max.allVariables.union(self.min.allVariables)
     }
 
 }
 
+/// Add `allVariables`.
 extension BooleanExpression {
 
-    var operands: [Expression] {
+    /// Get all operands of this expression.
+    @inlinable var operands: [Expression] {
         switch self {
         case .and(let lhs, let rhs):
             return [lhs, rhs]
@@ -247,15 +275,18 @@ extension BooleanExpression {
         }
     }
 
-    var allVariables: Set<VariableName> {
-        self.operands.reduce(Set<VariableName>()) { $0.union($1.allVariables) }
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
+        self.operands.reduce(into: Set<VariableName>()) { $0 = $0.union($1.allVariables) }
     }
 
 }
 
+/// Add `allVariables`.
 extension BinaryOperation {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .addition(let lhs, let rhs):
             return lhs.allVariables.union(rhs.allVariables)
@@ -272,17 +303,21 @@ extension BinaryOperation {
 
 }
 
+/// Add `allVariables`.
 extension CastOperation {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         self.expression.allVariables
     }
 
 }
 
+/// Add `allVariables`.
 extension ConditionalExpression {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .comparison(let value):
             return value.allVariables
@@ -295,9 +330,11 @@ extension ConditionalExpression {
 
 }
 
+/// Add `allVariables`.
 extension ComparisonOperation {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .equality(let lhs, let rhs):
             return lhs.allVariables.union(rhs.allVariables)
@@ -316,31 +353,37 @@ extension ComparisonOperation {
 
 }
 
+/// Add `allVariables`.
 extension EdgeCondition {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         self.expression.allVariables
     }
 
 }
 
+/// Add `allVariables`.
 extension FunctionCall {
 
-    var allVariables: Set<VariableName> {
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .custom(let function):
-            return function.arguments.reduce(Set<VariableName>()) { $0.union($1.allVariables) }
+            return function.arguments.reduce(into: Set<VariableName>()) { $0 = $0.union($1.allVariables) }
                 .union([function.name])
         case .mathReal(let function):
-            return function.arguments.reduce(Set<VariableName>()) { $0.union($1.allVariables) }
+            return function.arguments.reduce(into: Set<VariableName>()) { $0 = $0.union($1.allVariables) }
         }
     }
 
 }
 
+/// Add `allVariables`.
 extension MathRealFunctionCalls {
 
-    var arguments: [Expression] {
+    /// Return the arguments of this function.
+    @inlinable var arguments: [Expression] {
         switch self {
         case .ceil(let expression):
             return [expression]

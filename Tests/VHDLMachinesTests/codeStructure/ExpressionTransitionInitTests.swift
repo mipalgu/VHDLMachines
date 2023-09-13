@@ -96,10 +96,12 @@ final class ExpressionTransitionInitTests: XCTestCase {
             Expression(condition: .boolean(expression: .and(lhs: x, rhs: y))),
             .logical(operation: .and(lhs: x, rhs: y))
         )
-        XCTAssertEqual(Expression(
-            condition: .conditional(condition: .literal(value: true))),
-            .conditional(condition: .literal(value: true)
-        ))
+        XCTAssertEqual(
+            Expression(
+                condition: .conditional(condition: .literal(value: true))
+            ),
+            .conditional(condition: .literal(value: true))
+        )
         XCTAssertEqual(
             Expression(condition: .equals(lhs: tx, rhs: ty)),
             .conditional(condition: .comparison(value: .equality(lhs: x, rhs: y)))

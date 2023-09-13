@@ -26,10 +26,10 @@ public class VHDLMachinesConverterTests: XCTestCase {
         .joined(separator: "/")
         .dropFirst()
 
-    /// Setup
-    override public func setUp() {
-        super.setUp()
-    }
+    // Setup
+    // override public func setUp() {
+    //     super.setUp()
+    // }
 
     // func test_initialMachine() {
 //        print("Hello VHDL Tests!")
