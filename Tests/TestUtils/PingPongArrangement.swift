@@ -212,7 +212,7 @@ public struct PingPongArrangement {
             isParameterised: false,
             parameterSignals: [],
             returnableSignals: [],
-            states: [pingState, checkState(externalVariables: [.pong], reset: "ping")],
+            states: [pingState, checkState(externalVariables: [.pong, .ping], reset: "ping")],
             transitions: [pingTransition, pingWaitTransition],
             initialState: 0,
             suspendedState: nil
@@ -234,7 +234,7 @@ public struct PingPongArrangement {
             isParameterised: false,
             parameterSignals: [],
             returnableSignals: [],
-            states: [checkState(externalVariables: [.ping], reset: "pong"), pongState],
+            states: [checkState(externalVariables: [.ping, .pong], reset: "pong"), pongState],
             transitions: [pongWaitTransition, pongTransition],
             initialState: 0,
             suspendedState: nil
@@ -327,9 +327,9 @@ public struct PingPongArrangement {
                         internalState <= WriteSnapshot;
                     when ReadSnapshot =>
                         case currentState is
-                            when STATE_Check =>
-                                pong <= EXTERNAL_pong;
                             when STATE_Ping =>
+                                pong <= EXTERNAL_pong;
+                            when STATE_Check =>
                                 pong <= EXTERNAL_pong;
                             when others =>
                                 null;
@@ -342,6 +342,8 @@ public struct PingPongArrangement {
                     when WriteSnapshot =>
                         case currentState is
                             when STATE_Ping =>
+                                EXTERNAL_ping <= ping;
+                            when STATE_Check =>
                                 EXTERNAL_ping <= ping;
                             when others =>
                                 null;

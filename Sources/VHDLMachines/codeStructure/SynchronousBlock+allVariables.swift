@@ -265,6 +265,8 @@ extension BinaryOperation {
             return lhs.allVariables.union(rhs.allVariables)
         case .subtraction(let lhs, let rhs):
             return lhs.allVariables.union(rhs.allVariables)
+        case .concatenate(let lhs, let rhs):
+            return lhs.allVariables.union(rhs.allVariables)
         }
     }
 

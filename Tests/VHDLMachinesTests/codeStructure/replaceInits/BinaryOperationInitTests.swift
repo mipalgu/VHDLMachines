@@ -107,4 +107,11 @@ final class BinaryOperationInitTests: XCTestCase {
         XCTAssertEqual(result, .multiplication(lhs: expNewX, rhs: y))
     }
 
+    /// Test `concatenation` operation.
+    func testConcat() {
+        let operation = BinaryOperation.concatenate(lhs: x, rhs: y)
+        let result = BinaryOperation(operation: operation, replacing: .x, with: newX)
+        XCTAssertEqual(result, .concatenate(lhs: expNewX, rhs: y))
+    }
+
 }

@@ -99,6 +99,14 @@ extension BinaryOperation {
                 return nil
             }
             self = .multiplication(lhs: newLhs, rhs: newRhs)
+        case .concatenate(let lhs, let rhs):
+            guard
+                let newLhs = Expression(expression: lhs, replacing: variable, with: value),
+                let newRhs = Expression(expression: rhs, replacing: variable, with: value)
+            else {
+                return nil
+            }
+            self = .concatenate(lhs: newLhs, rhs: newRhs)
         }
     }
 
