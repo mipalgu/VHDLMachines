@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "McColl"
+  given-names: "Morgan"
+  orcid: "https://orcid.org/0000-0003-4217-7210"
+title: "VHDLMachines"
+version: 1.2.2
+date-released: 2023-09-15
+url: "https://github.com/mipalgu/VHDLMachines"
+preferred-citation:
+  type: conference-paper
+  conference:
+    name: "2018 International Conference on ReConFigurable Computing and FPGAs (ReConFig)"
+  authors:
+  - family-names: "Estivill-Castro"
+    given-names: "Vladimir"
+  - family-names: "Hexel"
+    given-names: "Rene"
+  - family-names: "McColl"
+    given-names: "Morgan"
+    orcid: "https://orcid.org/0000-0003-4217-7210"
+  doi: "10.1109/RECONFIG.2018.8641710"
+  month: 12
+  start: 1
+  end: 8
+  title: "High-Level Executable Models of Reactive Real-Time Systems with Logic-Labelled Finite-State Machines and FPGAs"
+  year: 2018  
+  issn: 2640-0472
+  isbn: 978-1-7281-1968-7
+  location:
+    name: "Cancun, Mexico"
+  url: "https://ieeexplore.ieee.org/abstract/document/8641710"
