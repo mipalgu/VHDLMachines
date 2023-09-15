@@ -95,14 +95,20 @@ final class FunctionCallsInitTests: XCTestCase {
 
     /// Test `custom` case.
     func testCustom() {
-        let original = FunctionCall.custom(function: CustomFunctionCall(name: .y, arguments: [x]))
+        let original = FunctionCall.custom(function: CustomFunctionCall(
+            name: .y, parameters: [Argument(argument: x)]
+        ))
         let result = FunctionCall(call: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .custom(function: CustomFunctionCall(name: .y, arguments: [expNewX])))
+        XCTAssertEqual(result, .custom(function: CustomFunctionCall(
+            name: .y, parameters: [Argument(argument: expNewX)]
+        )))
     }
 
     /// Test `custom` does nothing for invalid variable.
     func testCustomDoesNothing() {
-        let original = FunctionCall.custom(function: CustomFunctionCall(name: .x, arguments: [y]))
+        let original = FunctionCall.custom(function: CustomFunctionCall(
+            name: .x, parameters: [Argument(argument: y)]
+        ))
         let result = FunctionCall(call: original, replacing: .x, with: newX)
         XCTAssertEqual(result, original)
     }

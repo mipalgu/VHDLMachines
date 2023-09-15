@@ -88,9 +88,13 @@ final class VariableReferenceInitTests: XCTestCase {
         let range = VectorIndex.range(value: .downto(
             upper: .literal(value: .integer(value: 3)), lower: .literal(value: .integer(value: 0))
         ))
-        let x = VariableReference.indexed(name: .x, index: range)
+        let x = VariableReference.indexed(
+            name: .reference(variable: .variable(reference: .variable(name: .x))), index: range
+        )
         let result = VariableReference(reference: x, replacing: .x, with: newX)
-        let expected = VariableReference.indexed(name: newX, index: range)
+        let expected = VariableReference.indexed(
+            name: .reference(variable: .variable(reference: .variable(name: newX))), index: range
+        )
         XCTAssertEqual(result, expected)
     }
 
@@ -99,7 +103,9 @@ final class VariableReferenceInitTests: XCTestCase {
         let range = VectorIndex.range(value: .downto(
             upper: .literal(value: .integer(value: 3)), lower: .literal(value: .integer(value: 0))
         ))
-        let x = VariableReference.indexed(name: .x, index: range)
+        let x = VariableReference.indexed(
+            name: .reference(variable: .variable(reference: .variable(name: .x))), index: range
+        )
         let result = VariableReference(reference: x, replacing: .y, with: newX)
         XCTAssertEqual(result, x)
     }
