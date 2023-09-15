@@ -68,7 +68,7 @@ final class FunctionImplementationTests: XCTestCase {
         let original = FunctionImplementation(
             name: .g,
             arguments: [ArgumentDefinition(name: .x, type: .alias(name: .y))],
-            returnTube: .alias(name: .z),
+            returnType: .alias(name: .z),
             body: .statement(statement: .returns(
                 value: .reference(variable: .variable(reference: .variable(name: .a)))
             ))
@@ -77,7 +77,7 @@ final class FunctionImplementationTests: XCTestCase {
         let expected = FunctionImplementation(
             name: .clk,
             arguments: [ArgumentDefinition(name: .x, type: .alias(name: .y))],
-            returnTube: .alias(name: .z),
+            returnType: .alias(name: .z),
             body: .statement(statement: .returns(
                 value: .reference(variable: .variable(reference: .variable(name: .a)))
             ))
@@ -87,7 +87,7 @@ final class FunctionImplementationTests: XCTestCase {
         let expected2 = FunctionImplementation(
             name: .g,
             arguments: [ArgumentDefinition(name: .xs, type: .alias(name: .y))],
-            returnTube: .alias(name: .z),
+            returnType: .alias(name: .z),
             body: .statement(statement: .returns(
                 value: .reference(variable: .variable(reference: .variable(name: .a)))
             ))
@@ -97,7 +97,7 @@ final class FunctionImplementationTests: XCTestCase {
         let expected3 = FunctionImplementation(
             name: .g,
             arguments: [ArgumentDefinition(name: .x, type: .alias(name: .clk2))],
-            returnTube: .alias(name: .z),
+            returnType: .alias(name: .z),
             body: .statement(statement: .returns(
                 value: .reference(variable: .variable(reference: .variable(name: .a)))
             ))
@@ -107,7 +107,7 @@ final class FunctionImplementationTests: XCTestCase {
         let expected4 = FunctionImplementation(
             name: .g,
             arguments: [ArgumentDefinition(name: .x, type: .alias(name: .y))],
-            returnTube: .alias(name: .command),
+            returnType: .alias(name: .command),
             body: .statement(statement: .returns(
                 value: .reference(variable: .variable(reference: .variable(name: .a)))
             ))
@@ -117,7 +117,7 @@ final class FunctionImplementationTests: XCTestCase {
         let expected5 = FunctionImplementation(
             name: .g,
             arguments: [ArgumentDefinition(name: .x, type: .alias(name: .y))],
-            returnTube: .alias(name: .z),
+            returnType: .alias(name: .z),
             body: .statement(statement: .returns(
                 value: .reference(variable: .variable(reference: .variable(name: .internal)))
             ))
