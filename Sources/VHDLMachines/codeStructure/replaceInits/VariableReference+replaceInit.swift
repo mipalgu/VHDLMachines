@@ -68,14 +68,13 @@ extension VariableReference {
     init?(reference: VariableReference, replacing variable: VariableName, with value: VariableName) {
         switch reference {
         case .indexed(let name, let index):
-            guard let newIndex = VectorIndex(index: index, replacing: variable, with: value) else {
+            guard
+                let newIndex = VectorIndex(index: index, replacing: variable, with: value),
+                let newName = Expression(expression: name, replacing: variable, with: value)
+            else {
                 return nil
             }
-            guard name == variable else {
-                self = .indexed(name: name, index: newIndex)
-                return
-            }
-            self = .indexed(name: value, index: index)
+            self = .indexed(name: newName, index: newIndex)
         case .variable(let ref):
             self = .variable(reference: DirectReference(reference: ref, replacing: variable, with: value))
         }

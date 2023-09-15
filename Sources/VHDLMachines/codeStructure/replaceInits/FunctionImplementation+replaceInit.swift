@@ -79,7 +79,7 @@ extension FunctionImplementation {
         self.init(
             name: function.name == variable ? value : function.name,
             arguments: newArguments,
-            returnTube: newReturn,
+            returnType: newReturn,
             body: newBody
         )
     }

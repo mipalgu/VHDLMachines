@@ -68,13 +68,19 @@ extension FunctionCall {
     init?(call: FunctionCall, replacing variable: VariableName, with value: VariableName) {
         switch call {
         case .custom(let function):
-            let newArguments = function.arguments.compactMap {
-                Expression(expression: $0, replacing: variable, with: value)
+            let newArguments: [Argument] = function.parameters.compactMap {
+                let newLabel = $0.label.flatMap { $0 == variable ? value : $0 }
+                guard
+                    let newArgument = Expression(expression: $0.argument, replacing: variable, with: value)
+                else {
+                    return nil
+                }
+                return Argument(label: newLabel, argument: newArgument)
             }
-            guard newArguments.count == function.arguments.count else {
+            guard newArguments.count == function.parameters.count else {
                 return nil
             }
-            self = .custom(function: CustomFunctionCall(name: function.name, arguments: newArguments))
+            self = .custom(function: CustomFunctionCall(name: function.name, parameters: newArguments))
         case .mathReal(let function):
             guard let newFunction = MathRealFunctionCalls(
                 function: function, replacing: variable, with: value

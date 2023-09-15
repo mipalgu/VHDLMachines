@@ -79,7 +79,7 @@ final class AllVariablesTests: XCTestCase {
         )
         XCTAssertEqual(VectorSize.downto(upper: x, lower: y).allVariables, [.x, .y])
         XCTAssertEqual(VariableReference.variable(reference: .variable(name: .x)).allVariables, [.x])
-        XCTAssertEqual(VariableReference.indexed(name: .x, index: .index(value: y)).allVariables, [.x, .y])
+        XCTAssertEqual(VariableReference.indexed(name: x, index: .index(value: y)).allVariables, [.x, .y])
         XCTAssertEqual(EdgeCondition.falling(expression: x).allVariables, [.x])
         XCTAssertEqual(EdgeCondition.rising(expression: x).allVariables, [.x])
     }
@@ -150,8 +150,9 @@ final class AllVariablesTests: XCTestCase {
     /// Test function calls.
     func testFunctions() {
         XCTAssertEqual(
-            // swiftlint:disable:next force_unwrapping
-            FunctionCall.custom(function: CustomFunctionCall(function: "y", arguments: [x])!).allVariables,
+            FunctionCall.custom(function: CustomFunctionCall(
+                name: .y, parameters: [Argument(argument: x)]
+            )).allVariables,
             [.y, .x]
         )
         XCTAssertEqual(FunctionCall.mathReal(function: .ceil(expression: x)).allVariables, [.x])

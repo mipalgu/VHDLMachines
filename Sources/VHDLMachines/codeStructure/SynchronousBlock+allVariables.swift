@@ -192,7 +192,7 @@ extension VariableReference {
     @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .indexed(let name, let index):
-            return index.allVariables.union([name])
+            return index.allVariables.union(name.allVariables)
         case .variable(let ref):
             return ref.allVariables
         }
@@ -370,7 +370,7 @@ extension FunctionCall {
     @inlinable var allVariables: Set<VariableName> {
         switch self {
         case .custom(let function):
-            return function.arguments.reduce(into: Set<VariableName>()) { $0 = $0.union($1.allVariables) }
+            return function.parameters.reduce(into: Set<VariableName>()) { $0 = $0.union($1.allVariables) }
                 .union([function.name])
         case .mathReal(let function):
             return function.arguments.reduce(into: Set<VariableName>()) { $0 = $0.union($1.allVariables) }
@@ -400,6 +400,19 @@ extension MathRealFunctionCalls {
         case .sqrt(let expression):
             return [expression]
         }
+    }
+
+}
+
+/// Add `allVariables`.
+extension Argument {
+
+    /// Return all the variables.
+    @inlinable var allVariables: Set<VariableName> {
+        guard let label = label else {
+            return self.argument.allVariables
+        }
+        return self.argument.allVariables.union([label])
     }
 
 }
