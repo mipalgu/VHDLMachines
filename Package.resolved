@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mipalgu/VHDLParsing",
       "state" : {
-        "revision" : "ae3976bd928f019b8fa786bf2182fc8806860bed",
-        "version" : "2.1.0"
+        "revision" : "49ffb700c06a1d6d2b8f82540608a16140e9c4f0",
+        "version" : "2.2.0"
       }
     }
   ],
