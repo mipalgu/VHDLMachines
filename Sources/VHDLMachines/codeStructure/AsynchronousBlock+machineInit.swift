@@ -130,6 +130,11 @@ extension AsynchronousBlock {
                 return nil
             }
             self = .function(block: newFunction)
+        case .generate(let block):
+            guard let newBlock = GenerateBlock(block: block, replacing: variable, with: value) else {
+                return nil
+            }
+            self = .generate(block: newBlock)
         }
     }
 
