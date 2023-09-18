@@ -236,12 +236,14 @@ extension VariableAssignment {
     @inlinable
     init?(assignment: VariableAssignment, replacing variable: VariableName, with value: VariableName) {
         switch assignment {
-        case .reference(let ref):
-            guard let newVariable = VariableReference(reference: ref, replacing: variable, with: value) else {
+        case .expression(let expression):
+            guard let newExpression = Expression(
+                expression: expression, replacing: variable, with: value
+            ) else {
                 return nil
             }
-            self = .reference(variable: newVariable)
-        case .literal, .open:
+            self = .expression(value: newExpression)
+        case .open:
             self = assignment
         }
     }
