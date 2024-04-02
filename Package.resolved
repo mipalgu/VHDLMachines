@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mipalgu/swift_helpers",
       "state" : {
-        "revision" : "e9a24071afbb43cf8ebd7c920ae108116d6685c5",
-        "version" : "2.0.0"
+        "revision" : "08ea0c8be6bbaa506591fc1630602b8df199e165",
+        "version" : "2.0.1"
       }
     },
     {
