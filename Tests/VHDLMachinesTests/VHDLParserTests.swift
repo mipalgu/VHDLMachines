@@ -54,7 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
+#if os(Linux) || os(Windows)
 import IO
 #endif
 import TestUtils
