@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - name: Setup Swift
-        uses: compnerd/gha-setup-swift@v0.2.1
+        uses: compnerd/gha-setup-swift@main
         with:
           branch: swift-${{ matrix.swift }}-release
           tag: ${{ matrix.swift }}-RELEASE
