@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mipalgu/GUUnits",
       "state" : {
-        "revision" : "536174de0e80dd0e46788490d3a5f42d8e14bac3",
-        "version" : "2.1.0"
+        "revision" : "dfbd93fbeaf4ad8ad6660e9c8b25e3f37b16fef3",
+        "version" : "2.1.1"
       }
     },
     {
