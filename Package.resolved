@@ -46,6 +46,15 @@
       }
     },
     {
+      "identity" : "swiftutils",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cpslabgu/SwiftUtils",
+      "state" : {
+        "revision" : "1be53114f5f9c6903304d6fb7831912e2a000af1",
+        "version" : "0.1.0"
+      }
+    },
+    {
       "identity" : "vhdlparsing",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mipalgu/VHDLParsing",
