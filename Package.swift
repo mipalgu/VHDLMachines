@@ -16,7 +16,7 @@ let dependencies: [PackageDescription.Package.Dependency] = [
 /// The package dependencies.
 let dependencies: [PackageDescription.Package.Dependency] = [
     .package(url: "https://github.com/mipalgu/VHDLParsing", from: "2.4.1"),
-    .package(url: "https://github.com/mipalgu/GUUnits", from: "2.1.0"),
+    .package(url: "https://github.com/mipalgu/GUUnits", from: "2.1.1"),
     .package(url: "https://github.com/mipalgu/LLFSMModel", from: "1.0.0"),
     .package(url: "https://github.com/cpslabgu/SwiftUtils", from: "0.1.0")
 ]
