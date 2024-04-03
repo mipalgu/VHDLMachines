@@ -85,6 +85,9 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.WORKFLOWS_SSH_PRIVATE_KEY }}
+
+      - name: Disable NTFS protection
+        run: git config --global core.protectNTFS false
       
       #- name: Reconfigure Private Repo URLs
       #  run: sed -i 's/git@github.com:/https:\/\/${{ secrets.ACCESS_TOKEN }}@github.com\//g' Package.swift
