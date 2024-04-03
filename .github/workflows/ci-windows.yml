@@ -89,10 +89,11 @@ jobs:
       #- name: Reconfigure Private Repo URLs
       #  run: sed -i 's/git@github.com:/https:\/\/${{ secrets.ACCESS_TOKEN }}@github.com\//g' Package.swift
 
-      - name: build
-        run: |
-          swift package purge-cache
-          swift build -c ${{ matrix.build_mode }}
+      - name: Clone dependencies
+        run: swift package update
+
+      - name: Build
+        run: swift build -c ${{ matrix.build_mode }}
 
       - name: Test
         run: swift test -c ${{ matrix.build_mode }}
