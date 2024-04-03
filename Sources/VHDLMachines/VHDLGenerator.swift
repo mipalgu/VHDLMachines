@@ -7,7 +7,7 @@
 
 import Foundation
 #if os(Linux) || os(Windows)
-import IO
+import SwiftUtils
 #endif
 
 /// A generator that can generate a `FileWrapper` from a ``Machine``.

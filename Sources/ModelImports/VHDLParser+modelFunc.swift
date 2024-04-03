@@ -56,7 +56,7 @@
 
 import Foundation
 #if os(Linux) || os(Windows)
-import IO
+import SwiftUtils
 #endif
 import LLFSMModel
 import VHDLMachines

@@ -55,7 +55,7 @@
 // 
 
 #if os(Linux) || os(Windows)
-import IO
+import SwiftUtils
 #endif
 import TestUtils
 @testable import VHDLMachines

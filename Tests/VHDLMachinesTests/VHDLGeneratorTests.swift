@@ -54,7 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import IO
+import SwiftUtils
 import TestUtils
 @testable import VHDLMachines
 import XCTest
@@ -72,12 +72,12 @@ final class VHDLGeneratorTests: XCTestCase {
     let decoder = JSONDecoder()
 
     /// IO helper.
-    let helper = FileHelpers()
+    let manager = FileManager.default
 
     /// Remove ping machine after every test.
     override func tearDown() {
-        if helper.directoryExists(factory.pingMachinePath.path) {
-            _ = helper.deleteItem(atPath: factory.pingMachinePath)
+        if manager.fileExists(atPath: factory.pingMachinePath.path) {
+            _ = try? manager.removeItem(at: factory.pingMachinePath)
         }
     }
 
@@ -117,17 +117,19 @@ final class VHDLGeneratorTests: XCTestCase {
         }
         XCTAssertTrue(wrapper.isDirectory)
         XCTAssertEqual(wrapper.preferredFilename, "PingMachine.machine")
-        if helper.directoryExists(machine.path.path) {
-            _ = helper.deleteItem(atPath: machine.path)
+        if manager.fileExists(atPath: machine.path.path) {
+            try manager.removeItem(at: machine.path)
         }
         let path = factory.machinePath.appendingPathComponent("PingMachine.machine", isDirectory: true)
         try wrapper.write(to: path, originalContentsURL: nil)
         defer {
-            if helper.directoryExists(path.path) {
-                XCTAssertTrue(helper.deleteItem(atPath: path))
+            if manager.fileExists(atPath: path.path) {
+                _ = try? manager.removeItem(at: path)
             }
         }
-        XCTAssertTrue(helper.directoryExists(path.path))
+        var isDirectory: ObjCBool = false
+        XCTAssertTrue(manager.fileExists(atPath: path.path, isDirectory: &isDirectory))
+        XCTAssertTrue(isDirectory.boolValue)
         let data = try Data(contentsOf: factory.pingPath)
         let newMachine = try decoder.decode(Machine.self, from: data)
         XCTAssertEqual(factory.pingMachine, newMachine)
