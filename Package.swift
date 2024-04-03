@@ -17,7 +17,6 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
         .package(url: "https://github.com/mipalgu/VHDLParsing", from: "2.4.0"),
         .package(url: "https://github.com/mipalgu/GUUnits", from: "2.1.0"),
-        .package(url: "https://github.com/mipalgu/swift_helpers", from: "2.0.1"),
         .package(url: "https://github.com/mipalgu/LLFSMModel", from: "1.0.0"),
         .package(url: "https://github.com/cpslabgu/SwiftUtils", from: "0.1.0")
     ],
@@ -28,7 +27,6 @@ let package = Package(
         .target(
             name: "VHDLMachines",
             dependencies: [
-                .product(name: "swift_helpers", package: "swift_helpers"),
                 .product(name: "SwiftUtils", package: "SwiftUtils"),
                 .product(name: "GUUnits", package: "GUUnits"),
                 .product(name: "VHDLParsing", package: "VHDLParsing"),
@@ -49,9 +47,7 @@ let package = Package(
             name: "VHDLMachinesTests",
             dependencies: [
                 "VHDLMachines",
-                .product(name: "swift_helpers", package: "swift_helpers"),
                 .product(name: "SwiftUtils", package: "SwiftUtils"),
-                .product(name: "Functional", package: "swift_helpers"),
                 .product(name: "GUUnits", package: "GUUnits"),
                 "VHDLParsing",
                 "TestUtils"
