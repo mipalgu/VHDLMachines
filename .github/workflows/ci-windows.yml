@@ -93,7 +93,7 @@ jobs:
         run: swift package update
 
       - name: Build
-        run: swift build -c ${{ matrix.build_mode }} -Xlinker ${{ env.SDKROOT }}\usr\lib\swift\windows\x86_64\swiftCore.lib
+        run: swift build -c ${{ matrix.build_mode }} -Xswiftc -lswiftCore -Xlinker ${{ env.SDKROOT }}\usr\lib\swift\windows\x86_64\swiftCore.lib
 
       - name: Test
-        run: swift test -c ${{ matrix.build_mode }} -Xlinker ${{ env.SDKROOT }}\usr\lib\swift\windows\x86_64\swiftCore.lib
+        run: swift test -c ${{ matrix.build_mode }} -Xswiftc -lswiftCore -Xlinker ${{ env.SDKROOT }}\usr\lib\swift\windows\x86_64\swiftCore.lib
