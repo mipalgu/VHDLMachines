@@ -17,7 +17,7 @@ import VHDLParsing
 /// perspective, the only variables defined here are the external variables (and signals), and clocks that
 /// also act as a special external signal. The arrangment variables defined in this struct are available to
 /// all machines within the same arrangement and act as variables with global scope.
-public struct Arrangement: Equatable, Hashable, Codable {
+public struct Arrangement: Equatable, Hashable, Codable, Sendable {
 
     /// All machines in the arrangement.
     public var machines: [VariableName: MachineMapping]
