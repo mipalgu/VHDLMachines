@@ -64,10 +64,10 @@ final class MachineRepresentationTests: XCTestCase {
     /// Test the machine initialiser creates the stored properties correctly.
     func testMachineInit() {
         let machine = Machine.testMachine()
-        let representation = MachineRepresentation(machine: machine)
+        let representation = MachineRepresentation(machine: machine, name: .testMachine)
         guard
             let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
+            let entity = Entity(machine: newMachine, name: .testMachine),
             let name = VariableName(rawValue: "Behavioral"),
             let head = ArchitectureHead(machine: newMachine),
             let body = AsynchronousBlock(machine: newMachine)
@@ -88,7 +88,7 @@ final class MachineRepresentationTests: XCTestCase {
         var machine = Machine.testMachine()
         machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
         machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
+        XCTAssertNil(MachineRepresentation(machine: machine, name: .testMachine))
         machine = Machine.testMachine()
         guard let var1 = VariableName(rawValue: "duplicateVar") else {
             XCTFail("Failed to create test variables.")
@@ -96,13 +96,13 @@ final class MachineRepresentationTests: XCTestCase {
         }
         machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
         machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
-        let representation = MachineRepresentation(machine: machine)
+        let representation = MachineRepresentation(machine: machine, name: .testMachine)
         XCTAssertNotNil(representation)
         // representation?.architectureBody.rawValue.components(separatedBy: .newlines).forEach {
         //     print($0)
         // }
         machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine))
+        XCTAssertNil(MachineRepresentation(machine: machine, name: .testMachine))
     }
 
 }

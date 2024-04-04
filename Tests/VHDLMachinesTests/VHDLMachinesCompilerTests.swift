@@ -38,7 +38,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// FileWrapper for the test machine.
     var testMachineFileWrapper: FileWrapper? {
-        VHDLGenerator().generate(machine: machine)
+        VHDLGenerator().generate(machine: machine, with: .testMachine)
     }
 
     // swiftlint:disable type_contents_order
