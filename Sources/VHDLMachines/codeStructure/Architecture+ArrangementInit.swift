@@ -83,15 +83,44 @@ extension Architecture {
             else {
                 return nil
             }
-            let maps = mapping.mappings.map {
-                VariableMap(
-                    lhs: .variable(reference: .variable(name: $0.destination)),
+            let machine = representation.machine
+            let externalMaps = machine.externalSignals.map { signal in
+                let signalName: VariableName = signal.name
+                // swiftlint:disable:next force_unwrapping
+                let portName = VariableName(rawValue: "EXTERNAL_\(signalName.rawValue)")!
+                guard
+                    let variableMapping = mapping.mappings.first(where: { $0.destination == signalName })
+                else {
+                    return VariableMap(
+                        lhs: .variable(reference: .variable(name: portName)),
+                        rhs: .open
+                    )
+                }
+                return VariableMap(
+                    lhs: .variable(reference: .variable(name: portName)),
                     rhs: .expression(value: .reference(variable: .variable(
-                        reference: .variable(name: $0.source)
+                        reference: .variable(name: variableMapping.source)
                     )))
                 )
             }
-            let portMap = PortMap(variables: maps)
+            let clockMaps = machine.clocks.map {
+                let signalName: VariableName = $0.name
+                guard
+                    let variableMapping = mapping.mappings.first(where: { $0.destination == signalName })
+                else {
+                    return VariableMap(
+                        lhs: .variable(reference: .variable(name: signalName)),
+                        rhs: .open
+                    )
+                }
+                return VariableMap(
+                    lhs: .variable(reference: .variable(name: variableMapping.destination)),
+                    rhs: .expression(value: .reference(variable: .variable(
+                        reference: .variable(name: variableMapping.source)
+                    )))
+                )
+            }
+            let portMap = PortMap(variables: clockMaps + externalMaps)
             return AsynchronousBlock.component(block: ComponentInstantiation(
                 label: label,
                 name: entity.name,

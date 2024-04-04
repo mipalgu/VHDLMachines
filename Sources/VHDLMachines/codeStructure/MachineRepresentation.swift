@@ -61,7 +61,7 @@ import VHDLParsing
 /// Logic-Labelled Finite-State Machines and FPGAs* published at ReConfig2018. This format does not contain
 /// any inherent fault tolerance, but does provide mechanisms for after statements, suspension and
 /// parameterisation. Snapshot semantics are present for both external variables and parameters.
-public struct MachineRepresentation: MachineVHDLRepresentable {
+public struct MachineRepresentation: MachineVHDLRepresentable, Equatable, Hashable, Codable, Sendable {
 
     /// The body of the architecture.
     public let architectureBody: AsynchronousBlock

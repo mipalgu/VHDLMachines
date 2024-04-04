@@ -59,7 +59,7 @@ extension Entity {
 
     init?(arrangement: Arrangement, name: VariableName) {
         let clocks = arrangement.clocks.map { PortSignal(clock: $0) }
-        guard let externals = PortBlock(signals: arrangement.externalSignals + clocks) else {
+        guard let externals = PortBlock(signals: clocks + arrangement.externalSignals) else {
             return nil
         }
         self.init(name: name, port: externals)

@@ -83,7 +83,9 @@ public struct ArrangementRepresentation<Representation>: ArrangementVHDLRepresen
         let arrangementVariables = Set(allArrangementVariables)
         guard
             arrangementVariables.count == allArrangementVariables.count,
-            arrangement.machines.allSatisfy({ arrangementVariables.contains($0.key) })
+            arrangement.machines.allSatisfy({
+                $0.value.mappings.allSatisfy({ arrangementVariables.contains($0.source) })
+            })
         else {
             return nil
         }
