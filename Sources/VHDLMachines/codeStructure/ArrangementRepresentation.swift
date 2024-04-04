@@ -76,6 +76,17 @@ public struct ArrangementRepresentation<Representation>: ArrangementVHDLRepresen
         name: VariableName,
         createMachine: @escaping (Machine, VariableName) -> Representation?
     ) {
+        let arrangementExternalVariables = arrangement.externalSignals.map(\.name)
+        let arrangementGlobals = arrangement.signals.map(\.name)
+        let clocks = arrangement.clocks.map(\.name)
+        let allArrangementVariables = arrangementExternalVariables + arrangementGlobals + clocks
+        let arrangementVariables = Set(allArrangementVariables)
+        guard
+            arrangementVariables.count == allArrangementVariables.count,
+            arrangement.machines.allSatisfy({ arrangementVariables.contains($0.key) })
+        else {
+            return nil
+        }
         let machines = arrangement.machines.compactMap {
             createMachine($0.1.machine, $0.0)
         }
