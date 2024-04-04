@@ -99,6 +99,10 @@ public extension VariableName {
 
     static var pong: VariableName { VariableName(rawValue: "pong")! }
 
+    static let pingMachine = VariableName(rawValue: "PingMachine")!
+
+    static let pongMachine = VariableName(rawValue: "PongMachine")!
+
     static var parXs: VariableName { VariableName(rawValue: "parXs")! }
 
     static var retX: VariableName { VariableName(rawValue: "retX")! }
@@ -108,6 +112,8 @@ public extension VariableName {
     static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
 
     static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
+
+    static let testMachine = VariableName(rawValue: "TestMachine")!
 
 }
 

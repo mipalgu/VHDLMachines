@@ -64,18 +64,15 @@ final class EntityTests: XCTestCase {
 
     /// Test machine init.
     func testMachineInit() {
-        guard
-            var machine = Machine.initial(
-                path: URL(fileURLWithPath: "/tmp/NewMachine.machine", isDirectory: false)
-            )
-        else {
+        var machine = Machine.initialSuspensible
+        guard let name = VariableName(rawValue: "NewMachine") else {
             XCTFail("Failed to create machine.")
             return
         }
         let original = PortSignal(type: .stdLogic, name: .x, mode: .input)
         let signal = PortSignal(type: .stdLogic, name: original.externalName, mode: .input)
         machine.externalSignals = [original]
-        guard let entity = Entity(machine: machine) else {
+        guard let entity = Entity(machine: machine, name: name) else {
             XCTFail("Failed to create entity from machine.")
             return
         }
@@ -103,7 +100,7 @@ final class EntityTests: XCTestCase {
     /// Test machine init when machine is parameterised.
     func testParameterisedMachine() {
         let machine = Machine.testMachine()
-        guard let entity = Entity(machine: machine) else {
+        guard let entity = Entity(machine: machine, name: .testMachine) else {
             XCTFail("Failed to create entity from machine.")
             return
         }

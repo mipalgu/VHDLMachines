@@ -76,7 +76,7 @@ final class VHDLParserTests: XCTestCase {
     /// Test parse function works correctly.
     func testParse() throws {
         guard
-            let machineWrapper = generator.generate(machine: factory.pingMachine),
+            let machineWrapper = generator.generate(machine: factory.pingMachine, with: .pingMachine),
             let machine = parser.parse(wrapper: machineWrapper)
         else {
             XCTFail("Failed to parse machine.")

@@ -22,13 +22,19 @@ public struct VHDLCompiler {
 
     /// Compile a machine into a VHDL source file within the machine folder specified by the machines path.
     /// - Parameter machine: The machine to compile.
+    /// - Parameter url: The location to the machine folder. This url must end with a `.machine` extension.
     /// - Returns: Whether the compilation was successful.
     @inlinable
-    public func compile(_ machine: Machine) -> Bool {
-        guard let format = generateVHDLFile(machine) else {
+    public func compile(_ machine: Machine, location url: URL) -> Bool {
+        let name = url.lastPathComponent
+        guard
+            name.hasSuffix(".machine"),
+            let nameVar = VariableName(rawValue: String(name.dropLast(8))),
+            let format = generateVHDLFile(machine: machine, name: nameVar)
+        else {
             return false
         }
-        let fileName = "\(machine.name).vhd"
+        let fileName = "\(nameVar.rawValue).vhd"
         guard let data = format.data(using: .utf8) else {
             return false
         }
@@ -36,20 +42,21 @@ public struct VHDLCompiler {
         fileWrapper.preferredFilename = fileName
         let folderWrapper = FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
         var isDirectory: ObjCBool = false
-        if manager.fileExists(atPath: machine.path.path, isDirectory: &isDirectory), isDirectory.boolValue {
-            guard (try? manager.removeItem(at: machine.path)) != nil else {
+        if manager.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue {
+            guard (try? manager.removeItem(at: url)) != nil else {
                 return false
             }
         }
-        return (try? folderWrapper.write(to: machine.path, options: .atomic, originalContentsURL: nil)) != nil
+        return (try? folderWrapper.write(to: url, options: .atomic, originalContentsURL: nil)) != nil
     }
 
     /// Generate the VHDL source code for a machine.
     /// - Parameter machine: The machine to compile.
+    /// - Parameter name: The name of the machine.
     /// - Returns: The VHDL source code.
     @inlinable
-    func generateVHDLFile(_ machine: Machine) -> String? {
-        guard let representation = MachineRepresentation(machine: machine) else {
+    func generateVHDLFile(machine: Machine, name: VariableName) -> String? {
+        guard let representation = MachineRepresentation(machine: machine, name: name) else {
             return nil
         }
         return VHDLFile(representation: representation).rawValue

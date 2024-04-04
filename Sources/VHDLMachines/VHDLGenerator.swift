@@ -9,6 +9,7 @@ import Foundation
 #if os(Linux) || os(Windows)
 import SwiftUtils
 #endif
+import VHDLParsing
 
 /// A generator that can generate a `FileWrapper` from a ``Machine``.
 public struct VHDLGenerator {
@@ -19,9 +20,10 @@ public struct VHDLGenerator {
 
     /// Generate a `FileWrapper` from a ``Machine``.
     /// - Parameter machine: The machine to generate a `FileWrapper` from.
+    /// - Parameter name: The name of the machine.
     /// - Returns: The `FileWrapper` that represents the machine or nil if the machine could not be encoded.
     @inlinable
-    public func generate(machine: Machine) -> FileWrapper? {
+    public func generate(machine: Machine, with name: VariableName) -> FileWrapper? {
         let encoder = JSONEncoder()
         guard let data = try? encoder.encode(machine) else {
             return nil
@@ -29,7 +31,7 @@ public struct VHDLGenerator {
         let machineWrapper = FileWrapper(regularFileWithContents: data)
         machineWrapper.preferredFilename = "machine.json"
         let folderWrapper = FileWrapper(directoryWithFileWrappers: [:])
-        folderWrapper.preferredFilename = "\(machine.name).machine"
+        folderWrapper.preferredFilename = "\(name.rawValue).machine"
         _ = folderWrapper.addFileWrapper(machineWrapper)
         return folderWrapper
     }

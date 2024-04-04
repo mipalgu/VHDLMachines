@@ -11,14 +11,108 @@ import VHDLParsing
 /// The VHDL implementation of an LLFSM.
 public struct Machine: Codable, Equatable, Hashable {
 
+    // swiftlint:disable closure_body_length
+
+    /// Creates an initial machine containing an Initial state
+    /// with the default actions (OnEntry, OnExit, Internald). This new
+    /// machine is not parameterised or suspensible.
+    public static let initial: Machine = {
+        guard
+            let ieee = VariableName(rawValue: "IEEE"),
+            let stdLogicImport = UseStatement(rawValue: "use IEEE.std_logic_1164.all;"),
+            let mathRealImport = UseStatement(rawValue: "use IEEE.math_real.all;")
+        else {
+            fatalError("VHDL Modules are invalid.")
+        }
+        let defaultActions = [
+            VariableName.onEntry,
+            VariableName.onExit,
+            VariableName.internal
+        ]
+        return Machine(
+            actions: defaultActions,
+            includes: [
+                .library(value: ieee),
+                .include(statement: stdLogicImport),
+                .include(statement: mathRealImport)
+            ],
+            externalSignals: [],
+            clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
+            drivingClock: 0,
+            machineSignals: [],
+            isParameterised: false,
+            parameterSignals: [],
+            returnableSignals: [],
+            states: [
+                State(
+                    name: VariableName.initial,
+                    actions: [:],
+                    signals: [],
+                    externalVariables: []
+                )
+            ],
+            transitions: [],
+            initialState: 0,
+            suspendedState: nil
+        )
+    }()
+
+    /// Creates an initial machine containing an Initial and
+    /// Suspended state with the default actions (OnEntry, OnExit, Internal, OnResume, OnSuspend). This new
+    /// machine is not parameterised, but does include the suspension semantics.
+    public static let initialSuspensible: Machine = {
+        guard
+            let ieee = VariableName(rawValue: "IEEE"),
+            let stdLogicImport = UseStatement(rawValue: "use IEEE.std_logic_1164.all;"),
+            let mathRealImport = UseStatement(rawValue: "use IEEE.math_real.all;")
+        else {
+            fatalError("VHDL Modules are invalid.")
+        }
+        let defaultActions = [
+            VariableName.onEntry,
+            VariableName.onExit,
+            VariableName.internal,
+            VariableName.onResume,
+            VariableName.onSuspend
+        ]
+        return Machine(
+            actions: defaultActions,
+            includes: [
+                .library(value: ieee),
+                .include(statement: stdLogicImport),
+                .include(statement: mathRealImport)
+            ],
+            externalSignals: [],
+            clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
+            drivingClock: 0,
+            machineSignals: [],
+            isParameterised: false,
+            parameterSignals: [],
+            returnableSignals: [],
+            states: [
+                State(
+                    name: VariableName.initial,
+                    actions: [:],
+                    signals: [],
+                    externalVariables: []
+                ),
+                State(
+                    name: VariableName.suspendedState,
+                    actions: [:],
+                    signals: [],
+                    externalVariables: []
+                )
+            ],
+            transitions: [],
+            initialState: 0,
+            suspendedState: 1
+        )
+    }()
+
+    // swiftlint:enable closure_body_length
+
     /// The actions in the machine.
     public var actions: [VariableName]
-
-    /// The name of the machine.
-    public var name: VariableName
-
-    /// The location of the machine in the file system.
-    public var path: URL
 
     /// The includes for the machine.
     public var includes: [Include]
@@ -31,9 +125,6 @@ public struct Machine: Codable, Equatable, Hashable {
 
     /// The index of the driving clock.
     public var drivingClock: Int
-
-    /// The machines this machine depends on.
-    public var dependentMachines: [VariableName: URL]
 
     /// The machine signals for the machine.
     public var machineSignals: [LocalSignal]
@@ -106,13 +197,10 @@ public struct Machine: Codable, Equatable, Hashable {
     ///   - architectureBody: The extra synchronous VHDL code to be added to the architecture.
     public init(
         actions: [VariableName],
-        name: VariableName,
-        path: URL,
         includes: [Include],
         externalSignals: [PortSignal],
         clocks: [Clock],
         drivingClock: Int,
-        dependentMachines: [VariableName: URL],
         machineSignals: [LocalSignal],
         isParameterised: Bool,
         parameterSignals: [Parameter],
@@ -125,13 +213,10 @@ public struct Machine: Codable, Equatable, Hashable {
         architectureBody: AsynchronousBlock? = nil
     ) {
         self.actions = actions
-        self.name = name
-        self.path = path
         self.includes = includes
         self.externalSignals = externalSignals
         self.clocks = clocks
         self.drivingClock = drivingClock
-        self.dependentMachines = dependentMachines
         self.machineSignals = machineSignals
         self._isParameterised = isParameterised
         self.parameterSignals = parameterSignals
@@ -143,69 +228,5 @@ public struct Machine: Codable, Equatable, Hashable {
         self.architectureHead = architectureHead
         self.architectureBody = architectureBody
     }
-
-    // swiftlint:disable function_body_length
-
-    /// Creates an initial machine that will be located at `path`. The initial machine contains an Initial and
-    /// Suspended state with the default actions (OnEntry, OnExit, Internal, OnResume, OnSuspend). This new
-    /// machine is not parameterised, but does include the suspension semantics.
-    /// - Parameter path: The path the new machine will be located at.
-    /// - Returns: The new machine.
-    @inlinable
-    public static func initial(path: URL) -> Machine? {
-        guard
-            let nameComponent = path.lastPathComponent.components(separatedBy: ".machine").first,
-            let name = VariableName(rawValue: nameComponent),
-            let ieee = VariableName(rawValue: "IEEE"),
-            let stdLogicImport = UseStatement(rawValue: "use IEEE.std_logic_1164.all;"),
-            let mathRealImport = UseStatement(rawValue: "use IEEE.math_real.all;")
-        else {
-            return nil
-        }
-        let defaultActions = [
-            VariableName.onEntry,
-            VariableName.onExit,
-            VariableName.internal,
-            VariableName.onResume,
-            VariableName.onSuspend
-        ]
-        return Machine(
-            actions: defaultActions,
-            name: name,
-            path: path,
-            includes: [
-                .library(value: ieee),
-                .include(statement: stdLogicImport),
-                .include(statement: mathRealImport)
-            ],
-            externalSignals: [],
-            clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
-            drivingClock: 0,
-            dependentMachines: [:],
-            machineSignals: [],
-            isParameterised: false,
-            parameterSignals: [],
-            returnableSignals: [],
-            states: [
-                State(
-                    name: VariableName.initial,
-                    actions: [:],
-                    signals: [],
-                    externalVariables: []
-                ),
-                State(
-                    name: VariableName.suspendedState,
-                    actions: [:],
-                    signals: [],
-                    externalVariables: []
-                )
-            ],
-            transitions: [],
-            initialState: 0,
-            suspendedState: 1
-        )
-    }
-
-    // swiftlint:enable function_body_length
 
 }

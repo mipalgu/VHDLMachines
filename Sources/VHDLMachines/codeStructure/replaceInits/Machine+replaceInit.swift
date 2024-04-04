@@ -74,13 +74,10 @@ extension Machine {
         }
         self.init(
             actions: machine.actions,
-            name: machine.name,
-            path: machine.path,
             includes: machine.includes,
             externalSignals: machine.externalSignals,
             clocks: machine.clocks,
             drivingClock: machine.drivingClock,
-            dependentMachines: machine.dependentMachines,
             machineSignals: machine.machineSignals,
             isParameterised: machine.isParameterised,
             parameterSignals: machine.parameterSignals,
