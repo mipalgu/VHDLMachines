@@ -113,9 +113,7 @@ final class ArrangementTests: XCTestCase {
         machines: machines,
         externalSignals: externalSignals,
         signals: signals,
-        clocks: clocks,
-        parents: parents,
-        path: path
+        clocks: clocks
     )
 
     /// Initialises the arrangement to test.
@@ -124,9 +122,7 @@ final class ArrangementTests: XCTestCase {
             machines: machines,
             externalSignals: externalSignals,
             signals: signals,
-            clocks: clocks,
-            parents: parents,
-            path: path
+            clocks: clocks
         )
     }
 
@@ -136,8 +132,6 @@ final class ArrangementTests: XCTestCase {
         XCTAssertEqual(self.arrangement.externalSignals, self.externalSignals)
         XCTAssertEqual(self.arrangement.signals, self.signals)
         XCTAssertEqual(self.arrangement.clocks, self.clocks)
-        XCTAssertEqual(self.arrangement.parents, self.parents)
-        XCTAssertEqual(self.arrangement.path, self.path)
     }
 
     /// Tests getters and setters update properties correctly.
@@ -174,60 +168,14 @@ final class ArrangementTests: XCTestCase {
         let newClocks = [
             Clock(name: VariableName.clk2, frequency: 100, unit: .MHz)
         ]
-        let newParents = [VariableName(rawValue: "M2")!]
-        let newPath = URL(fileURLWithPath: "/path/to/new/arrangement")
         self.arrangement.machines = newMachines
         self.arrangement.externalSignals = newExternalSignals
         self.arrangement.signals = newSignals
         self.arrangement.clocks = newClocks
-        self.arrangement.parents = newParents
-        self.arrangement.path = newPath
         XCTAssertEqual(self.arrangement.machines, newMachines)
         XCTAssertEqual(self.arrangement.externalSignals, newExternalSignals)
         XCTAssertEqual(self.arrangement.signals, newSignals)
         XCTAssertEqual(self.arrangement.clocks, newClocks)
-        XCTAssertEqual(self.arrangement.parents, newParents)
-        XCTAssertEqual(self.arrangement.path, newPath)
-    }
-
-    /// Test initial function creates default arrangement correctly.
-    func testInitial() {
-        let url = URL(fileURLWithPath: "Arrangement.arrangement", isDirectory: true)
-        let arrangement = Arrangement.initial(url: url)
-        let machineURL = URL(fileURLWithPath: "./Machine.machine", isDirectory: true)
-        guard let machine = Machine.initial(path: machineURL) else {
-            XCTFail("Failed to create machine!")
-            return
-        }
-        let expected = Arrangement(
-            machines: [VariableName(rawValue: "Machine")!: machineURL],
-            externalSignals: [],
-            signals: [],
-            clocks: machine.clocks,
-            parents: [VariableName(rawValue: "Machine")!],
-            path: url
-        )
-        #if os(macOS)
-        guard let arrangement else {
-            XCTFail("Failed to get arrangement.")
-            return
-        }
-        XCTAssertEqual(arrangement.clocks, expected.clocks)
-        XCTAssertEqual(arrangement.externalSignals, expected.externalSignals)
-        XCTAssertEqual(arrangement.machines.count, expected.machines.count)
-        arrangement.machines.keys.forEach {
-            guard let m0 = arrangement.machines[$0], let m1 = expected.machines[$0] else {
-                XCTFail("Failed to get machine.")
-                return
-            }
-            XCTAssertEqual(m0.absoluteString, m1.absoluteString)
-        }
-        XCTAssertEqual(arrangement.parents, expected.parents)
-        XCTAssertEqual(arrangement.path.absoluteString, expected.path.absoluteString)
-        XCTAssertEqual(arrangement.signals, expected.signals)
-        #else
-        XCTAssertEqual(arrangement, expected)
-        #endif
     }
 
     // swiftlint:enable force_unwrapping
