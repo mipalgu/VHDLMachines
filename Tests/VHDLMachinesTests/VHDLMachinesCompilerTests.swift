@@ -126,7 +126,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// Test compilation creates intermediate folder.
     func testCompileWorksInEmptySubdir() {
-        var machine = factory.pingMachine
+        let machine = factory.pingMachine
         let subdir = factory.machinePath.appendingPathComponent("subdir", isDirectory: true)
         if !manager.fileExists(atPath: subdir.path) {
             _ = try? manager.createDirectory(at: subdir, withIntermediateDirectories: false)
