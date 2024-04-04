@@ -1,0 +1,50 @@
+{
+  "pins" : [
+    {
+      "identity" : "guunits",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mipalgu/GUUnits",
+      "state" : {
+        "revision" : "dfbd93fbeaf4ad8ad6660e9c8b25e3f37b16fef3",
+        "version" : "2.1.1"
+      }
+    },
+    {
+      "identity" : "swift-docc-plugin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-docc-plugin",
+      "state" : {
+        "revision" : "26ac5758409154cc448d7ab82389c520fa8a8247",
+        "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "swift-docc-symbolkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-docc-symbolkit",
+      "state" : {
+        "revision" : "b45d1f2ed151d057b54504d653e0da5552844e34",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "swiftutils",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cpslabgu/SwiftUtils",
+      "state" : {
+        "revision" : "1be53114f5f9c6903304d6fb7831912e2a000af1",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "vhdlparsing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mipalgu/VHDLParsing",
+      "state" : {
+        "revision" : "b4227951199257713563de0b34e93da2d0099e79",
+        "version" : "2.4.1"
+      }
+    }
+  ],
+  "version" : 2
+}
