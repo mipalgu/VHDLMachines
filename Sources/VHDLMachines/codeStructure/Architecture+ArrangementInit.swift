@@ -85,9 +85,9 @@ extension Architecture {
             }
             let maps = mapping.mappings.map {
                 VariableMap(
-                    lhs: .variable(reference: .variable(name: $0.source)),
+                    lhs: .variable(reference: .variable(name: $0.destination)),
                     rhs: .expression(value: .reference(variable: .variable(
-                        reference: .variable(name: $0.destination)
+                        reference: .variable(name: $0.source)
                     )))
                 )
             }
