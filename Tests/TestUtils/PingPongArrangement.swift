@@ -206,13 +206,10 @@ public struct PingPongArrangement {
     public var pingMachine: Machine {
         Machine(
             actions: [.onEntry, .onExit, .internal],
-            name: VariableName(rawValue: "PingMachine")!,
-            path: pingMachinePath,
             includes: includes,
             externalSignals: pingSignals,
             clocks: clocks,
             drivingClock: 0,
-            dependentMachines: [:],
             machineSignals: [],
             isParameterised: false,
             parameterSignals: [],
@@ -228,13 +225,10 @@ public struct PingPongArrangement {
     public var pongMachine: Machine {
         Machine(
             actions: [.onEntry, .onExit, .internal],
-            name: VariableName(rawValue: "PongMachine")!,
-            path: pongMachinePath,
             includes: includes,
             externalSignals: pongSignals,
             clocks: clocks,
             drivingClock: 0,
-            dependentMachines: [:],
             machineSignals: [],
             isParameterised: false,
             parameterSignals: [],
@@ -255,9 +249,7 @@ public struct PingPongArrangement {
             ],
             externalSignals: [],
             signals: [],
-            clocks: clocks,
-            parents: [VariableName(rawValue: "PingMachine")!, VariableName(rawValue: "PongMachine")!],
-            path: arrangementPath
+            clocks: clocks
         )
     }
 

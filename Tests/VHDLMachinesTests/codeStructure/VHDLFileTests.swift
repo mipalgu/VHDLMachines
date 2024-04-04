@@ -63,7 +63,9 @@ final class VHDLFileTests: XCTestCase {
 
     /// Test representation initialiser.
     func testRepresentationInit() {
-        guard let representation = MachineRepresentation(machine: Machine.testMachine()) else {
+        guard let representation = MachineRepresentation(
+            machine: Machine.testMachine(), name: .testMachine
+        ) else {
             XCTFail("Invalid data!")
             return
         }

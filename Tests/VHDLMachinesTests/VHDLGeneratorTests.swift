@@ -83,7 +83,7 @@ final class VHDLGeneratorTests: XCTestCase {
 
     /// Test Generate creates correct file structure.
     func testGenerate() {
-        guard let wrapper = generator.generate(machine: factory.pingMachine) else {
+        guard let wrapper = generator.generate(machine: factory.pingMachine, with: .pingMachine) else {
             XCTFail("Failed to create wrapper!")
             return
         }
@@ -111,16 +111,16 @@ final class VHDLGeneratorTests: XCTestCase {
     /// Test write creates correct file structure.
     func testWrite() throws {
         let machine = factory.pingMachine
-        guard let wrapper = generator.generate(machine: machine) else {
+        guard let wrapper = generator.generate(machine: machine, with: .pingMachine) else {
             XCTFail("Failed to create wrapper!")
             return
         }
         XCTAssertTrue(wrapper.isDirectory)
         XCTAssertEqual(wrapper.preferredFilename, "PingMachine.machine")
-        if manager.fileExists(atPath: machine.path.path) {
-            try manager.removeItem(at: machine.path)
-        }
         let path = factory.machinePath.appendingPathComponent("PingMachine.machine", isDirectory: true)
+        if manager.fileExists(atPath: path.path) {
+            try manager.removeItem(at: path)
+        }
         try wrapper.write(to: path, originalContentsURL: nil)
         defer {
             if manager.fileExists(atPath: path.path) {

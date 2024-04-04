@@ -216,13 +216,10 @@ final class MachineTests: XCTestCase {
     /// The machine to test.
     lazy var machine = Machine(
         actions: actions,
-        name: machineName,
-        path: path,
         includes: includes,
         externalSignals: externalSignals,
         clocks: clocks,
         drivingClock: drivingClock,
-        dependentMachines: dependentMachines,
         machineSignals: machineSignals,
         isParameterised: true,
         parameterSignals: parameterSignals,
@@ -239,13 +236,10 @@ final class MachineTests: XCTestCase {
     override func setUp() {
         self.machine = Machine(
             actions: actions,
-            name: machineName,
-            path: path,
             includes: includes,
             externalSignals: externalSignals,
             clocks: clocks,
             drivingClock: drivingClock,
-            dependentMachines: dependentMachines,
             machineSignals: machineSignals,
             isParameterised: true,
             parameterSignals: parameterSignals,
@@ -261,13 +255,10 @@ final class MachineTests: XCTestCase {
 
     /// Test init sets the correct values.
     func testInit() {
-        XCTAssertEqual(machine.name, machineName)
-        XCTAssertEqual(machine.path, path)
         XCTAssertEqual(machine.includes, includes)
         XCTAssertEqual(machine.externalSignals, externalSignals)
         XCTAssertEqual(machine.clocks, clocks)
         XCTAssertEqual(machine.drivingClock, drivingClock)
-        XCTAssertEqual(machine.dependentMachines, dependentMachines)
         XCTAssertEqual(machine.machineSignals, machineSignals)
         XCTAssertTrue(machine.isParameterised)
         XCTAssertTrue(machine.isSuspensible)
@@ -286,8 +277,6 @@ final class MachineTests: XCTestCase {
 
     /// Test getters and setters work.
     func testGettersAndSetters() {
-        let newMachineName = VariableName(rawValue: "M3")!
-        let newPath = URL(fileURLWithPath: "/path/to/M3")
         let newIncludes = [
             Include.include(statement: UseStatement(rawValue: "use IEEE.STD_LOGIC_1164.ALL;")!)
         ]
@@ -305,7 +294,6 @@ final class MachineTests: XCTestCase {
             Clock(name: VariableName.clk2, frequency: 100, unit: .MHz)
         ]
         let newDrivingClock = 1
-        let newDependentMachines = [VariableName(rawValue: "M1")!: URL(fileURLWithPath: "/path/to/M1")]
         let newMachineSignals = [
             LocalSignal(
                 type: .stdLogic,
@@ -351,13 +339,10 @@ final class MachineTests: XCTestCase {
             name: .variable(reference: .variable(name: .g)),
             value: .expression(value: .literal(value: .bit(value: .low)))
         ))
-        machine.name = newMachineName
-        machine.path = newPath
         machine.includes = newIncludes
         machine.externalSignals = newExternalSignals
         machine.clocks = newClocks
         machine.drivingClock = newDrivingClock
-        machine.dependentMachines = newDependentMachines
         machine.machineSignals = newMachineSignals
         machine.parameterSignals = newParameterSignals
         machine.returnableSignals = newReturnableSignals
@@ -367,13 +352,10 @@ final class MachineTests: XCTestCase {
         machine.suspendedState = newSuspendedState
         machine.architectureHead = newArchitectureHead
         machine.architectureBody = newArchitectureBody
-        XCTAssertEqual(machine.name, newMachineName)
-        XCTAssertEqual(machine.path, newPath)
         XCTAssertEqual(machine.includes, newIncludes)
         XCTAssertEqual(machine.externalSignals, newExternalSignals)
         XCTAssertEqual(machine.clocks, newClocks)
         XCTAssertEqual(machine.drivingClock, newDrivingClock)
-        XCTAssertEqual(machine.dependentMachines, newDependentMachines)
         XCTAssertEqual(machine.machineSignals, newMachineSignals)
         XCTAssertEqual(machine.parameterSignals, newParameterSignals)
         XCTAssertEqual(machine.returnableSignals, newReturnableSignals)
@@ -386,13 +368,10 @@ final class MachineTests: XCTestCase {
     }
 
     /// Test initial machine is setup correctly.
-    func testInitial() {
-        let path = URL(fileURLWithPath: "NewMachine.machine", isDirectory: true)
-        let machine = Machine.initial(path: path)
+    func testInitialSuspensible() {
+        let machine = Machine.initialSuspensible
         let expected = Machine(
             actions: actions,
-            name: VariableName(rawValue: "NewMachine")!,
-            path: path,
             includes: [
                 .library(value: VariableName(rawValue: "IEEE")!),
                 .include(statement: UseStatement(rawValue: "use IEEE.std_logic_1164.All;")!),
@@ -401,7 +380,6 @@ final class MachineTests: XCTestCase {
             externalSignals: [],
             clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
             drivingClock: 0,
-            dependentMachines: [:],
             machineSignals: [],
             isParameterised: false,
             parameterSignals: [],

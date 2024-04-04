@@ -72,8 +72,6 @@ extension Machine {
         ))
         var machine = VHDLMachines.Machine(
             actions: [.onEntry, .internal, .onExit, .onResume, .onSuspend],
-            name: VariableName(rawValue: "TestMachine")!,
-            path: directory.appendingPathComponent("TestMachine.machine", isDirectory: true),
             includes: [
                 .library(value: VariableName(rawValue: "IEEE")!),
                 .include(statement: UseStatement(rawValue: "use IEEE.std_logic_1164.ALL;")!),
@@ -105,7 +103,6 @@ extension Machine {
                 Clock(name: VariableName.clk2, frequency: 20, unit: .kHz)
             ],
             drivingClock: 0,
-            dependentMachines: [:],
             machineSignals: [
                 LocalSignal(
                     type: .stdLogic,

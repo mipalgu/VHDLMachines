@@ -38,7 +38,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// FileWrapper for the test machine.
     var testMachineFileWrapper: FileWrapper? {
-        VHDLGenerator().generate(machine: machine)
+        VHDLGenerator().generate(machine: machine, with: .testMachine)
     }
 
     // swiftlint:disable type_contents_order
@@ -89,7 +89,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// Test can compile initial machine.
     func testInitialMachine() {
-        XCTAssertTrue(compiler.compile(machine))
+        XCTAssertTrue(compiler.compile(machine, location: testMachinePath))
     }
 
     /// Test compiler overwrite parent folder.
@@ -102,14 +102,11 @@ class VHDLMachinesCompilerTests: XCTestCase {
                 return
             }
         }
-        XCTAssertTrue(compiler.compile(machine))
+        XCTAssertTrue(compiler.compile(machine, location: testMachinePath))
     }
 
     /// Test compilation overwrites existing file.
     func testCompileWorksWhenFileIsPresent() {
-        print("Machine path:")
-        print(testMachinePath.path)
-        fflush(stdout)
         if !manager.fileExists(atPath: testMachinePath.path) {
             guard (
                 try? manager.createDirectory(at: testMachinePath, withIntermediateDirectories: false)
@@ -118,13 +115,13 @@ class VHDLMachinesCompilerTests: XCTestCase {
                 return
             }
         }
-        let vhdFile = testMachinePath.path + "/\(machine.name).vhd"
+        let vhdFile = testMachinePath.path + "/\(VariableName.testMachine.rawValue).vhd"
         if !manager.fileExists(atPath: vhdFile) {
             XCTAssertTrue(
                 manager.createFile(atPath: vhdFile, contents: "Test Data\n".data(using: .utf8))
             )
         }
-        XCTAssertTrue(compiler.compile(machine))
+        XCTAssertTrue(compiler.compile(machine, location: testMachinePath))
     }
 
     /// Test compilation creates intermediate folder.
@@ -138,8 +135,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
         let newPath = subdir.appendingPathComponent(
             "PingMachine.machine", isDirectory: true
         )
-        machine.path = newPath
-        XCTAssertTrue(compiler.compile(machine))
+        XCTAssertTrue(compiler.compile(machine, location: newPath))
         var isDirectory: ObjCBool = false
         XCTAssertTrue(manager.fileExists(atPath: newPath.path, isDirectory: &isDirectory))
         XCTAssertTrue(isDirectory.boolValue)
@@ -148,7 +144,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
     /// Test the VHDL code generation is correct for the Ping Machine.
     func testPingMachineCodeGeneration() {
         let machine = factory.pingMachine
-        guard let code = compiler.generateVHDLFile(machine) else {
+        guard let code = compiler.generateVHDLFile(machine: machine, name: .pingMachine) else {
             XCTFail("Failed to generate code.")
             return
         }
@@ -161,12 +157,12 @@ class VHDLMachinesCompilerTests: XCTestCase {
             _ = try? manager.removeItem(at: factory.pingMachinePath)
         }
         let machine = factory.pingMachine
-        XCTAssertTrue(compiler.compile(machine))
+        XCTAssertTrue(compiler.compile(machine, location: factory.pingMachinePath))
     }
 
     /// Test generated code matches expected.
     func testGenerateVHDLFile() {
-        guard let code = compiler.generateVHDLFile(machine) else {
+        guard let code = compiler.generateVHDLFile(machine: machine, name: .testMachine) else {
             XCTFail("Failed to generate vhdl file.")
             return
         }
