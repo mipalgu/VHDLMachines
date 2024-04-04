@@ -113,6 +113,8 @@ public extension VariableName {
 
     static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
 
+    static let testMachine = VariableName(rawValue: "TestMachine")!
+
 }
 
 // swiftlint:enable missing_docs
