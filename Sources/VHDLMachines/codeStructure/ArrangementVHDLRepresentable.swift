@@ -71,10 +71,20 @@ public protocol ArrangementVHDLRepresentable {
 
     var includes: [Include] { get }
 
+    var file: VHDLFile { get }
+
     init?(
         arrangement: Arrangement,
         name: VariableName,
         createMachine: @escaping (Machine, VariableName) -> Representation?
     )
+
+}
+
+public extension ArrangementVHDLRepresentable {
+
+    var file: VHDLFile {
+        VHDLFile(architectures: [self.architecture], entities: [self.entity], includes: self.includes)
+    }
 
 }
