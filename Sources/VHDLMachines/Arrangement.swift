@@ -31,14 +31,6 @@ public struct Arrangement: Equatable, Hashable, Codable {
     /// The clocks in the arrangement available to every machine.
     public var clocks: [Clock]
 
-    /// The parent machines in the arrangement. These machines act as entry points into the main program
-    /// of this arrangement.
-    public var parents: [VariableName]
-
-    /// The path to the arrangement. This is the path to the file containing the arrangement definition. This
-    /// path will be used to persist the arrangement.
-    public var path: URL
-
     /// Initialises the arrangement with the given values.
     /// - Parameters:
     ///   - machines: The machines in the arrangement.
@@ -52,41 +44,12 @@ public struct Arrangement: Equatable, Hashable, Codable {
         machines: [VariableName: URL],
         externalSignals: [PortSignal],
         signals: [LocalSignal],
-        clocks: [Clock],
-        parents: [VariableName],
-        path: URL
+        clocks: [Clock]
     ) {
         self.machines = machines
         self.externalSignals = externalSignals
         self.signals = signals
         self.clocks = clocks
-        self.parents = parents
-        self.path = path
-    }
-
-    /// Create an initial arrangement located at the given URL. This arrangement will contain a single machine
-    /// called *Machine* that will exist within the same directory as the arrangement folder.
-    /// - Parameter url: The URL to the arrangement folder.
-    /// - Returns: The initial arrangement.
-    @inlinable
-    public static func initial(url: URL) -> Arrangement? {
-        let machineURL = url.deletingLastPathComponent().appendingPathComponent(
-            "Machine.machine", isDirectory: true
-        )
-        guard
-            let newMachine = Machine.initial(path: machineURL), let name = VariableName(rawValue: "Machine")
-        else {
-            return nil
-        }
-        let clock = newMachine.clocks
-        return Arrangement(
-            machines: [name: machineURL],
-            externalSignals: [],
-            signals: [],
-            clocks: clock,
-            parents: [name],
-            path: url
-        )
     }
 
 }

@@ -85,7 +85,7 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
 
     /// Create the machine representation for the given machine.
     /// - Parameter machine: The machine to convert into a `VHDL` file.
-    public init?(machine: Machine) {
+    public init?(machine: Machine, name: VariableName) {
         let representationVariables: [VariableName] = [
             .suspended, .internalState, .currentState, .previousRinglet, .suspendedFrom, .ringletLength,
             .clockPeriod, .ringletPerPs, .ringletPerNs, .ringletPerUs, .ringletPerMs, .ringletPerS,
@@ -126,7 +126,7 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
         }
         guard
             let newMachine = Machine(replacingStateRefsIn: machine),
-            let entity = Entity(machine: newMachine),
+            let entity = Entity(machine: newMachine, name: name),
             let architectureName = VariableName(rawValue: "Behavioral"),
             let head = ArchitectureHead(machine: newMachine),
             let body = AsynchronousBlock(machine: newMachine)
