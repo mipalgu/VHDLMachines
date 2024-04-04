@@ -54,6 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
 import XCTest
@@ -65,8 +66,20 @@ final class ArrangementTests: XCTestCase {
 
     /// The machines in the arrangement.
     let machines = [
-        VariableName(rawValue: "M1")!: URL(fileURLWithPath: "/path/to/M1"),
-        VariableName(rawValue: "M2")!: URL(fileURLWithPath: "/path/to/M2")
+        VariableName(rawValue: "M1")!: MachineMapping(
+            machine: PingPongArrangement().pingMachine,
+            mappings: [
+                VariableMapping(source: .x, destination: .ping),
+                VariableMapping(source: .y, destination: .pong)
+            ]
+        ),
+        VariableName(rawValue: "M2")!: MachineMapping(
+            machine: PingPongArrangement().pongMachine,
+            mappings: [
+                VariableMapping(source: .x, destination: .ping),
+                VariableMapping(source: .y, destination: .pong)
+            ]
+        )
     ]
 
     /// The clocks in the arrangement.
@@ -137,8 +150,9 @@ final class ArrangementTests: XCTestCase {
     /// Tests getters and setters update properties correctly.
     func testGettersAndSetters() {
         let newMachines = [
-            VariableName(rawValue: "M3")!: URL(fileURLWithPath: "/path/to/M3"),
-            VariableName(rawValue: "M4")!: URL(fileURLWithPath: "/path/to/M4")
+            VariableName(rawValue: "M3")!: MachineMapping(
+                machine: PingPongArrangement().pingMachine, mappings: []
+            )
         ]
         let newExternalSignals = [
             PortSignal(

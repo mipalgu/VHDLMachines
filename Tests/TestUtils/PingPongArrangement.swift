@@ -244,11 +244,26 @@ public struct PingPongArrangement {
     public var arrangement: Arrangement {
         Arrangement(
             machines: [
-                VariableName(rawValue: "PingMachine")!: pingPath,
-                VariableName(rawValue: "PongMachine")!: pongPath
+                VariableName(rawValue: "PingMachine")!: MachineMapping(
+                    machine: self.pingMachine,
+                    mappings: [
+                        VariableMapping(source: .ping, destination: .ping),
+                        VariableMapping(source: .pong, destination: .pong)
+                    ]
+                ),
+                VariableName(rawValue: "PongMachine")!: MachineMapping(
+                    machine: self.pongMachine,
+                    mappings: [
+                        VariableMapping(source: .ping, destination: .ping),
+                        VariableMapping(source: .pong, destination: .pong)
+                    ]
+                )
             ],
             externalSignals: [],
-            signals: [],
+            signals: [
+                LocalSignal(type: .stdLogic, name: .ping),
+                LocalSignal(type: .stdLogic, name: .pong)
+            ],
             clocks: clocks
         )
     }

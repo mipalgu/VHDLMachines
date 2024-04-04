@@ -20,7 +20,7 @@ import VHDLParsing
 public struct Arrangement: Equatable, Hashable, Codable {
 
     /// All machines in the arrangement.
-    public var machines: [VariableName: URL]
+    public var machines: [VariableName: MachineMapping]
 
     /// The external signals in the arrangement that map to physical pins.
     public var externalSignals: [PortSignal]
@@ -33,15 +33,13 @@ public struct Arrangement: Equatable, Hashable, Codable {
 
     /// Initialises the arrangement with the given values.
     /// - Parameters:
-    ///   - machines: The machines in the arrangement.
+    ///   - machines: The machine mappings in the arrangement.
     ///   - externalSignals: The external signals in the arrangement.
-    ///   - externalVariables: The external variables in the arrangement.
+    ///   - signals: The local signals in the arrangement.
     ///   - clocks: The clocks in the arrangement.
-    ///   - parents: The parent machines in the arrangement.
-    ///   - path: The file path to the arrangement.
     @inlinable
     public init(
-        machines: [VariableName: URL],
+        machines: [VariableName: MachineMapping],
         externalSignals: [PortSignal],
         signals: [LocalSignal],
         clocks: [Clock]
