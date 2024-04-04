@@ -94,7 +94,7 @@ public struct ArrangementRepresentation<Representation>: ArrangementVHDLRepresen
             machines: machines,
             entity: entity,
             architecture: architecture,
-            includes: []
+            includes: Machine.initial.includes
         )
     }
 
