@@ -85,6 +85,7 @@ public struct MachineRepresentation: MachineVHDLRepresentable {
 
     /// Create the machine representation for the given machine.
     /// - Parameter machine: The machine to convert into a `VHDL` file.
+    /// - Parameter name: The name of the machine.
     public init?(machine: Machine, name: VariableName) {
         let representationVariables: [VariableName] = [
             .suspended, .internalState, .currentState, .previousRinglet, .suspendedFrom, .ringletLength,

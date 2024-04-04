@@ -20,6 +20,7 @@ public struct VHDLGenerator {
 
     /// Generate a `FileWrapper` from a ``Machine``.
     /// - Parameter machine: The machine to generate a `FileWrapper` from.
+    /// - Parameter name: The name of the machine.
     /// - Returns: The `FileWrapper` that represents the machine or nil if the machine could not be encoded.
     @inlinable
     public func generate(machine: Machine, with name: VariableName) -> FileWrapper? {
