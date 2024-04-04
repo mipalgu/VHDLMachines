@@ -61,9 +61,14 @@ import VHDLParsing
 /// A factory for creating a PingPong arrangement.
 public struct PingPongArrangement {
 
+    #if os(Windows)
+    /// The path to the package root.
+    public let packageRootPath = FileManager.default.currentDirectoryPath
+    #else
     /// The path to the package root.
     public let packageRootPath = URL(fileURLWithPath: #file)
         .pathComponents.prefix { $0 != "Tests" }.joined(separator: "/").dropFirst()
+    #endif
 
     /// The path to the machines folder.
     public var machinesFolder: String {

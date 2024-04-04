@@ -54,8 +54,8 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-#if os(Linux)
-import IO
+#if os(Linux) || os(Windows)
+import SwiftUtils
 #endif
 import TestUtils
 @testable import VHDLMachines

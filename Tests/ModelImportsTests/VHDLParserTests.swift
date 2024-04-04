@@ -55,8 +55,8 @@
 // 
 
 import Foundation
-#if os(Linux)
-import IO
+#if os(Linux) || os(Windows)
+import SwiftUtils
 #endif
 import LLFSMModel
 @testable import ModelImports

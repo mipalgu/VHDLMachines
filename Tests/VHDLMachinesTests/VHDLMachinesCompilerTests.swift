@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import IO
+import SwiftUtils
 import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
@@ -34,7 +34,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
     let factory = PingPongArrangement()
 
     /// IO Helper.
-    let helper = FileHelpers()
+    let manager = FileManager.default
 
     /// FileWrapper for the test machine.
     var testMachineFileWrapper: FileWrapper? {
@@ -45,10 +45,12 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// Create test paths for machines.
     override func setUp() {
-        if !helper.directoryExists(factory.machinesFolder) {
-            _ = helper.createDirectory(atPath: factory.machinePath)
+        if !manager.fileExists(atPath: factory.machinesFolder) {
+            _ = try? manager.createDirectory(
+                atPath: factory.machinePath.path, withIntermediateDirectories: false
+            )
         }
-        if !helper.directoryExists(testMachinePath.path) {
+        if !manager.fileExists(atPath: testMachinePath.path) {
             guard let wrapper = testMachineFileWrapper else {
                 return
             }
@@ -61,8 +63,8 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// Remove test machines.
     override func tearDown() {
-        _ = helper.deleteItem(atPath: testMachinePath)
-        _ = helper.deleteItem(atPath: factory.pingMachinePath)
+        _ = try? manager.removeItem(at: testMachinePath)
+        _ = try? manager.removeItem(at: factory.pingMachinePath)
     }
 
     /// Default state creation.
@@ -92,8 +94,10 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// Test compiler overwrite parent folder.
     func testCompileWorksWhenParentFolderExists() {
-        if !helper.directoryExists(testMachinePath.path) {
-            guard helper.createDirectory(atPath: testMachinePath) else {
+        if !manager.fileExists(atPath: testMachinePath.path) {
+            guard (
+                try? manager.createDirectory(at: testMachinePath, withIntermediateDirectories: false)
+            ) != nil else {
                 XCTFail("Failed to create directory!")
                 return
             }
@@ -106,18 +110,18 @@ class VHDLMachinesCompilerTests: XCTestCase {
         print("Machine path:")
         print(testMachinePath.path)
         fflush(stdout)
-        if !helper.directoryExists(testMachinePath.path) {
-            guard helper.createDirectory(atPath: testMachinePath) else {
+        if !manager.fileExists(atPath: testMachinePath.path) {
+            guard (
+                try? manager.createDirectory(at: testMachinePath, withIntermediateDirectories: false)
+            ) != nil else {
                 XCTFail("Failed to create directory!")
                 return
             }
         }
         let vhdFile = testMachinePath.path + "/\(machine.name).vhd"
-        if !helper.fileExists(vhdFile) {
+        if !manager.fileExists(atPath: vhdFile) {
             XCTAssertTrue(
-                helper.createFile(
-                    atPath: URL(fileURLWithPath: vhdFile, isDirectory: false), withContents: "Test Data\n"
-                )
+                manager.createFile(atPath: vhdFile, contents: "Test Data\n".data(using: .utf8))
             )
         }
         XCTAssertTrue(compiler.compile(machine))
@@ -127,17 +131,18 @@ class VHDLMachinesCompilerTests: XCTestCase {
     func testCompileWorksInEmptySubdir() {
         var machine = factory.pingMachine
         let subdir = factory.machinePath.appendingPathComponent("subdir", isDirectory: true)
-        if !helper.directoryExists(subdir.path) {
-            _ = helper.createDirectory(atPath: subdir)
+        if !manager.fileExists(atPath: subdir.path) {
+            _ = try? manager.createDirectory(at: subdir, withIntermediateDirectories: false)
         }
-        defer { _ = helper.deleteItem(atPath: subdir) }
+        defer { _ = try? manager.removeItem(at: subdir) }
         let newPath = subdir.appendingPathComponent(
             "PingMachine.machine", isDirectory: true
         )
         machine.path = newPath
         XCTAssertTrue(compiler.compile(machine))
-        defer { _ = helper.deleteItem(atPath: subdir) }
-        XCTAssertTrue(helper.fileExists(newPath.path))
+        var isDirectory: ObjCBool = false
+        XCTAssertTrue(manager.fileExists(atPath: newPath.path, isDirectory: &isDirectory))
+        XCTAssertTrue(isDirectory.boolValue)
     }
 
     /// Test the VHDL code generation is correct for the Ping Machine.
@@ -152,8 +157,8 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// Test VHDL compilation.
     func testCompilationForEmptyFolder() {
-        if helper.directoryExists(factory.pingMachinePath.path) {
-            _ = helper.deleteItem(atPath: factory.pingMachinePath)
+        if manager.fileExists(atPath: factory.pingMachinePath.path) {
+            _ = try? manager.removeItem(at: factory.pingMachinePath)
         }
         let machine = factory.pingMachine
         XCTAssertTrue(compiler.compile(machine))

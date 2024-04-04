@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import IO
+import SwiftUtils
 import VHDLParsing
 
 /// A struct that compiles a VHDL machine into a VHDL source file (vhd). The source file is located
@@ -14,7 +14,7 @@ import VHDLParsing
 public struct VHDLCompiler {
 
     /// A file helper.
-    @usableFromInline let helper = FileHelpers()
+    @usableFromInline let manager = FileManager.default
 
     /// Create a VHDL compiler.
     @inlinable
@@ -35,8 +35,9 @@ public struct VHDLCompiler {
         let fileWrapper = FileWrapper(regularFileWithContents: data)
         fileWrapper.preferredFilename = fileName
         let folderWrapper = FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
-        if helper.directoryExists(machine.path.path) {
-            guard helper.deleteItem(atPath: machine.path) else {
+        var isDirectory: ObjCBool = false
+        if manager.fileExists(atPath: machine.path.path, isDirectory: &isDirectory), isDirectory.boolValue {
+            guard (try? manager.removeItem(at: machine.path)) != nil else {
                 return false
             }
         }

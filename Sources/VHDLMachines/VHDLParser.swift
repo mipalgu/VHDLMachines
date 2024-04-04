@@ -6,8 +6,8 @@
 //
 
 import Foundation
-#if os(Linux)
-import IO
+#if os(Linux) || os(Windows)
+import SwiftUtils
 #endif
 
 /// A parser for VHDL machines. This struct reads the contents of a `FileWrapper` and parses the machine
