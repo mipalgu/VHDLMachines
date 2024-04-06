@@ -1,4 +1,4 @@
-// MachineInstance.swift
+// MachineInstanceTests.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -53,27 +53,35 @@
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
+@testable import VHDLMachines
 import VHDLParsing
+import XCTest
 
-/// A `MachineInstance` represents an instance of a machine that lives within an arrangement. The `name` of
-/// the instance should be unique to any other instance of the same machine. The `type` property is the type
-/// of the machine, typically derived from a shared path where the machine is located.
-public struct MachineInstance: Equatable, Hashable, Codable, Sendable {
+/// Test class for ``MachineInstance``.
+final class MachineInstanceTests: XCTestCase {
 
-    /// The name of the instance.
-    public var name: VariableName
+    /// The instance to test.
+    var instance = MachineInstance(name: .testMachine, type: .pongMachine)
 
-    /// The type of the machine this instance was created from.
-    public var type: VariableName
+    /// Initialise the instance before every test.
+    override func setUp() {
+        instance = MachineInstance(name: .testMachine, type: .pongMachine)
+    }
 
-    /// Creates a new instance of `MachineInstance`.
-    /// - Parameters:
-    ///   - name: The name of the instance.
-    ///   - type: The type of the machine this instance was created from.
-    @inlinable
-    public init(name: VariableName, type: VariableName) {
-        self.name = name
-        self.type = type
+    /// Test init sets properties correctly.
+    func testInit() {
+        XCTAssertEqual(instance.name, .testMachine)
+        XCTAssertEqual(instance.type, .pongMachine)
+    }
+
+    /// Test the setters mutate the properties correctly.
+    func testSetters() {
+        instance.name = .machineSignal1
+        XCTAssertEqual(instance.name, .machineSignal1)
+        XCTAssertEqual(instance.type, .pongMachine)
+        instance.type = .pingMachine
+        XCTAssertEqual(instance.name, .machineSignal1)
+        XCTAssertEqual(instance.type, .pingMachine)
     }
 
 }
