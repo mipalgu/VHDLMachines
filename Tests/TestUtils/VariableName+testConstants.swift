@@ -67,8 +67,6 @@ public extension VariableName {
 
     static let arrangement1 = VariableName(rawValue: "Arrangement1")!
 
-    static let behavioral = VariableName(rawValue: "Behavioral")!
-
     static var clk2: VariableName { VariableName(rawValue: "clk2")! }
 
     static let externalPing = VariableName(rawValue: "EXTERNAL_ping")!

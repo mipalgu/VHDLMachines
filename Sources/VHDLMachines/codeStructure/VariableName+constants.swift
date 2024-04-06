@@ -62,6 +62,9 @@ extension VariableName {
 
     // swiftlint:disable force_unwrapping
 
+    /// The `Behavioral` variable.
+    @usableFromInline static let behavioral = VariableName(rawValue: "Behavioral")!
+
     /// The `clk` variable.
     @usableFromInline static let clk = VariableName(rawValue: "clk")!
 
