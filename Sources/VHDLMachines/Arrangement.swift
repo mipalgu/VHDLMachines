@@ -5,7 +5,6 @@
 //  Created by Morgan McColl on 14/4/21.
 //
 
-import Foundation
 import VHDLParsing
 
 /// An arrangement represents a collection of machines that are executing together. An arrangment has a set of
