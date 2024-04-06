@@ -89,11 +89,15 @@ public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
         else {
             return nil
         }
-        let machines = arrangement.machines.compactMap {
-            createMachine($0.1.machine, $0.0.type)
+        let machinesTuples: [(VariableName, any MachineVHDLRepresentable)] = arrangement.machines
+        .compactMap { instance, mapping in
+            createMachine(mapping.machine, instance.type).flatMap { machine in (instance.name, machine) }
         }
+        guard machinesTuples.count == arrangement.machines.count else {
+            return nil
+        }
+        let machines = Dictionary(uniqueKeysWithValues: machinesTuples)
         guard
-            machines.count == arrangement.machines.count,
             let entity = Entity(arrangement: arrangement, name: name),
             let architecture = Architecture(
                 arrangement: arrangement, machines: machines, name: name
@@ -104,7 +108,7 @@ public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
         self.init(
             name: name,
             arrangement: arrangement,
-            machines: machines,
+            machines: Array(machines.values),
             entity: entity,
             architecture: architecture,
             includes: Machine.initial.includes
