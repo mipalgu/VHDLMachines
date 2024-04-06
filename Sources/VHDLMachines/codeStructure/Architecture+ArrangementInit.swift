@@ -61,13 +61,15 @@ extension Architecture {
         arrangement: Arrangement, machines: [VariableName: any MachineVHDLRepresentable], name: VariableName
     ) {
         var foundEntities: Set<VariableName> = []
-        let entities = machines.map { $1.entity }.filter {
-            guard !foundEntities.contains($0.name) else {
-                return false
+        let entities = machines.map { $1.entity }
+            .filter {
+                guard !foundEntities.contains($0.name) else {
+                    return false
+                }
+                foundEntities.insert($0.name)
+                return true
             }
-            foundEntities.insert($0.name)
-            return true
-        }
+            .sorted { $0.name < $1.name }
         let definitions: [HeadStatement] = entities.compactMap {
             HeadStatement.definition(value: .component(value: ComponentDefinition(
                 name: $0.name, port: $0.port
@@ -84,14 +86,26 @@ extension Architecture {
             HeadStatement.definition(value: .signal(value: $0))
         }
         let mappings = Dictionary(uniqueKeysWithValues: arrangement.machines.map { ($0.name, $1) })
-        let blocks: [AsynchronousBlock] = machines.compactMap { instance, rep -> AsynchronousBlock? in
+        let sortedMachines = machines.sorted {
+            let lhsName = $0.value.entity.name
+            let rhsName = $1.value.entity.name
+            guard lhsName == rhsName else {
+                return lhsName < rhsName
+            }
+            return $0.key < $1.key
+        }
+        let blocks: [AsynchronousBlock] = sortedMachines.compactMap { instance, rep -> AsynchronousBlock? in
             let entity = rep.entity
             guard let mapping: MachineMapping = mappings[instance] else {
                 return nil
             }
             let machine = rep.machine
-            let externalMaps = machine.externalSignals.map { VariableMap(name: $0.name, mapping: mapping) }
-            let clockMaps = machine.clocks.map { VariableMap(name: $0.name, mapping: mapping) }
+            let externalMaps = machine.externalSignals.map {
+                VariableMap(name: $0.name, mapping: mapping, isExternal: true)
+            }
+            let clockMaps = machine.clocks.map {
+                VariableMap(name: $0.name, mapping: mapping, isExternal: false)
+                }
             let portMap = PortMap(variables: clockMaps + externalMaps)
             return AsynchronousBlock.component(block: ComponentInstantiation(
                 label: instance,
@@ -114,8 +128,9 @@ extension Architecture {
 
 extension VariableMap {
 
-    init(name: VariableName, mapping: MachineMapping) {
-        let portName = VariableName(rawValue: "EXTERNAL_\(name.rawValue)")!
+    init(name: VariableName, mapping: MachineMapping, isExternal: Bool) {
+        // swiftlint:disable:next force_unwrapping
+        let portName = isExternal ? VariableName(rawValue: "EXTERNAL_\(name.rawValue)")! : name
         guard
             let variableMapping = mapping.mappings.first(where: { $0.destination == name })
         else {
