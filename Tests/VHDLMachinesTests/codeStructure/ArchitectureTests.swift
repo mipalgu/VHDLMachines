@@ -61,8 +61,65 @@ import XCTest
 /// Test class for `Architecture` extensions.
 final class ArchitectureTests: XCTestCase {
 
+    /// A `ping` component.
+    let pingComponent = ComponentInstantiation(
+        label: .pingMachine,
+        name: .pingMachine,
+        port: PortMap(variables: [
+            VariableMap(
+                lhs: .variable(reference: .variable(name: .clk)),
+                rhs: .expression(value: .reference(
+                    variable: .variable(reference: .variable(name: .clk))
+                ))
+            ),
+            VariableMap(
+                lhs: .variable(reference: .variable(name: .externalPing)),
+                rhs: .expression(value: .reference(
+                    variable: .variable(reference: .variable(name: .ping))
+                ))
+            ),
+            VariableMap(
+                lhs: .variable(reference: .variable(name: .externalPong)),
+                rhs: .expression(value: .reference(
+                    variable: .variable(reference: .variable(name: .pong))
+                ))
+            )
+        ])
+    )
+
+    /// An instance of a ping machine.
+    var pingInstance: AsynchronousBlock{
+        .component(block: pingComponent)
+    }
+
+    /// An instance of the pong machine.
+    let pongInstance = AsynchronousBlock.component(block: ComponentInstantiation(
+        label: .pongMachine,
+        name: .pongMachine,
+        port: PortMap(variables: [
+            VariableMap(
+                lhs: .variable(reference: .variable(name: .clk)),
+                rhs: .expression(value: .reference(
+                    variable: .variable(reference: .variable(name: .clk))
+                ))
+            ),
+            VariableMap(
+                lhs: .variable(reference: .variable(name: .externalPing)),
+                rhs: .expression(value: .reference(
+                    variable: .variable(reference: .variable(name: .ping))
+                ))
+            ),
+            VariableMap(
+                lhs: .variable(reference: .variable(name: .externalPong)),
+                rhs: .expression(value: .reference(
+                    variable: .variable(reference: .variable(name: .pong))
+                ))
+            )
+        ])
+    ))
+
     /// A test arrangement.
-    let arrangement = Arrangement.testArrangement
+    var arrangement = Arrangement.testArrangement
 
     /// The machine representations in `arrangement`.
     var machineRepresentations: [VariableName: MachineVHDLRepresentable] {
@@ -70,6 +127,11 @@ final class ArchitectureTests: XCTestCase {
             // swiftlint:disable:next force_unwrapping
             ($0.name, MachineRepresentation(machine: $1.machine, name: $0.type)!)
         })
+    }
+
+    /// Initialise test data before every test.
+    override func setUp() {
+        arrangement = Arrangement.testArrangement
     }
 
     /// Test the architecture is created correctly in arrangement init.
@@ -95,60 +157,56 @@ final class ArchitectureTests: XCTestCase {
         ]
         XCTAssertEqual(
             architecture.head,
-            ArchitectureHead(statements: signalStatements + machineDefinitions),
-            architecture.head.rawValue
+            ArchitectureHead(statements: signalStatements + machineDefinitions)
         )
-        let mappings = AsynchronousBlock.blocks(blocks: [
-            .component(block: ComponentInstantiation(
-                label: .pingMachine,
-                name: .pingMachine,
-                port: PortMap(variables: [
-                    VariableMap(
-                        lhs: .variable(reference: .variable(name: .clk)),
-                        rhs: .expression(value: .reference(
-                            variable: .variable(reference: .variable(name: .clk))
-                        ))
-                    ),
-                    VariableMap(
-                        lhs: .variable(reference: .variable(name: .externalPing)),
-                        rhs: .expression(value: .reference(
-                            variable: .variable(reference: .variable(name: .ping))
-                        ))
-                    ),
-                    VariableMap(
-                        lhs: .variable(reference: .variable(name: .externalPong)),
-                        rhs: .expression(value: .reference(
-                            variable: .variable(reference: .variable(name: .pong))
-                        ))
-                    )
-                ])
-            )),
-            .component(block: ComponentInstantiation(
-                label: .pongMachine,
-                name: .pongMachine,
-                port: PortMap(variables: [
-                    VariableMap(
-                        lhs: .variable(reference: .variable(name: .clk)),
-                        rhs: .expression(value: .reference(
-                            variable: .variable(reference: .variable(name: .clk))
-                        ))
-                    ),
-                    VariableMap(
-                        lhs: .variable(reference: .variable(name: .externalPing)),
-                        rhs: .expression(value: .reference(
-                            variable: .variable(reference: .variable(name: .ping))
-                        ))
-                    ),
-                    VariableMap(
-                        lhs: .variable(reference: .variable(name: .externalPong)),
-                        rhs: .expression(value: .reference(
-                            variable: .variable(reference: .variable(name: .pong))
-                        ))
-                    )
-                ])
+        let mappings = AsynchronousBlock.blocks(blocks: [pingInstance, pongInstance])
+        XCTAssertEqual(architecture.body, mappings)
+        XCTAssertEqual(architecture.entity, .arrangement1)
+        XCTAssertEqual(architecture.name, .behavioral)
+    }
+
+    /// Test that the architecture generates only unique components.
+    func testArrangementGeneratesUniqueComponents() {
+        var mappings = arrangement.machines
+        guard let pingMapping = mappings[MachineInstance(name: .pingMachine, type: .pingMachine)] else {
+            XCTFail("No ping machine!")
+            return
+        }
+        mappings[MachineInstance(name: .pongMachine, type: .pongMachine)] = nil
+        mappings[MachineInstance(name: .pongMachine, type: .pingMachine)] = pingMapping
+        arrangement = Arrangement(
+            machines: mappings,
+            externalSignals: arrangement.externalSignals,
+            signals: arrangement.signals,
+            clocks: arrangement.clocks
+        )
+        guard
+            let architecture = Architecture(
+                arrangement: arrangement, machines: machineRepresentations, name: .arrangement1
+            ),
+            let pingMachine = machineRepresentations[.pingMachine]
+        else {
+            XCTFail("Failed to create architecture!")
+            return
+        }
+        let signalStatements = arrangement.signals.map {
+            HeadStatement.definition(value: .signal(value: $0))
+        }
+        let expectedHead = ArchitectureHead(statements: signalStatements + [
+            HeadStatement.definition(value: .component(
+                value: ComponentDefinition(name: .pingMachine, port: pingMachine.entity.port)
             ))
         ])
-        XCTAssertEqual(architecture.body, mappings, architecture.body.rawValue)
+        XCTAssertEqual(architecture.head, expectedHead)
+        let ping2Instance = AsynchronousBlock.component(block: ComponentInstantiation(
+            label: .pongMachine,
+            name: pingComponent.name,
+            port: pingComponent.port
+        ))
+        let expectedBody = AsynchronousBlock.blocks(blocks: [pingInstance, ping2Instance])
+        XCTAssertEqual(architecture.body, expectedBody)
+        XCTAssertEqual(architecture.entity, .arrangement1)
+        XCTAssertEqual(architecture.name, .behavioral)
     }
 
 }
