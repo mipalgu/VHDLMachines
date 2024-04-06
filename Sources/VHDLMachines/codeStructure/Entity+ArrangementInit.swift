@@ -55,8 +55,14 @@
 
 import VHDLParsing
 
+/// Add initialiser for arrangement entity.
 extension Entity {
 
+    /// Initialise an Arrangements Entity.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to create the entity from.
+    ///   - name: The name of the arrangement.
+    @inlinable
     init?(arrangement: Arrangement, name: VariableName) {
         let clocks = arrangement.clocks.map { PortSignal(clock: $0) }
         guard let externals = PortBlock(signals: clocks + arrangement.externalSignals) else {
