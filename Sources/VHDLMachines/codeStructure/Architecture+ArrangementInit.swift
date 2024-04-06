@@ -55,11 +55,15 @@
 
 import VHDLParsing
 
+/// Add init to construct `Architecture` from ``Arrangement``.
 extension Architecture {
 
     init?(
         arrangement: Arrangement, machines: [VariableName: any MachineVHDLRepresentable], name: VariableName
     ) {
+        guard arrangement.machines.count == machines.count else {
+            return nil
+        }
         var foundEntities: Set<VariableName> = []
         let entities = machines.map { $1.entity }
             .filter {
@@ -98,7 +102,7 @@ extension Architecture {
             }
             let clockMaps = machine.clocks.map {
                 VariableMap(name: $0.name, mapping: mapping, isExternal: false)
-                }
+            }
             let portMap = PortMap(variables: clockMaps + externalMaps)
             return AsynchronousBlock.component(block: ComponentInstantiation(
                 label: instance,
