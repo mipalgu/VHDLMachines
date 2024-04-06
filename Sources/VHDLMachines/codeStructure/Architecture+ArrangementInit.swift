@@ -57,7 +57,7 @@ import VHDLParsing
 
 extension Architecture {
 
-    init?<T>(arrangement: Arrangement, machines: [T], name: VariableName) where T: MachineVHDLRepresentable {
+    init?(arrangement: Arrangement, machines: [any MachineVHDLRepresentable], name: VariableName) {
         let definitions: [HeadStatement] = machines.compactMap {
             let entity = $0.entity
             return HeadStatement.definition(value: .component(value: ComponentDefinition(

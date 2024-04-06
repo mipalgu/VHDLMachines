@@ -120,12 +120,7 @@ public struct MachineRepresentation: MachineVHDLRepresentable, Equatable, Hashab
                         VariableName(rawValue: "STATE_\(state.name.rawValue)_\($0.name.rawValue)")!
                     )
                 }
-            })
-        else {
-            // Duplicate variable names.
-            return nil
-        }
-        guard
+            }),
             let newMachine = Machine(replacingStateRefsIn: machine),
             let entity = Entity(machine: newMachine, name: name),
             let architectureName = VariableName(rawValue: "Behavioral"),
@@ -134,11 +129,27 @@ public struct MachineRepresentation: MachineVHDLRepresentable, Equatable, Hashab
         else {
             return nil
         }
-        self.machine = newMachine
-        self.entity = entity
+        self.init(
+            architectureBody: body,
+            architectureHead: head,
+            architectureName: architectureName,
+            entity: entity,
+            machine: newMachine
+        )
+    }
+
+    init(
+        architectureBody: AsynchronousBlock,
+        architectureHead: ArchitectureHead,
+        architectureName: VariableName,
+        entity: Entity,
+        machine: Machine
+    ) {
+        self.architectureBody = architectureBody
+        self.architectureHead = architectureHead
         self.architectureName = architectureName
-        self.architectureHead = head
-        self.architectureBody = body
+        self.entity = entity
+        self.machine = machine
     }
 
 }

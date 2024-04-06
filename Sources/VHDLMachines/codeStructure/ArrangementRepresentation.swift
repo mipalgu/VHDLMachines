@@ -55,15 +55,13 @@
 
 import VHDLParsing
 
-public struct ArrangementRepresentation<Representation>: ArrangementVHDLRepresentable,
-    Equatable, Hashable, Codable, Sendable where Representation: MachineVHDLRepresentable,
-    Representation: Equatable, Representation: Hashable, Representation: Codable, Representation: Sendable {
+public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
 
     public let name: VariableName
 
     public let arrangement: Arrangement
 
-    public let machines: [Representation]
+    public let machines: [any MachineVHDLRepresentable]
 
     public let entity: Entity
 
@@ -74,7 +72,9 @@ public struct ArrangementRepresentation<Representation>: ArrangementVHDLRepresen
     public init?(
         arrangement: Arrangement,
         name: VariableName,
-        createMachine: @escaping (Machine, VariableName) -> Representation?
+        createMachine: @escaping (Machine, VariableName) -> (any MachineVHDLRepresentable)? = {
+            MachineRepresentation(machine: $0, name: $1)
+        }
     ) {
         let arrangementExternalVariables = arrangement.externalSignals.map(\.name)
         let arrangementGlobals = arrangement.signals.map(\.name)
@@ -114,7 +114,7 @@ public struct ArrangementRepresentation<Representation>: ArrangementVHDLRepresen
     init(
         name: VariableName,
         arrangement: Arrangement,
-        machines: [Representation],
+        machines: [any MachineVHDLRepresentable],
         entity: Entity,
         architecture: Architecture,
         includes: [Include]

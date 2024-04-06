@@ -57,13 +57,11 @@ import VHDLParsing
 
 public protocol ArrangementVHDLRepresentable {
 
-    associatedtype Representation where Representation: MachineVHDLRepresentable
-
     var name: VariableName { get }
 
     var arrangement: Arrangement { get }
 
-    var machines: [Representation] { get }
+    var machines: [any MachineVHDLRepresentable] { get }
 
     var entity: Entity { get }
 
@@ -76,7 +74,7 @@ public protocol ArrangementVHDLRepresentable {
     init?(
         arrangement: Arrangement,
         name: VariableName,
-        createMachine: @escaping (Machine, VariableName) -> Representation?
+        createMachine: @escaping (Machine, VariableName) -> (any MachineVHDLRepresentable)?
     )
 
 }
