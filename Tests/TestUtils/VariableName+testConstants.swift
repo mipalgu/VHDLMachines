@@ -69,6 +69,10 @@ public extension VariableName {
 
     static var clk2: VariableName { VariableName(rawValue: "clk2")! }
 
+    static let externalPing = VariableName(rawValue: "EXTERNAL_ping")!
+
+    static let externalPong = VariableName(rawValue: "EXTERNAL_pong")!
+
     static var g: VariableName { VariableName(rawValue: "g")! }
 
     static var initialX: VariableName { VariableName(rawValue: "initialX")! }
