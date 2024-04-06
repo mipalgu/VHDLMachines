@@ -1,4 +1,4 @@
-// Arrangement+testArrangement.swift
+// MachineInstance.swift
 // VHDLMachines
 // 
 // Created by Morgan McColl.
@@ -53,40 +53,17 @@
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
-@testable import VHDLMachines
 import VHDLParsing
 
-/// Add helpful test data.
-extension Arrangement {
+public struct MachineInstance: Equatable, Hashable, Codable, Sendable {
 
-    /// A test arrangement.
-    public static let testArrangement = Arrangement(
-        machines: [
-            MachineInstance(name: .pingMachine, type: .pingMachine): MachineMapping(
-                machine: PingPongArrangement().pingMachine,
-                mappings: [
-                    VariableMapping(source: .ping, destination: .ping),
-                    VariableMapping(source: .pong, destination: .pong),
-                    VariableMapping(source: .clk, destination: .clk)
-                ]
-            ),
-            MachineInstance(name: .pongMachine, type: .pongMachine): MachineMapping(
-                machine: PingPongArrangement().pongMachine,
-                mappings: [
-                    VariableMapping(source: .ping, destination: .ping),
-                    VariableMapping(source: .pong, destination: .pong),
-                    VariableMapping(source: .clk, destination: .clk)
-                ]
-            )
-        ],
-        externalSignals: [
-            PortSignal(type: .stdLogic, name: .y, mode: .output)
-        ],
-        signals: [
-            LocalSignal(type: .stdLogic, name: .ping),
-            LocalSignal(type: .stdLogic, name: .pong)
-        ],
-        clocks: [Clock(name: .clk, frequency: 50, unit: .MHz)]
-    )
+    public var name: VariableName
+
+    public var type: VariableName
+
+    public init(name: VariableName, type: VariableName) {
+        self.name = name
+        self.type = type
+    }
 
 }

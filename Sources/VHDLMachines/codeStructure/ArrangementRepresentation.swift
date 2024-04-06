@@ -90,7 +90,7 @@ public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
             return nil
         }
         let machines = arrangement.machines.compactMap {
-            createMachine($0.1.machine, $0.0)
+            createMachine($0.1.machine, $0.0.type)
         }
         guard
             machines.count == arrangement.machines.count,

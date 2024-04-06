@@ -192,7 +192,11 @@ final class EntityTests: XCTestCase {
     /// Test the entity is successfully created for the arrangement.
     func testArrangementInit() {
         let arrangement = Arrangement(
-            machines: [.testMachine: MachineMapping(machine: .testMachine(), mappings: [])],
+            machines: [
+                MachineInstance(name: .testMachine, type: .testMachine): MachineMapping(
+                    machine: .testMachine(), mappings: []
+                )
+            ],
             externalSignals: [PortSignal(type: .stdLogic, name: .x, mode: .input)],
             signals: [LocalSignal(type: .stdLogic, name: .y)],
             clocks: [Clock(name: .clk, frequency: 125, unit: .MHz)]
@@ -215,7 +219,11 @@ final class EntityTests: XCTestCase {
     /// Test the arrangement init returns nil for invalid port block.
     func testArrangementInitDetectsInvalidSignals() {
         let arrangement = Arrangement(
-            machines: [.testMachine: MachineMapping(machine: .testMachine(), mappings: [])],
+            machines: [
+                MachineInstance(name: .testMachine, type: .testMachine): MachineMapping(
+                    machine: .testMachine(), mappings: []
+                )
+            ],
             externalSignals: [PortSignal(type: .stdLogic, name: .clk, mode: .input)],
             signals: [LocalSignal(type: .stdLogic, name: .y)],
             clocks: [Clock(name: .clk, frequency: 125, unit: .MHz)]

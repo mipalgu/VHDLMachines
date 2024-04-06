@@ -74,7 +74,7 @@ extension Architecture {
         let variables = arrangement.signals.map {
             HeadStatement.definition(value: .signal(value: $0))
         }
-        let mappings = arrangement.machines
+        let mappings = Dictionary(uniqueKeysWithValues: arrangement.machines.map { ($0.name, $1) })
         let blocks: [AsynchronousBlock] = machines.compactMap { representation -> AsynchronousBlock? in
             let entity = representation.entity
             guard

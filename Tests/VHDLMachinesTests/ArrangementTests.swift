@@ -66,14 +66,14 @@ final class ArrangementTests: XCTestCase {
 
     /// The machines in the arrangement.
     let machines = [
-        VariableName(rawValue: "M1")!: MachineMapping(
+        MachineInstance(name: VariableName(rawValue: "M1")!, type: .pingMachine): MachineMapping(
             machine: PingPongArrangement().pingMachine,
             mappings: [
                 VariableMapping(source: .x, destination: .ping),
                 VariableMapping(source: .y, destination: .pong)
             ]
         ),
-        VariableName(rawValue: "M2")!: MachineMapping(
+        MachineInstance(name: VariableName(rawValue: "M2")!, type: .pongMachine): MachineMapping(
             machine: PingPongArrangement().pongMachine,
             mappings: [
                 VariableMapping(source: .x, destination: .ping),
@@ -150,7 +150,7 @@ final class ArrangementTests: XCTestCase {
     /// Tests getters and setters update properties correctly.
     func testGettersAndSetters() {
         let newMachines = [
-            VariableName(rawValue: "M3")!: MachineMapping(
+            MachineInstance(name: VariableName(rawValue: "M3")!, type: .testMachine): MachineMapping(
                 machine: PingPongArrangement().pingMachine, mappings: []
             )
         ]
