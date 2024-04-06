@@ -70,17 +70,10 @@ extension Architecture {
                 return true
             }
             .sorted { $0.name < $1.name }
-        let definitions: [HeadStatement] = entities.compactMap {
+        let definitions: [HeadStatement] = entities.map {
             HeadStatement.definition(value: .component(value: ComponentDefinition(
                 name: $0.name, port: $0.port
             )))
-        }
-        guard
-            !definitions.isEmpty,
-            definitions.count == entities.count,
-            let behavioral = VariableName(rawValue: "Behavioral")
-        else {
-            return nil
         }
         let variables = arrangement.signals.map {
             HeadStatement.definition(value: .signal(value: $0))
@@ -120,7 +113,7 @@ extension Architecture {
             body: blocks.count == 1 ? blocks[0] : .blocks(blocks: blocks),
             entity: name,
             head: ArchitectureHead(statements: variables + definitions),
-            name: behavioral
+            name: .behavioral
         )
     }
 
