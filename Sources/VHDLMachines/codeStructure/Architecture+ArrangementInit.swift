@@ -58,6 +58,15 @@ import VHDLParsing
 /// Add init to construct `Architecture` from ``Arrangement``.
 extension Architecture {
 
+    // swiftlint:disable function_body_length
+
+    /// Construct an `Architecture` from an `Arrangement`.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to create the architecture for.
+    ///   - machines: The machine representations to use in the architecture. The key of the dictionary is the
+    /// name of the instance.
+    ///   - name: The name of the entity this architecture implements.
+    @inlinable
     init?(
         arrangement: Arrangement, machines: [VariableName: any MachineVHDLRepresentable], name: VariableName
     ) {
@@ -94,10 +103,10 @@ extension Architecture {
             }
             return $0.key < $1.key
         }
-        let blocks: [AsynchronousBlock] = sortedMachines.compactMap { instance, rep -> AsynchronousBlock? in
+        let blocks: [AsynchronousBlock] = sortedMachines.map { instance, rep in
             let entity = rep.entity
             guard let mapping: MachineMapping = mappings[instance] else {
-                return nil
+                fatalError("Cannot find mapping for \(instance)")
             }
             let machine = rep.machine
             let externalMaps = machine.externalSignals.map {
@@ -113,9 +122,6 @@ extension Architecture {
                 port: portMap
             ))
         }
-        guard blocks.count == machines.count, !blocks.isEmpty else {
-            return nil
-        }
         self.init(
             body: blocks.count == 1 ? blocks[0] : .blocks(blocks: blocks),
             entity: name,
@@ -124,10 +130,19 @@ extension Architecture {
         )
     }
 
+    // swiftlint:enable function_body_length
+
 }
 
+/// Add initialiser for create a variable map from a machine mapping.
 extension VariableMap {
 
+    /// Create a variable map from a machine mapping.
+    /// - Parameters:
+    ///   - name: The name of the variable to map.
+    ///   - mapping: The machine mapping to use.
+    ///   - isExternal: Whether the variable is an external signal.
+    @inlinable
     init(name: VariableName, mapping: MachineMapping, isExternal: Bool) {
         // swiftlint:disable:next force_unwrapping
         let portName = isExternal ? VariableName(rawValue: "EXTERNAL_\(name.rawValue)")! : name
