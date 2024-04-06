@@ -253,6 +253,13 @@ final class ArchitectureTests: XCTestCase {
         XCTAssertEqual(architecture.name, .behavioral)
     }
 
+    /// Test that the arrangement returns `nil` when the machines don't match the arrangement passed.
+    func testArrangementInitDetectsDifferentInstances() {
+        var machines = machineRepresentations
+        machines[.pingMachine] = MachineRepresentation(machine: .testMachine(), name: .testMachine)
+        XCTAssertNil(Architecture(arrangement: arrangement, machines: machines, name: .arrangement1))
+    }
+
     /// Test the machines must match the arrangement machines.
     func testArrangementInitChecksMachineCount() {
         var machines = machineRepresentations

@@ -61,7 +61,10 @@ extension Architecture {
     init?(
         arrangement: Arrangement, machines: [VariableName: any MachineVHDLRepresentable], name: VariableName
     ) {
-        guard arrangement.machines.count == machines.count else {
+        guard
+            arrangement.machines.count == machines.count,
+            arrangement.machines.allSatisfy({ $0.0.type == machines[$0.0.name]?.entity.name })
+        else {
             return nil
         }
         var foundEntities: Set<VariableName> = []
