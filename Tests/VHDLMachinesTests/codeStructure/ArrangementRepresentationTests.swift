@@ -65,17 +65,14 @@ final class ArrangementRepresentationTests: XCTestCase {
     /// A test arrangement
     let arrangement = Arrangement.testArrangement
 
+    /// The representation of `arrangement`.
+    var representation: ArrangementRepresentation {
+        // swiftlint:disable:next force_unwrapping
+        ArrangementRepresentation(arrangement: arrangement, name: .arrangement1)!
+    }
+
     /// Test arrangement.
     func testArrangement() {
-        let representation = ArrangementRepresentation(
-            arrangement: arrangement, name: VariableName(rawValue: "Arrangement1")!
-        ) {
-            MachineRepresentation(machine: $0, name: $1)
-        }
-        guard let representation else {
-            XCTFail("Failed to create representation!")
-            return
-        }
         print(representation.file.rawValue)
         fflush(stdout)
     }
