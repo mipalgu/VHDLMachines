@@ -32,7 +32,7 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
 
     /// This initialiser will attempt to create an arrangement with the given mapping and signals. Please note
     /// that the types in ``MachineInstance`` (the keys in the `mappings`) must point to the same ``Machine``.
-    /// This initialiser will return nil if this is not the case.
+    /// This initialiser will return nil if this is not the case. The instance names must also be unique.
     /// - Parameters:
     ///   - mappings: The signal mappings for each machine instance.
     ///   - externalSignals: The external signals in the arrangement.
@@ -47,6 +47,10 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
         signals: [LocalSignal],
         clocks: [Clock]
     ) {
+        let instanceNames = mappings.map(\.key.name)
+        guard instanceNames.count == Set(instanceNames).count else {
+            return nil
+        }
         var mappingsDictionary: [VariableName: [MachineMapping]] = [:]
         mappings.forEach { instance, mapping in
             guard let oldMappings = mappingsDictionary[instance.type] else {

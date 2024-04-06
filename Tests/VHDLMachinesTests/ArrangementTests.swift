@@ -175,6 +175,24 @@ final class ArrangementTests: XCTestCase {
         XCTAssertNil(arrangement)
     }
 
+    /// Make sure instance names are also unique.
+    func testPublicInitDetectsDuplicateInstances() {
+        let arrangement = Arrangement(
+            mappings: [
+                MachineInstance(name: .machineSignal1, type: .pingMachine): MachineMapping(
+                    machine: PingPongArrangement().pingMachine, mappings: []
+                ),
+                MachineInstance(name: .machineSignal1, type: .pongMachine): MachineMapping(
+                    machine: PingPongArrangement().pongMachine, mappings: []
+                )
+            ],
+            externalSignals: externalSignals,
+            signals: signals,
+            clocks: clocks
+        )
+        XCTAssertNil(arrangement)
+    }
+
     // /// Tests getters and setters update properties correctly.
     // func testGettersAndSetters() {
     //     let newMachines = [
