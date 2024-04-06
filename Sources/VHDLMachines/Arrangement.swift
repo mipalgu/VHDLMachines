@@ -20,16 +20,47 @@ import VHDLParsing
 public struct Arrangement: Equatable, Hashable, Codable, Sendable {
 
     /// All machines in the arrangement.
-    public var machines: [MachineInstance: MachineMapping]
+    public let machines: [MachineInstance: MachineMapping]
 
     /// The external signals in the arrangement that map to physical pins.
-    public var externalSignals: [PortSignal]
+    public let externalSignals: [PortSignal]
 
     /// The signals local to every machine in the arrangement, but do not map to external devices.
-    public var signals: [LocalSignal]
+    public let signals: [LocalSignal]
 
     /// The clocks in the arrangement available to every machine.
-    public var clocks: [Clock]
+    public let clocks: [Clock]
+
+    /// This initialiser will attempt to create an arrangement with the given mapping and signals. Please note
+    /// that the types in ``MachineInstance`` (the keys in the `mappings`) must point to the same ``Machine``.
+    /// This initialiser will return nil if this is not the case.
+    /// - Parameters:
+    ///   - mappings: The signal mappings for each machine instance.
+    ///   - externalSignals: The external signals in the arrangement.
+    ///   - signals: The local (global in machine scope) signals to the arrangement.
+    ///   - clocks: The clocks in the arrangement. It is assumed that clocks are not local to the arrangement.
+    /// If you are synthesising clocks (i.e. through PLL or DCM) within the arrangement, then use local
+    /// `signals`.
+    @inlinable
+    public init?(
+        mappings: [MachineInstance: MachineMapping],
+        externalSignals: [PortSignal],
+        signals: [LocalSignal],
+        clocks: [Clock]
+    ) {
+        var mappingsDictionary: [VariableName: [MachineMapping]] = [:]
+        mappings.forEach { instance, mapping in
+            guard let oldMappings = mappingsDictionary[instance.type] else {
+                mappingsDictionary[instance.type] = [mapping]
+                return
+            }
+            mappingsDictionary[instance.type] = oldMappings + [mapping]
+        }
+        guard mappingsDictionary.allSatisfy({ Set($1).count == 1 }) else {
+            return nil
+        }
+        self.init(machines: mappings, externalSignals: externalSignals, signals: signals, clocks: clocks)
+    }
 
     /// Initialises the arrangement with the given values.
     /// - Parameters:
