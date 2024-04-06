@@ -65,6 +65,8 @@ public extension VariableName {
 
     static var a: VariableName { VariableName(rawValue: "A")! }
 
+    static let arrangement1 = VariableName(rawValue: "Arrangement1")
+
     static var clk2: VariableName { VariableName(rawValue: "clk2")! }
 
     static var g: VariableName { VariableName(rawValue: "g")! }
