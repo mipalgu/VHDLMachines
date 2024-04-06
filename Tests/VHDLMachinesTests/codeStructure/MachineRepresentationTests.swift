@@ -105,4 +105,33 @@ final class MachineRepresentationTests: XCTestCase {
         XCTAssertNil(MachineRepresentation(machine: machine, name: .testMachine))
     }
 
+    /// Test that the stored-property initialiser works correctly.
+    func testPropertyInit() {
+        guard
+            let port = PortBlock(signals: [PortSignal(type: .stdLogic, name: .clk, mode: .input)]),
+            let comment = Comment(rawValue: "-- Test comment")
+        else {
+            XCTFail("Failed to create VHDL blocks.")
+            return
+        }
+        let machine = Machine.testMachine()
+        let body = AsynchronousBlock.statement(statement: .comment(value: comment))
+        let entity = Entity(name: .pingMachine, port: port)
+        let head = ArchitectureHead(statements: [
+            .definition(value: .signal(value: LocalSignal(type: .stdLogic, name: .x)))
+        ])
+        let representation = MachineRepresentation(
+            architectureBody: body,
+            architectureHead: head,
+            architectureName: .y,
+            entity: entity,
+            machine: machine
+        )
+        XCTAssertEqual(representation.architectureBody, body)
+        XCTAssertEqual(representation.architectureHead, head)
+        XCTAssertEqual(representation.architectureName, .y)
+        XCTAssertEqual(representation.entity, entity)
+        XCTAssertEqual(representation.machine, machine)
+    }
+
 }

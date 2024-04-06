@@ -138,6 +138,14 @@ public struct MachineRepresentation: MachineVHDLRepresentable, Equatable, Hashab
         )
     }
 
+    /// Create a `MachineRepresentation` from its stored properties.
+    /// - Parameters:
+    ///   - architectureBody: The body of the architecture.
+    ///   - architectureHead: The head of the architecture.
+    ///   - architectureName: The name of the architecture.
+    ///   - entity: The entity of the representation.
+    ///   - machine: The machine this representation is for.
+    @inlinable
     init(
         architectureBody: AsynchronousBlock,
         architectureHead: ArchitectureHead,
