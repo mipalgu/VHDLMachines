@@ -271,4 +271,66 @@ final class ArchitectureTests: XCTestCase {
         XCTAssertNil(Architecture(arrangement: arrangement, machines: [:], name: .arrangement1))
     }
 
+    // swiftlint:disable function_body_length
+
+    /// Test arrangement init makes signals open when not mapped.
+    func testArrangementHandlesSignalsNotMapped() {
+        var mappings = arrangement.machines
+        mappings[MachineInstance(name: .pingMachine, type: .pingMachine)] = MachineMapping(
+            machine: PingPongArrangement().pingMachine, mappings: []
+        )
+        arrangement = Arrangement(
+            machines: mappings,
+            externalSignals: arrangement.externalSignals,
+            signals: arrangement.signals,
+            clocks: arrangement.clocks
+        )
+        guard
+            let architecture = Architecture(
+                arrangement: arrangement, machines: machineRepresentations, name: .arrangement1
+            ),
+            let pingMachine = machineRepresentations[.pingMachine],
+            let pongMachine = machineRepresentations[.pongMachine]
+        else {
+            XCTFail("Failed to create architecture!")
+            return
+        }
+        let signalStatements = arrangement.signals.map {
+            HeadStatement.definition(value: .signal(value: $0))
+        }
+        let expectedHead = ArchitectureHead(statements: signalStatements + [
+            HeadStatement.definition(value: .component(
+                value: ComponentDefinition(name: .pingMachine, port: pingMachine.entity.port)
+            )),
+            HeadStatement.definition(value: .component(
+                value: ComponentDefinition(name: .pongMachine, port: pongMachine.entity.port)
+            ))
+        ])
+        XCTAssertEqual(architecture.head, expectedHead)
+        let ping2Instance = AsynchronousBlock.component(block: ComponentInstantiation(
+            label: .pingMachine,
+            name: pingComponent.name,
+            port: PortMap(variables: [
+                VariableMap(
+                    lhs: .variable(reference: .variable(name: .clk)),
+                    rhs: .open
+                ),
+                VariableMap(
+                    lhs: .variable(reference: .variable(name: .externalPing)),
+                    rhs: .open
+                ),
+                VariableMap(
+                    lhs: .variable(reference: .variable(name: .externalPong)),
+                    rhs: .open
+                )
+            ])
+        ))
+        let expectedBody = AsynchronousBlock.blocks(blocks: [ping2Instance, pongInstance])
+        XCTAssertEqual(architecture.body, expectedBody)
+        XCTAssertEqual(architecture.entity, .arrangement1)
+        XCTAssertEqual(architecture.name, .behavioral)
+    }
+
+    // swiftlint:enable function_body_length
+
 }
