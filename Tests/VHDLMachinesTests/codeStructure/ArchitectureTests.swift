@@ -88,7 +88,7 @@ final class ArchitectureTests: XCTestCase {
     )
 
     /// An instance of a ping machine.
-    var pingInstance: AsynchronousBlock{
+    var pingInstance: AsynchronousBlock {
         .component(block: pingComponent)
     }
 
@@ -207,6 +207,61 @@ final class ArchitectureTests: XCTestCase {
         XCTAssertEqual(architecture.body, expectedBody)
         XCTAssertEqual(architecture.entity, .arrangement1)
         XCTAssertEqual(architecture.name, .behavioral)
+    }
+
+    /// Test the architecture generates the correct components with the correct labels.
+    func testArrangementGeneratesDifferentInstanceNames() {
+        guard
+            let pingMapping = arrangement.machines[MachineInstance(name: .pingMachine, type: .pingMachine)]
+        else {
+            XCTFail("Failed to find ping mapping!")
+            return
+        }
+        let mappings: [MachineInstance: MachineMapping] = [
+            MachineInstance(name: .testMachine, type: .pingMachine): pingMapping
+        ]
+        arrangement = Arrangement(
+            machines: mappings,
+            externalSignals: arrangement.externalSignals,
+            signals: arrangement.signals,
+            clocks: arrangement.clocks
+        )
+        guard
+            let architecture = Architecture(
+                arrangement: arrangement, machines: machineRepresentations, name: .arrangement1
+            ),
+            let pingMachine = machineRepresentations[.testMachine]
+        else {
+            XCTFail("Couldn't create architecture!")
+            return
+        }
+        let signalStatements = arrangement.signals.map {
+            HeadStatement.definition(value: .signal(value: $0))
+        }
+        let expectedHead = ArchitectureHead(statements: signalStatements + [
+            HeadStatement.definition(value: .component(
+                value: ComponentDefinition(name: .pingMachine, port: pingMachine.entity.port)
+            ))
+        ])
+        XCTAssertEqual(architecture.head, expectedHead)
+        let component = ComponentInstantiation(
+            label: .testMachine, name: .pingMachine, port: pingComponent.port
+        )
+        let expectedBody = AsynchronousBlock.component(block: component)
+        XCTAssertEqual(architecture.body, expectedBody)
+        XCTAssertEqual(architecture.entity, .arrangement1)
+        XCTAssertEqual(architecture.name, .behavioral)
+    }
+
+    /// Test the machines must match the arrangement machines.
+    func testArrangementInitChecksMachineCount() {
+        var machines = machineRepresentations
+        machines[.testMachine] = MachineRepresentation(machine: .testMachine(), name: .testMachine)
+        XCTAssertNil(Architecture(arrangement: arrangement, machines: machines, name: .arrangement1))
+        machines[.pingMachine] = nil
+        machines[.testMachine] = nil
+        XCTAssertNil(Architecture(arrangement: arrangement, machines: machines, name: .arrangement1))
+        XCTAssertNil(Architecture(arrangement: arrangement, machines: [:], name: .arrangement1))
     }
 
 }
