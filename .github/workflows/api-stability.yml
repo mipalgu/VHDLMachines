@@ -43,7 +43,4 @@ jobs:
       #  run: sed -i 's/git@github.com:/https:\/\/${{ secrets.ACCESS_TOKEN }}@github.com\//g' Package.swift
 
       - name: Check API Stability 
-        run: |
-          echo "TAG=$(git tag | sort --version-sort | tail -n1)" >> "$GITHUB_ENV"
-          swift package diagnose-api-breaking-changes ${{ env.TAG }} 
-
+        run: swift package diagnose-api-breaking-changes `git tag | sort --version-sort | tail -n1`
