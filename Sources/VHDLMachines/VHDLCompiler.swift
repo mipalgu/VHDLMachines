@@ -5,7 +5,6 @@
 //  Created by Morgan McColl on 19/5/21.
 //
 
-import Foundation
 import SwiftUtils
 import VHDLParsing
 
@@ -17,17 +16,14 @@ public struct VHDLCompiler {
     @inlinable
     public init() {}
 
-    public func compile(_ arrangement: Arrangement, location url: URL) -> FileWrapper? {
-        let name = url.lastPathComponent
+    public func compile(arrangement: Arrangement, name: VariableName) -> FileWrapper? {
         guard
-            name.hasSuffix(".arrangement"),
-            let nameVar = VariableName(rawValue: String(name.dropLast(11))),
-            let representation = ArrangementRepresentation(arrangement: arrangement, name: nameVar),
+            let representation = ArrangementRepresentation(arrangement: arrangement, name: name),
             let data = representation.file.rawValue.data(using: .utf8)
         else {
             return nil
         }
-        let fileName = "\(nameVar.rawValue).vhd"
+        let fileName = "\(name.rawValue).vhd"
         let fileWrapper = FileWrapper(regularFileWithContents: data)
         fileWrapper.preferredFilename = fileName
         return FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
@@ -38,17 +34,14 @@ public struct VHDLCompiler {
     /// - Parameter url: The location to the machine folder. This url must end with a `.machine` extension.
     /// - Returns: Whether the compilation was successful.
     @inlinable
-    public func compile(_ machine: Machine, location url: URL) -> FileWrapper? {
-        let name = url.lastPathComponent
+    public func compile(machine: Machine, name: VariableName) -> FileWrapper? {
         guard
-            name.hasSuffix(".machine"),
-            let nameVar = VariableName(rawValue: String(name.dropLast(8))),
-            let format = generateVHDLFile(machine: machine, name: nameVar),
+            let format = generateVHDLFile(machine: machine, name: name),
             let data = format.data(using: .utf8)
         else {
             return nil
         }
-        let fileName = "\(nameVar.rawValue).vhd"
+        let fileName = "\(name.rawValue).vhd"
         let fileWrapper = FileWrapper(regularFileWithContents: data)
         fileWrapper.preferredFilename = fileName
         return FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
