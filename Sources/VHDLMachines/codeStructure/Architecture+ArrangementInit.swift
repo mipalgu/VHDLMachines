@@ -104,22 +104,19 @@ extension Architecture {
             return $0.key < $1.key
         }
         let blocks: [AsynchronousBlock] = sortedMachines.map { instance, rep in
-            let entity = rep.entity
             guard let mapping: MachineMapping = mappings[instance] else {
                 fatalError("Cannot find mapping for \(instance)")
             }
-            let machine = rep.machine
-            let externalMaps = machine.externalSignals.map {
+            let externalMaps = rep.machine.externalSignals.map {
                 VariableMap(name: $0.name, mapping: mapping, isExternal: true)
             }
-            let clockMaps = machine.clocks.map {
+            let clockMaps = rep.machine.clocks.map {
                 VariableMap(name: $0.name, mapping: mapping, isExternal: false)
             }
-            let portMap = PortMap(variables: clockMaps + externalMaps)
             return AsynchronousBlock.component(block: ComponentInstantiation(
                 label: instance,
-                name: entity.name,
-                port: portMap
+                name: rep.entity.name,
+                port: PortMap(variables: clockMaps + externalMaps)
             ))
         }
         self.init(
