@@ -42,7 +42,7 @@ jobs:
 
       - name: Check API Stability 
         run: |
-          tag=$(git tag | sort --version-sort | tail -n1)
-          echo $tag
-          swift package diagnose-api-breaking-changes ${{ env.tag }}
+          echo "{TAG}={git tag | sort --version-sort | tail -n1}" >> "$GITHUB_ENV"
+          echo ${{ env.TAG }}
+          swift package diagnose-api-breaking-changes ${{ env.TAG }}
 
