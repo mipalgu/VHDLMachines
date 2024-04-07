@@ -333,4 +333,14 @@ final class ArchitectureTests: XCTestCase {
 
     // swiftlint:enable function_body_length
 
+    /// Test the arrangement init detects invalid additional mappings.
+    func testArrangementInitWithAdditionalMappings() {
+        var representations = machineRepresentations
+        representations[.pongMachine] = nil
+        XCTAssertNil(Architecture(arrangement: arrangement, machines: representations, name: .arrangement1))
+        representations[.testMachine] = MachineRepresentation(machine: .testMachine(), name: .testMachine)
+        XCTAssertNotNil(representations[.testMachine])
+        XCTAssertNil(Architecture(arrangement: arrangement, machines: representations, name: .arrangement1))
+    }
+
 }
