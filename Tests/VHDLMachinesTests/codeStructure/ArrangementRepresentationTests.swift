@@ -63,7 +63,7 @@ import XCTest
 final class ArrangementRepresentationTests: XCTestCase {
 
     /// A test arrangement
-    let arrangement = Arrangement.testArrangement
+    var arrangement = Arrangement.testArrangement
 
     /// The architecture of `arrangement`.
     var architecture: Architecture {
@@ -125,6 +125,11 @@ final class ArrangementRepresentationTests: XCTestCase {
         ArrangementRepresentation(arrangement: arrangement, name: .arrangement1)!
     }
 
+    /// Initialise the arrangement before every test.
+    override func setUp() {
+        arrangement = .testArrangement
+    }
+
     /// Test arrangement.
     func testArrangement() {
         XCTAssertEqual(representation.architecture, expected.architecture)
@@ -143,6 +148,55 @@ final class ArrangementRepresentationTests: XCTestCase {
         XCTAssertEqual(expected.architecture, architecture)
         XCTAssertEqual(expected.entity, entity)
         XCTAssertEqual(expected.includes, includes)
+    }
+
+    /// Test the public init detects invalid variable mappings in arrangement.
+    func testInvalidVariableMappingsReturnsNil() {
+        let arrangement2 = Arrangement(
+            machines: arrangement.machines,
+            externalSignals: arrangement.externalSignals,
+            signals: arrangement.signals + [LocalSignal(type: .stdLogic, name: .clk)],
+            clocks: arrangement.clocks
+        )
+        XCTAssertNil(ArrangementRepresentation(arrangement: arrangement2, name: .arrangement1))
+        var mappings = arrangement.machines
+        mappings[MachineInstance(name: .pingMachine, type: .pingMachine)] = MachineMapping(
+            machine: PingPongArrangement().pingMachine,
+            mappings: [
+                VariableMapping(source: .clk, destination: .clk),
+                VariableMapping(source: .a, destination: .ping),
+                VariableMapping(source: .pong, destination: .pong)
+            ]
+        )
+        let arrangement3 = Arrangement(
+            machines: mappings,
+            externalSignals: arrangement.externalSignals,
+            signals: arrangement.signals,
+            clocks: arrangement.clocks
+        )
+        XCTAssertNil(ArrangementRepresentation(arrangement: arrangement3, name: .arrangement1))
+    }
+
+    /// Test the public init detects invalid machine creation.
+    func testPublicInitReturnsNilWhenMachinesAreNotCreated() {
+        let arrangement2 = Arrangement(
+            machines: arrangement.machines,
+            externalSignals: arrangement.externalSignals,
+            signals: arrangement.signals,
+            clocks: arrangement.clocks
+        )
+        XCTAssertNil(
+            ArrangementRepresentation(arrangement: arrangement2, name: .arrangement1) { _, _ in nil }
+        )
+    }
+
+    /// Test that the representation returns nil when the architecture isn't created.
+    func testInvalidArchitectureReturnsNil() {
+        XCTAssertNil(
+            ArrangementRepresentation(arrangement: arrangement, name: .arrangement1) { machine, _ in
+                MachineRepresentation(machine: machine, name: .pingMachine)
+            }
+        )
     }
 
 }
