@@ -42,8 +42,7 @@ jobs:
       #- name: Reconfigure Private Repo URLs
       #  run: sed -i 's/git@github.com:/https:\/\/${{ secrets.ACCESS_TOKEN }}@github.com\//g' Package.swift
       - name: Retrieve Tag
-        #run: echo "TAG=$(git tag | sort --version-sort | tail -n1)" >> $GITHUB_OUTPUT
-        run: echo "TAG=1.0" >> $GITHUB_OUTPUT
+        run: echo "TAG=$(git tag | sort --version-sort | tail -n1)" >> $GITHUB_OUTPUT
         id: version
 
       - name: Check API Stability 
