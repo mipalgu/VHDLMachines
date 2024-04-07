@@ -189,4 +189,46 @@ final class EntityTests: XCTestCase {
     // swiftlint:enable force_unwrapping
     // swiftlint:enable function_body_length
 
+    /// Test the entity is successfully created for the arrangement.
+    func testArrangementInit() {
+        let arrangement = Arrangement(
+            machines: [
+                MachineInstance(name: .testMachine, type: .testMachine): MachineMapping(
+                    machine: .testMachine(), mappings: []
+                )
+            ],
+            externalSignals: [PortSignal(type: .stdLogic, name: .x, mode: .input)],
+            signals: [LocalSignal(type: .stdLogic, name: .y)],
+            clocks: [Clock(name: .clk, frequency: 125, unit: .MHz)]
+        )
+        guard
+            let entity = Entity(arrangement: arrangement, name: .arrangement1),
+            let expectedPort = PortBlock(signals: [
+                PortSignal(type: .stdLogic, name: .clk, mode: .input),
+                PortSignal(type: .stdLogic, name: .x, mode: .input)
+            ])
+        else {
+            XCTFail("Failed to create entity.")
+            return
+        }
+        XCTAssertEqual(entity.name, .arrangement1)
+        XCTAssertEqual(entity.port, expectedPort)
+        XCTAssertNil(entity.generic)
+    }
+
+    /// Test the arrangement init returns nil for invalid port block.
+    func testArrangementInitDetectsInvalidSignals() {
+        let arrangement = Arrangement(
+            machines: [
+                MachineInstance(name: .testMachine, type: .testMachine): MachineMapping(
+                    machine: .testMachine(), mappings: []
+                )
+            ],
+            externalSignals: [PortSignal(type: .stdLogic, name: .clk, mode: .input)],
+            signals: [LocalSignal(type: .stdLogic, name: .y)],
+            clocks: [Clock(name: .clk, frequency: 125, unit: .MHz)]
+        )
+        XCTAssertNil(Entity(arrangement: arrangement, name: .arrangement1))
+    }
+
 }

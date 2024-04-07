@@ -1,8 +1,8 @@
-// Variable+testConstants.swift
-// Machines
+// MachineMappingTests.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2023 Morgan McColl. All rights reserved.
+// Copyright © 2024 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -52,77 +52,51 @@
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
 
+import TestUtils
+@testable import VHDLMachines
 import VHDLParsing
+import XCTest
 
-// swiftlint:disable force_unwrapping
+/// Test class for ``MachineMapping``.
+final class MachineMappingTests: XCTestCase {
 
-// swiftlint:disable missing_docs
+    /// A machine to use as test data.
+    let machine = Machine.testMachine()
 
-/// Add test constants.
-public extension VariableName {
+    /// The mappings for the machine.
+    let mappings = [VariableMapping(source: .g, destination: .x)]
 
-    static var a: VariableName { VariableName(rawValue: "A")! }
+    /// The unit under test.
+    lazy var machineMapping = MachineMapping(machine: machine, mappings: mappings)
 
-    static let arrangement1 = VariableName(rawValue: "Arrangement1")!
+    /// Initialise the uut before every run.
+    override func setUp() {
+        machineMapping = MachineMapping(machine: machine, mappings: mappings)
+    }
 
-    static var clk2: VariableName { VariableName(rawValue: "clk2")! }
+    /// Test init sets stored properties correctly.
+    func testDefaultInit() {
+        XCTAssertEqual(machineMapping.machine, machine)
+        XCTAssertEqual(machineMapping.mappings, mappings)
+    }
 
-    static let externalPing = VariableName(rawValue: "EXTERNAL_ping")!
+    /// Test the public init stores the properties correctly.
+    func testPublicInit() {
+        let newMapping = MachineMapping(machine: machine, with: mappings)
+        XCTAssertEqual(newMapping?.machine, machine)
+        XCTAssertEqual(newMapping?.mappings, mappings)
+    }
 
-    static let externalPong = VariableName(rawValue: "EXTERNAL_pong")!
+    /// Test public init returns nil for invalid mappings.
+    func testPublicInitDetectsInvalidMapping() {
+        XCTAssertNil(MachineMapping(machine: Machine.initial, with: mappings))
+    }
 
-    static var g: VariableName { VariableName(rawValue: "g")! }
-
-    static var initialX: VariableName { VariableName(rawValue: "initialX")! }
-
-    static var p: VariableName { VariableName(rawValue: "p")! }
-
-    static var r: VariableName { VariableName(rawValue: "r")! }
-
-    static var s: VariableName { VariableName(rawValue: "s")! }
-
-    static var x: VariableName { VariableName(rawValue: "x")! }
-
-    static var xx: VariableName { VariableName(rawValue: "xx")! }
-
-    static var xs: VariableName { VariableName(rawValue: "xs")! }
-
-    static var y: VariableName { VariableName(rawValue: "y")! }
-
-    static var z: VariableName { VariableName(rawValue: "z")! }
-
-    static var s0: VariableName { VariableName(rawValue: "S0")! }
-
-    static var s1: VariableName { VariableName(rawValue: "S1")! }
-
-    static var state0: VariableName { VariableName(rawValue: "State0")! }
-
-    static var parX: VariableName { VariableName(rawValue: "parX")! }
-
-    static var ping: VariableName { VariableName(rawValue: "ping")! }
-
-    static var pong: VariableName { VariableName(rawValue: "pong")! }
-
-    static let pingMachine = VariableName(rawValue: "PingMachine")!
-
-    static let pongMachine = VariableName(rawValue: "PongMachine")!
-
-    static var parXs: VariableName { VariableName(rawValue: "parXs")! }
-
-    static var retX: VariableName { VariableName(rawValue: "retX")! }
-
-    static var retXs: VariableName { VariableName(rawValue: "retXs")! }
-
-    static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
-
-    static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
-
-    static let testMachine = VariableName(rawValue: "TestMachine")!
+    /// Test the port variable names are correct.
+    func testPortVariableNames() {
+        let expected: Set<VariableName> = [.x, .xx, .clk, .clk2, .parX, .parXs, .retX, .retXs]
+        XCTAssertEqual(machine.portVariableNames, expected)
+    }
 
 }
-
-// swiftlint:enable missing_docs
-
-// swiftlint:enable force_unwrapping

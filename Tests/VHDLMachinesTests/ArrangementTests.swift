@@ -54,6 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
 import XCTest
@@ -65,8 +66,20 @@ final class ArrangementTests: XCTestCase {
 
     /// The machines in the arrangement.
     let machines = [
-        VariableName(rawValue: "M1")!: URL(fileURLWithPath: "/path/to/M1"),
-        VariableName(rawValue: "M2")!: URL(fileURLWithPath: "/path/to/M2")
+        MachineInstance(name: VariableName(rawValue: "M1")!, type: .pingMachine): MachineMapping(
+            machine: PingPongArrangement().pingMachine,
+            mappings: [
+                VariableMapping(source: .x, destination: .ping),
+                VariableMapping(source: .y, destination: .pong)
+            ]
+        ),
+        MachineInstance(name: VariableName(rawValue: "M2")!, type: .pongMachine): MachineMapping(
+            machine: PingPongArrangement().pongMachine,
+            mappings: [
+                VariableMapping(source: .x, destination: .ping),
+                VariableMapping(source: .y, destination: .pong)
+            ]
+        )
     ]
 
     /// The clocks in the arrangement.
@@ -134,49 +147,96 @@ final class ArrangementTests: XCTestCase {
         XCTAssertEqual(self.arrangement.clocks, self.clocks)
     }
 
-    /// Tests getters and setters update properties correctly.
-    func testGettersAndSetters() {
-        let newMachines = [
-            VariableName(rawValue: "M3")!: URL(fileURLWithPath: "/path/to/M3"),
-            VariableName(rawValue: "M4")!: URL(fileURLWithPath: "/path/to/M4")
-        ]
-        let newExternalSignals = [
-            PortSignal(
-                type: .stdLogic,
-                name: VariableName.z,
-                mode: .input,
-                defaultValue: .literal(value: .logic(value: .high)),
-                comment: Comment.signalZ
+    /// Test that the public init sets the stored properties for a valid arrangement.
+    func testPublicInit() {
+        XCTAssertEqual(
+            Arrangement(
+                mappings: machines, externalSignals: externalSignals, signals: signals, clocks: clocks
             ),
-            PortSignal(
-                type: .stdLogic,
-                name: VariableName.z,
-                mode: .output,
-                defaultValue: .literal(value: .logic(value: .low)),
-                comment: Comment.externalZ
-            )
-        ]
-
-        let newSignals = [
-            LocalSignal(
-                type: .stdLogic,
-                name: VariableName.y,
-                defaultValue: .literal(value: .logic(value: .high)),
-                comment: Comment.signalY
-            )
-        ]
-        let newClocks = [
-            Clock(name: VariableName.clk2, frequency: 100, unit: .MHz)
-        ]
-        self.arrangement.machines = newMachines
-        self.arrangement.externalSignals = newExternalSignals
-        self.arrangement.signals = newSignals
-        self.arrangement.clocks = newClocks
-        XCTAssertEqual(self.arrangement.machines, newMachines)
-        XCTAssertEqual(self.arrangement.externalSignals, newExternalSignals)
-        XCTAssertEqual(self.arrangement.signals, newSignals)
-        XCTAssertEqual(self.arrangement.clocks, newClocks)
+            arrangement
+        )
     }
+
+    /// Test that the public init returns nil for same-typed machines with different implementations.
+    func testInvalidTypedMachinesInPublicInit() {
+        let arrangement = Arrangement(
+            mappings: [
+                MachineInstance(name: .machineSignal1, type: .pingMachine): MachineMapping(
+                    machine: PingPongArrangement().pingMachine, mappings: []
+                ),
+                MachineInstance(name: .machineSignal2, type: .pingMachine): MachineMapping(
+                    machine: PingPongArrangement().pongMachine, mappings: []
+                )
+            ],
+            externalSignals: externalSignals,
+            signals: signals,
+            clocks: clocks
+        )
+        XCTAssertNil(arrangement)
+    }
+
+    /// Make sure instance names are also unique.
+    func testPublicInitDetectsDuplicateInstances() {
+        let arrangement = Arrangement(
+            mappings: [
+                MachineInstance(name: .machineSignal1, type: .pingMachine): MachineMapping(
+                    machine: PingPongArrangement().pingMachine, mappings: []
+                ),
+                MachineInstance(name: .machineSignal1, type: .pongMachine): MachineMapping(
+                    machine: PingPongArrangement().pongMachine, mappings: []
+                )
+            ],
+            externalSignals: externalSignals,
+            signals: signals,
+            clocks: clocks
+        )
+        XCTAssertNil(arrangement)
+    }
+
+    // /// Tests getters and setters update properties correctly.
+    // func testGettersAndSetters() {
+    //     let newMachines = [
+    //         MachineInstance(name: VariableName(rawValue: "M3")!, type: .testMachine): MachineMapping(
+    //             machine: PingPongArrangement().pingMachine, mappings: []
+    //         )
+    //     ]
+    //     let newExternalSignals = [
+    //         PortSignal(
+    //             type: .stdLogic,
+    //             name: VariableName.z,
+    //             mode: .input,
+    //             defaultValue: .literal(value: .logic(value: .high)),
+    //             comment: Comment.signalZ
+    //         ),
+    //         PortSignal(
+    //             type: .stdLogic,
+    //             name: VariableName.z,
+    //             mode: .output,
+    //             defaultValue: .literal(value: .logic(value: .low)),
+    //             comment: Comment.externalZ
+    //         )
+    //     ]
+
+    //     let newSignals = [
+    //         LocalSignal(
+    //             type: .stdLogic,
+    //             name: VariableName.y,
+    //             defaultValue: .literal(value: .logic(value: .high)),
+    //             comment: Comment.signalY
+    //         )
+    //     ]
+    //     let newClocks = [
+    //         Clock(name: VariableName.clk2, frequency: 100, unit: .MHz)
+    //     ]
+    //     self.arrangement.machines = newMachines
+    //     self.arrangement.externalSignals = newExternalSignals
+    //     self.arrangement.signals = newSignals
+    //     self.arrangement.clocks = newClocks
+    //     XCTAssertEqual(self.arrangement.machines, newMachines)
+    //     XCTAssertEqual(self.arrangement.externalSignals, newExternalSignals)
+    //     XCTAssertEqual(self.arrangement.signals, newSignals)
+    //     XCTAssertEqual(self.arrangement.clocks, newClocks)
+    // }
 
     // swiftlint:enable force_unwrapping
 

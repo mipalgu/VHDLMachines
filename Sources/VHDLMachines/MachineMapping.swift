@@ -1,8 +1,8 @@
-// Variable+testConstants.swift
-// Machines
+// MachineMapping.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2023 Morgan McColl. All rights reserved.
+// Copyright © 2024 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -52,77 +52,56 @@
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
 
 import VHDLParsing
 
-// swiftlint:disable force_unwrapping
+/// A machine mapping is a mapping of variables to the external interface of the machine. The variables
+/// must be either clocks, external signals, parameters or return variables.
+public struct MachineMapping: Equatable, Hashable, Codable, Sendable {
 
-// swiftlint:disable missing_docs
+    /// The machine this mapping applies to.
+    public let machine: Machine
 
-/// Add test constants.
-public extension VariableName {
+    /// The mapping to the external interface.
+    public let mappings: [VariableMapping]
 
-    static var a: VariableName { VariableName(rawValue: "A")! }
+    /// Creates a new machine mapping.
+    /// - Parameters:
+    ///   - machine: The machine this mapping applies to.
+    ///   - mappings: The mapping to the machines external interface.
+    /// - Warning: Please make sure the mappings match the variables within the machine. `nil` is returned
+    /// when this is not the case.
+    @inlinable
+    public init?(machine: Machine, with mappings: [VariableMapping]) {
+        let variables = machine.portVariableNames
+        guard mappings.allSatisfy({ variables.contains($0.destination) }) else {
+            return nil
+        }
+        self.init(machine: machine, mappings: mappings)
+    }
 
-    static let arrangement1 = VariableName(rawValue: "Arrangement1")!
-
-    static var clk2: VariableName { VariableName(rawValue: "clk2")! }
-
-    static let externalPing = VariableName(rawValue: "EXTERNAL_ping")!
-
-    static let externalPong = VariableName(rawValue: "EXTERNAL_pong")!
-
-    static var g: VariableName { VariableName(rawValue: "g")! }
-
-    static var initialX: VariableName { VariableName(rawValue: "initialX")! }
-
-    static var p: VariableName { VariableName(rawValue: "p")! }
-
-    static var r: VariableName { VariableName(rawValue: "r")! }
-
-    static var s: VariableName { VariableName(rawValue: "s")! }
-
-    static var x: VariableName { VariableName(rawValue: "x")! }
-
-    static var xx: VariableName { VariableName(rawValue: "xx")! }
-
-    static var xs: VariableName { VariableName(rawValue: "xs")! }
-
-    static var y: VariableName { VariableName(rawValue: "y")! }
-
-    static var z: VariableName { VariableName(rawValue: "z")! }
-
-    static var s0: VariableName { VariableName(rawValue: "S0")! }
-
-    static var s1: VariableName { VariableName(rawValue: "S1")! }
-
-    static var state0: VariableName { VariableName(rawValue: "State0")! }
-
-    static var parX: VariableName { VariableName(rawValue: "parX")! }
-
-    static var ping: VariableName { VariableName(rawValue: "ping")! }
-
-    static var pong: VariableName { VariableName(rawValue: "pong")! }
-
-    static let pingMachine = VariableName(rawValue: "PingMachine")!
-
-    static let pongMachine = VariableName(rawValue: "PongMachine")!
-
-    static var parXs: VariableName { VariableName(rawValue: "parXs")! }
-
-    static var retX: VariableName { VariableName(rawValue: "retX")! }
-
-    static var retXs: VariableName { VariableName(rawValue: "retXs")! }
-
-    static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
-
-    static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
-
-    static let testMachine = VariableName(rawValue: "TestMachine")!
+    /// Creates a new machine mapping.
+    /// - Parameters:
+    ///   - machine: The machine this mapping applies to.
+    ///   - mappings: The mapping to the machines external interface.
+    @inlinable
+    init(machine: Machine, mappings: [VariableMapping]) {
+        self.machine = machine
+        self.mappings = mappings
+    }
 
 }
 
-// swiftlint:enable missing_docs
+/// Add helper property for getting the machines external interface.
+extension Machine {
 
-// swiftlint:enable force_unwrapping
+    /// The variables available on the machines external interface.
+    @inlinable var portVariableNames: Set<VariableName> {
+        let clocks = self.clocks.map(\.name)
+        let externalSignals = self.externalSignals.map(\.name)
+        let parameters = self.parameterSignals.map(\.name)
+        let returnVariables = self.returnableSignals.map(\.name)
+        return Set(clocks + externalSignals + parameters + returnVariables)
+    }
+
+}

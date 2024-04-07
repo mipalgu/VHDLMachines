@@ -9,7 +9,7 @@ import Foundation
 import VHDLParsing
 
 /// A variable that can be returned from a parameterised machine.
-public struct ReturnableVariable: ExternalType, Codable, Equatable, Hashable {
+public struct ReturnableVariable: ExternalType, Codable, Equatable, Hashable, Sendable {
 
     /// The mode is an output for a returnable variable.
     public var mode: Mode = .output

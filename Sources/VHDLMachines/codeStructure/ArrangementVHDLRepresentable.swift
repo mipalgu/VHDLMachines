@@ -1,8 +1,8 @@
-// Variable+testConstants.swift
-// Machines
+// ArrangementVHDLRepresentable.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2023 Morgan McColl. All rights reserved.
+// Copyright © 2024 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -52,77 +52,53 @@
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
 
 import VHDLParsing
 
-// swiftlint:disable force_unwrapping
+/// An arrangement representation in `VHDL`. This type allows multiple representations to be created by
+/// conforming to this protocol.
+public protocol ArrangementVHDLRepresentable {
 
-// swiftlint:disable missing_docs
+    /// The name of the arrangement.
+    var name: VariableName { get }
 
-/// Add test constants.
-public extension VariableName {
+    /// The arrangement this represents.
+    var arrangement: Arrangement { get }
 
-    static var a: VariableName { VariableName(rawValue: "A")! }
+    /// The machines within the representation.
+    var machines: [any MachineVHDLRepresentable] { get }
 
-    static let arrangement1 = VariableName(rawValue: "Arrangement1")!
+    /// The entity of the representation.
+    var entity: Entity { get }
 
-    static var clk2: VariableName { VariableName(rawValue: "clk2")! }
+    /// The architecture of the representation.
+    var architecture: Architecture { get }
 
-    static let externalPing = VariableName(rawValue: "EXTERNAL_ping")!
+    /// The includes of the representation.
+    var includes: [Include] { get }
 
-    static let externalPong = VariableName(rawValue: "EXTERNAL_pong")!
+    /// The combined `VHDLFile` of the representation.
+    var file: VHDLFile { get }
 
-    static var g: VariableName { VariableName(rawValue: "g")! }
-
-    static var initialX: VariableName { VariableName(rawValue: "initialX")! }
-
-    static var p: VariableName { VariableName(rawValue: "p")! }
-
-    static var r: VariableName { VariableName(rawValue: "r")! }
-
-    static var s: VariableName { VariableName(rawValue: "s")! }
-
-    static var x: VariableName { VariableName(rawValue: "x")! }
-
-    static var xx: VariableName { VariableName(rawValue: "xx")! }
-
-    static var xs: VariableName { VariableName(rawValue: "xs")! }
-
-    static var y: VariableName { VariableName(rawValue: "y")! }
-
-    static var z: VariableName { VariableName(rawValue: "z")! }
-
-    static var s0: VariableName { VariableName(rawValue: "S0")! }
-
-    static var s1: VariableName { VariableName(rawValue: "S1")! }
-
-    static var state0: VariableName { VariableName(rawValue: "State0")! }
-
-    static var parX: VariableName { VariableName(rawValue: "parX")! }
-
-    static var ping: VariableName { VariableName(rawValue: "ping")! }
-
-    static var pong: VariableName { VariableName(rawValue: "pong")! }
-
-    static let pingMachine = VariableName(rawValue: "PingMachine")!
-
-    static let pongMachine = VariableName(rawValue: "PongMachine")!
-
-    static var parXs: VariableName { VariableName(rawValue: "parXs")! }
-
-    static var retX: VariableName { VariableName(rawValue: "retX")! }
-
-    static var retXs: VariableName { VariableName(rawValue: "retXs")! }
-
-    static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
-
-    static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
-
-    static let testMachine = VariableName(rawValue: "TestMachine")!
+    /// Create an arrangement representation in `VHDL`.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to represent.
+    ///   - name: The name of the arrangement.
+    ///   - createMachine: A function to create machine representations.
+    init?(
+        arrangement: Arrangement,
+        name: VariableName,
+        createMachine: @escaping (Machine, VariableName) -> (any MachineVHDLRepresentable)?
+    )
 
 }
 
-// swiftlint:enable missing_docs
+/// Add default implementation for `file`.
+public extension ArrangementVHDLRepresentable {
 
-// swiftlint:enable force_unwrapping
+    /// A `file` created from the `entity`, `architecture` and `includes`.
+    @inlinable var file: VHDLFile {
+        VHDLFile(architectures: [self.architecture], entities: [self.entity], includes: self.includes)
+    }
+
+}

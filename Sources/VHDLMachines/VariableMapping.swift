@@ -1,8 +1,8 @@
-// Variable+testConstants.swift
-// Machines
+// VariableMapping.swift
+// VHDLMachines
 // 
 // Created by Morgan McColl.
-// Copyright © 2023 Morgan McColl. All rights reserved.
+// Copyright © 2024 Morgan McColl. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -52,77 +52,26 @@
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
 
 import VHDLParsing
 
-// swiftlint:disable force_unwrapping
+/// A mapping from a source variable into a destination variable.
+public struct VariableMapping: Equatable, Hashable, Codable, Sendable {
 
-// swiftlint:disable missing_docs
+    /// The name of the source variable.
+    public var source: VariableName
 
-/// Add test constants.
-public extension VariableName {
+    /// The name of the destination variable.
+    public var destination: VariableName
 
-    static var a: VariableName { VariableName(rawValue: "A")! }
-
-    static let arrangement1 = VariableName(rawValue: "Arrangement1")!
-
-    static var clk2: VariableName { VariableName(rawValue: "clk2")! }
-
-    static let externalPing = VariableName(rawValue: "EXTERNAL_ping")!
-
-    static let externalPong = VariableName(rawValue: "EXTERNAL_pong")!
-
-    static var g: VariableName { VariableName(rawValue: "g")! }
-
-    static var initialX: VariableName { VariableName(rawValue: "initialX")! }
-
-    static var p: VariableName { VariableName(rawValue: "p")! }
-
-    static var r: VariableName { VariableName(rawValue: "r")! }
-
-    static var s: VariableName { VariableName(rawValue: "s")! }
-
-    static var x: VariableName { VariableName(rawValue: "x")! }
-
-    static var xx: VariableName { VariableName(rawValue: "xx")! }
-
-    static var xs: VariableName { VariableName(rawValue: "xs")! }
-
-    static var y: VariableName { VariableName(rawValue: "y")! }
-
-    static var z: VariableName { VariableName(rawValue: "z")! }
-
-    static var s0: VariableName { VariableName(rawValue: "S0")! }
-
-    static var s1: VariableName { VariableName(rawValue: "S1")! }
-
-    static var state0: VariableName { VariableName(rawValue: "State0")! }
-
-    static var parX: VariableName { VariableName(rawValue: "parX")! }
-
-    static var ping: VariableName { VariableName(rawValue: "ping")! }
-
-    static var pong: VariableName { VariableName(rawValue: "pong")! }
-
-    static let pingMachine = VariableName(rawValue: "PingMachine")!
-
-    static let pongMachine = VariableName(rawValue: "PongMachine")!
-
-    static var parXs: VariableName { VariableName(rawValue: "parXs")! }
-
-    static var retX: VariableName { VariableName(rawValue: "retX")! }
-
-    static var retXs: VariableName { VariableName(rawValue: "retXs")! }
-
-    static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
-
-    static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
-
-    static let testMachine = VariableName(rawValue: "TestMachine")!
+    /// Create a variable mapping between a source and destination.
+    /// - Parameters:
+    ///   - source: The name of the source variable.
+    ///   - destination: The name of the destination variable.
+    @inlinable
+    public init(source: VariableName, destination: VariableName) {
+        self.source = source
+        self.destination = destination
+    }
 
 }
-
-// swiftlint:enable missing_docs
-
-// swiftlint:enable force_unwrapping
