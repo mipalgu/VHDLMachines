@@ -59,9 +59,20 @@ public struct VHDLCompiler {
     /// - Parameter name: The name of the machine.
     /// - Returns: The VHDL source code.
     @inlinable
+    func generateVHDLFile<T>(
+        machine: Machine, name: VariableName, createRepresentation: @escaping (Machine, VariableName) -> T?
+    ) -> String? where T: MachineVHDLRepresentable {
+        createRepresentation(machine, name).flatMap { VHDLFile(representation: $0).rawValue }
+    }
+
+    /// Generate the VHDL source code for a machine.
+    /// - Parameter machine: The machine to compile.
+    /// - Parameter name: The name of the machine.
+    /// - Returns: The VHDL source code.
+    @inlinable
     func generateVHDLFile(machine: Machine, name: VariableName) -> String? {
-        MachineRepresentation(machine: machine, name: name).flatMap {
-            VHDLFile(representation: $0).rawValue
+        generateVHDLFile(machine: machine, name: name) {
+            MachineRepresentation(machine: $0, name: $1)
         }
     }
 
