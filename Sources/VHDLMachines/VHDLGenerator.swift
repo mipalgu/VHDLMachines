@@ -36,4 +36,17 @@ public struct VHDLGenerator {
         return folderWrapper
     }
 
+    public func generate(arrangement: Arrangement, name: VariableName) -> FileWrapper? {
+        let encoder = JSONEncoder()
+        guard let data = try? encoder.encode(arrangement) else {
+            return nil
+        }
+        let arrangementWrapper = FileWrapper(regularFileWithContents: data)
+        arrangementWrapper.preferredFilename = "arrangement.json"
+        let folderWrapper = FileWrapper(directoryWithFileWrappers: [:])
+        folderWrapper.preferredFilename = "\(name.rawValue).arrangement"
+        _ = folderWrapper.addFileWrapper(arrangementWrapper)
+        return folderWrapper
+    }
+
 }
