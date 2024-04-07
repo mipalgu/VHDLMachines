@@ -55,20 +55,39 @@
 
 import VHDLParsing
 
+/// This representation simply instantiates the machines within it's scope. No extra logic is added.
 public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
 
+    /// The name of the representation.
     public let name: VariableName
 
+    /// The arrangement this representation is based on.
     public let arrangement: Arrangement
 
+    /// The representations of the machines within the `arrangement`.
     public let machines: [any MachineVHDLRepresentable]
 
+    /// The entity of this representation.
     public let entity: Entity
 
+    /// The architecture of this representation.
     public let architecture: Architecture
 
+    /// The includes in this representation.
     public let includes: [Include]
 
+    /// Create an `ArrangementRepresentation`.
+    /// 
+    /// This initialiser will create a representation for `arrangement` that allows multiple machine
+    /// formats to be used. The `createMachine` method instantiates each machine and may be modified
+    /// to allow for custom machine representations.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to create this representation from.
+    ///   - name: The name of the representation. This will be the name of the entity and architecture.
+    ///   - createMachine: A function to create a machine representation from. The default
+    /// implementation is `MachineRepresentation`.
+    /// - SeeAlso: ``MachineVHDLRepresentable``
+    @inlinable
     public init?(
         arrangement: Arrangement,
         name: VariableName,
@@ -115,6 +134,15 @@ public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
         )
     }
 
+    /// Create an `ArrangementRepresentation`.
+    /// - Parameters:
+    ///   - name: The name of the representation.
+    ///   - arrangement: The arrangement this representation is based on.
+    ///   - machines: The representations of the machines within the `arrangement`.
+    ///   - entity: The entity of this representation.
+    ///   - architecture: The architecture of this representation.
+    ///   - includes: The includes in this representation.
+    @inlinable
     init(
         name: VariableName,
         arrangement: Arrangement,
