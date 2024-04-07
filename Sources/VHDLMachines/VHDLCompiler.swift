@@ -57,6 +57,7 @@ public struct VHDLCompiler {
     /// Generate the VHDL source code for a machine.
     /// - Parameter machine: The machine to compile.
     /// - Parameter name: The name of the machine.
+    /// - Parameter createRepresentation: A closure that creates a representation of the machine.
     /// - Returns: The VHDL source code.
     @inlinable
     func generateVHDLFile<T>(
