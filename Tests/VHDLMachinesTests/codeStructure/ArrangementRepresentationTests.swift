@@ -138,6 +138,14 @@ final class ArrangementRepresentationTests: XCTestCase {
         XCTAssertEqual(representation.machines as? [MachineRepresentation], machines)
         XCTAssertEqual(representation.name, expected.name)
         XCTAssertEqual(representation.arrangement, expected.arrangement)
+        XCTAssertEqual(
+            representation.file,
+            VHDLFile(
+                architectures: [expected.architecture],
+                entities: [expected.entity],
+                includes: expected.includes
+            )
+        )
     }
 
     /// Test property init sets stored-properties correctly.
