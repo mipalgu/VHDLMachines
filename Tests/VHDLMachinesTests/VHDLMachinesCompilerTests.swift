@@ -71,7 +71,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// Test can compile initial machine.
     func testInitialMachine() {
-        guard let wrapper = compiler.compile(machine, location: testMachinePath) else {
+        guard let wrapper = compiler.compile(machine: machine, name: .testMachine) else {
             XCTFail("Failed to create wrapper!")
             return
         }
