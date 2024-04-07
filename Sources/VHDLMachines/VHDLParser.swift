@@ -30,8 +30,7 @@ public struct VHDLParser {
     public func parse(wrapper: FileWrapper) -> Machine? {
         guard
             wrapper.isDirectory,
-            let files = wrapper.fileWrappers,
-            let machineWrapper = files["machine.json"],
+            let machineWrapper = wrapper.fileWrappers?["machine.json"],
             machineWrapper.isRegularFile,
             let data = machineWrapper.regularFileContents,
             let machine = try? decoder.decode(Machine.self, from: data)
@@ -44,8 +43,7 @@ public struct VHDLParser {
     public func parseArrangement(wrapper: FileWrapper) -> Arrangement? {
         guard
             wrapper.isDirectory,
-            let files = wrapper.fileWrappers,
-            let arrangementWrapper = files["arrangement.json"],
+            let arrangementWrapper = wrapper.fileWrappers?["arrangement.json"],
             arrangementWrapper.isRegularFile,
             let data = arrangementWrapper.regularFileContents,
             let arrangement = try? decoder.decode(Arrangement.self, from: data)
