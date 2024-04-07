@@ -1,8 +1,7 @@
 name: API Stability CI
 
 on:
-  pull_request:
-    branches: [development, main]
+  workflow_dispatch:
 
 jobs:
   build_linux:
