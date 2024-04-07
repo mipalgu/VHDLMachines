@@ -108,7 +108,7 @@ public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
         self.init(
             name: name,
             arrangement: arrangement,
-            machines: Array(machines.values),
+            machines: Array(machines.sorted { $0.key < $1.key }.map(\.value)),
             entity: entity,
             architecture: architecture,
             includes: Machine.initial.includes
