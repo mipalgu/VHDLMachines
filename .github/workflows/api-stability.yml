@@ -19,7 +19,7 @@ jobs:
         with:
           version: ${{ matrix.swift }}
 
-      - if: ${{ runner.os == "macOS" }}
+      - if: ${{ runner.os == 'macOS' }}
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest
