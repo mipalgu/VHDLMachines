@@ -65,6 +65,60 @@ final class ArrangementRepresentationTests: XCTestCase {
     /// A test arrangement
     let arrangement = Arrangement.testArrangement
 
+    /// The architecture of `arrangement`.
+    var architecture: Architecture {
+        // swiftlint:disable force_unwrapping
+        Architecture(
+            arrangement: arrangement, machines: machinesDictionary, name: .arrangement1
+        )!
+        // swiftlint:enable force_unwrapping
+    }
+
+    /// The entity of the arrangement.
+    var entity: Entity {
+        // swiftlint:disable:next force_unwrapping
+        Entity(arrangement: arrangement, name: .arrangement1)!
+    }
+
+    /// The expected representation.
+    var expected: ArrangementRepresentation {
+        ArrangementRepresentation(
+            name: .arrangement1,
+            arrangement: arrangement,
+            machines: machines,
+            entity: entity,
+            architecture: architecture,
+            includes: includes
+        )
+    }
+
+    // swiftlint:disable force_unwrapping
+
+    /// The includes in the representation.
+    var includes: [Include] {
+        [
+            .library(value: VariableName(rawValue: "IEEE")!),
+            .include(statement: UseStatement(rawValue: "use IEEE.std_logic_1164.all;")!),
+            .include(statement: UseStatement(rawValue: "use IEEE.math_real.all;")!)
+        ]
+    }
+
+    // swiftlint:enable force_unwrapping
+
+    /// An array of machine representations.
+    var machines: [MachineRepresentation] {
+        arrangement.machines.sorted { $0.key.name < $1.key.name }.compactMap {
+            MachineRepresentation(machine: $0.value.machine, name: $0.key.type)
+        }
+    }
+
+    /// A dictionary of `machines`.
+    var machinesDictionary: [VariableName: MachineRepresentation] {
+        Dictionary(uniqueKeysWithValues: machines.map {
+            ($0.entity.name, $0)
+        })
+    }
+
     /// The representation of `arrangement`.
     var representation: ArrangementRepresentation {
         // swiftlint:disable:next force_unwrapping
@@ -73,8 +127,22 @@ final class ArrangementRepresentationTests: XCTestCase {
 
     /// Test arrangement.
     func testArrangement() {
-        print(representation.file.rawValue)
-        fflush(stdout)
+        XCTAssertEqual(representation.architecture, expected.architecture)
+        XCTAssertEqual(representation.entity, expected.entity)
+        XCTAssertEqual(representation.includes, expected.includes)
+        XCTAssertEqual(representation.machines as? [MachineRepresentation], machines)
+        XCTAssertEqual(representation.name, expected.name)
+        XCTAssertEqual(representation.arrangement, expected.arrangement)
+    }
+
+    /// Test property init sets stored-properties correctly.
+    func testPropertyInit() {
+        XCTAssertEqual(expected.name, .arrangement1)
+        XCTAssertEqual(expected.arrangement, arrangement)
+        XCTAssertEqual(expected.machines as? [MachineRepresentation], machines)
+        XCTAssertEqual(expected.architecture, architecture)
+        XCTAssertEqual(expected.entity, entity)
+        XCTAssertEqual(expected.includes, includes)
     }
 
 }
