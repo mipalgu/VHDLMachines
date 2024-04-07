@@ -55,86 +55,108 @@
 
 import VHDLParsing
 
+/// Add init to construct `Architecture` from ``Arrangement``.
 extension Architecture {
 
-    init?<T>(arrangement: Arrangement, machines: [T], name: VariableName) where T: MachineVHDLRepresentable {
-        let definitions: [HeadStatement] = machines.compactMap {
-            let entity = $0.entity
-            return HeadStatement.definition(value: .component(value: ComponentDefinition(
-                name: entity.name, port: entity.port
-            )))
-        }
+    // swiftlint:disable function_body_length
+
+    /// Construct an `Architecture` from an `Arrangement`.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to create the architecture for.
+    ///   - machines: The machine representations to use in the architecture. The key of the dictionary is the
+    /// name of the instance.
+    ///   - name: The name of the entity this architecture implements.
+    @inlinable
+    init?(
+        arrangement: Arrangement, machines: [VariableName: any MachineVHDLRepresentable], name: VariableName
+    ) {
         guard
-            !definitions.isEmpty,
-            definitions.count == machines.count,
-            let behavioral = VariableName(rawValue: "Behavioral")
+            arrangement.machines.count == machines.count,
+            arrangement.machines.allSatisfy({ $0.0.type == machines[$0.0.name]?.entity.name })
         else {
             return nil
+        }
+        var foundEntities: Set<VariableName> = []
+        let entities = machines.map { $1.entity }
+            .filter {
+                guard !foundEntities.contains($0.name) else {
+                    return false
+                }
+                foundEntities.insert($0.name)
+                return true
+            }
+            .sorted { $0.name < $1.name }
+        let definitions: [HeadStatement] = entities.map {
+            HeadStatement.definition(value: .component(value: ComponentDefinition(
+                name: $0.name, port: $0.port
+            )))
         }
         let variables = arrangement.signals.map {
             HeadStatement.definition(value: .signal(value: $0))
         }
-        let mappings = arrangement.machines
-        let blocks: [AsynchronousBlock] = machines.compactMap { representation -> AsynchronousBlock? in
-            let entity = representation.entity
-            guard
-                let label = VariableName(rawValue: "\(entity.name.rawValue)_inst"),
-                let mapping: MachineMapping = mappings[entity.name]
-            else {
-                return nil
+        let mappings = Dictionary(uniqueKeysWithValues: arrangement.machines.map { ($0.name, $1) })
+        let sortedMachines = machines.sorted {
+            let lhsName = $0.value.entity.name
+            let rhsName = $1.value.entity.name
+            guard lhsName == rhsName else {
+                return lhsName < rhsName
             }
-            let machine = representation.machine
-            let externalMaps = machine.externalSignals.map { signal in
-                let signalName: VariableName = signal.name
-                // swiftlint:disable:next force_unwrapping
-                let portName = VariableName(rawValue: "EXTERNAL_\(signalName.rawValue)")!
-                guard
-                    let variableMapping = mapping.mappings.first(where: { $0.destination == signalName })
-                else {
-                    return VariableMap(
-                        lhs: .variable(reference: .variable(name: portName)),
-                        rhs: .open
-                    )
-                }
-                return VariableMap(
-                    lhs: .variable(reference: .variable(name: portName)),
-                    rhs: .expression(value: .reference(variable: .variable(
-                        reference: .variable(name: variableMapping.source)
-                    )))
-                )
-            }
-            let clockMaps = machine.clocks.map {
-                let signalName: VariableName = $0.name
-                guard
-                    let variableMapping = mapping.mappings.first(where: { $0.destination == signalName })
-                else {
-                    return VariableMap(
-                        lhs: .variable(reference: .variable(name: signalName)),
-                        rhs: .open
-                    )
-                }
-                return VariableMap(
-                    lhs: .variable(reference: .variable(name: variableMapping.destination)),
-                    rhs: .expression(value: .reference(variable: .variable(
-                        reference: .variable(name: variableMapping.source)
-                    )))
-                )
-            }
-            let portMap = PortMap(variables: clockMaps + externalMaps)
-            return AsynchronousBlock.component(block: ComponentInstantiation(
-                label: label,
-                name: entity.name,
-                port: portMap
-            ))
+            return $0.key < $1.key
         }
-        guard blocks.count == machines.count, !blocks.isEmpty else {
-            return nil
+        let blocks: [AsynchronousBlock] = sortedMachines.map { instance, rep in
+            guard let mapping: MachineMapping = mappings[instance] else {
+                fatalError("Cannot find mapping for \(instance)")
+            }
+            let externalMaps = rep.machine.externalSignals.map {
+                VariableMap(name: $0.name, mapping: mapping, isExternal: true)
+            }
+            let clockMaps = rep.machine.clocks.map {
+                VariableMap(name: $0.name, mapping: mapping, isExternal: false)
+            }
+            return AsynchronousBlock.component(block: ComponentInstantiation(
+                label: instance,
+                name: rep.entity.name,
+                port: PortMap(variables: clockMaps + externalMaps)
+            ))
         }
         self.init(
             body: blocks.count == 1 ? blocks[0] : .blocks(blocks: blocks),
             entity: name,
             head: ArchitectureHead(statements: variables + definitions),
-            name: behavioral
+            name: .behavioral
+        )
+    }
+
+    // swiftlint:enable function_body_length
+
+}
+
+/// Add initialiser for create a variable map from a machine mapping.
+extension VariableMap {
+
+    /// Create a variable map from a machine mapping.
+    /// - Parameters:
+    ///   - name: The name of the variable to map.
+    ///   - mapping: The machine mapping to use.
+    ///   - isExternal: Whether the variable is an external signal.
+    @inlinable
+    init(name: VariableName, mapping: MachineMapping, isExternal: Bool) {
+        // swiftlint:disable:next force_unwrapping
+        let portName = isExternal ? VariableName(rawValue: "EXTERNAL_\(name.rawValue)")! : name
+        guard
+            let variableMapping = mapping.mappings.first(where: { $0.destination == name })
+        else {
+            self.init(
+                lhs: .variable(reference: .variable(name: portName)),
+                rhs: .open
+            )
+            return
+        }
+        self.init(
+            lhs: .variable(reference: .variable(name: portName)),
+            rhs: .expression(value: .reference(variable: .variable(
+                reference: .variable(name: variableMapping.source)
+            )))
         )
     }
 

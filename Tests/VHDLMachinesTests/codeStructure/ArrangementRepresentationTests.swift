@@ -63,21 +63,148 @@ import XCTest
 final class ArrangementRepresentationTests: XCTestCase {
 
     /// A test arrangement
-    let arrangement = Arrangement.testArrangement
+    var arrangement = Arrangement.testArrangement
+
+    /// The architecture of `arrangement`.
+    var architecture: Architecture {
+        // swiftlint:disable force_unwrapping
+        Architecture(
+            arrangement: arrangement, machines: machinesDictionary, name: .arrangement1
+        )!
+        // swiftlint:enable force_unwrapping
+    }
+
+    /// The entity of the arrangement.
+    var entity: Entity {
+        // swiftlint:disable:next force_unwrapping
+        Entity(arrangement: arrangement, name: .arrangement1)!
+    }
+
+    /// The expected representation.
+    var expected: ArrangementRepresentation {
+        ArrangementRepresentation(
+            name: .arrangement1,
+            arrangement: arrangement,
+            machines: machines,
+            entity: entity,
+            architecture: architecture,
+            includes: includes
+        )
+    }
+
+    // swiftlint:disable force_unwrapping
+
+    /// The includes in the representation.
+    var includes: [Include] {
+        [
+            .library(value: VariableName(rawValue: "IEEE")!),
+            .include(statement: UseStatement(rawValue: "use IEEE.std_logic_1164.all;")!),
+            .include(statement: UseStatement(rawValue: "use IEEE.math_real.all;")!)
+        ]
+    }
+
+    // swiftlint:enable force_unwrapping
+
+    /// An array of machine representations.
+    var machines: [MachineRepresentation] {
+        arrangement.machines.sorted { $0.key.name < $1.key.name }.compactMap {
+            MachineRepresentation(machine: $0.value.machine, name: $0.key.type)
+        }
+    }
+
+    /// A dictionary of `machines`.
+    var machinesDictionary: [VariableName: MachineRepresentation] {
+        Dictionary(uniqueKeysWithValues: machines.map {
+            ($0.entity.name, $0)
+        })
+    }
+
+    /// The representation of `arrangement`.
+    var representation: ArrangementRepresentation {
+        // swiftlint:disable:next force_unwrapping
+        ArrangementRepresentation(arrangement: arrangement, name: .arrangement1)!
+    }
+
+    /// Initialise the arrangement before every test.
+    override func setUp() {
+        arrangement = .testArrangement
+    }
 
     /// Test arrangement.
     func testArrangement() {
-        let representation = ArrangementRepresentation(
-            arrangement: arrangement, name: VariableName(rawValue: "Arrangement1")!
-        ) {
-            MachineRepresentation(machine: $0, name: $1)
-        }
-        guard let representation else {
-            XCTFail("Failed to create representation!")
-            return
-        }
-        print(representation.file.rawValue)
-        fflush(stdout)
+        XCTAssertEqual(representation.architecture, expected.architecture)
+        XCTAssertEqual(representation.entity, expected.entity)
+        XCTAssertEqual(representation.includes, expected.includes)
+        XCTAssertEqual(representation.machines as? [MachineRepresentation], machines)
+        XCTAssertEqual(representation.name, expected.name)
+        XCTAssertEqual(representation.arrangement, expected.arrangement)
+        XCTAssertEqual(
+            representation.file,
+            VHDLFile(
+                architectures: [expected.architecture],
+                entities: [expected.entity],
+                includes: expected.includes
+            )
+        )
+    }
+
+    /// Test property init sets stored-properties correctly.
+    func testPropertyInit() {
+        XCTAssertEqual(expected.name, .arrangement1)
+        XCTAssertEqual(expected.arrangement, arrangement)
+        XCTAssertEqual(expected.machines as? [MachineRepresentation], machines)
+        XCTAssertEqual(expected.architecture, architecture)
+        XCTAssertEqual(expected.entity, entity)
+        XCTAssertEqual(expected.includes, includes)
+    }
+
+    /// Test the public init detects invalid variable mappings in arrangement.
+    func testInvalidVariableMappingsReturnsNil() {
+        let arrangement2 = Arrangement(
+            machines: arrangement.machines,
+            externalSignals: arrangement.externalSignals,
+            signals: arrangement.signals + [LocalSignal(type: .stdLogic, name: .clk)],
+            clocks: arrangement.clocks
+        )
+        XCTAssertNil(ArrangementRepresentation(arrangement: arrangement2, name: .arrangement1))
+        var mappings = arrangement.machines
+        mappings[MachineInstance(name: .pingMachine, type: .pingMachine)] = MachineMapping(
+            machine: PingPongArrangement().pingMachine,
+            mappings: [
+                VariableMapping(source: .clk, destination: .clk),
+                VariableMapping(source: .a, destination: .ping),
+                VariableMapping(source: .pong, destination: .pong)
+            ]
+        )
+        let arrangement3 = Arrangement(
+            machines: mappings,
+            externalSignals: arrangement.externalSignals,
+            signals: arrangement.signals,
+            clocks: arrangement.clocks
+        )
+        XCTAssertNil(ArrangementRepresentation(arrangement: arrangement3, name: .arrangement1))
+    }
+
+    /// Test the public init detects invalid machine creation.
+    func testPublicInitReturnsNilWhenMachinesAreNotCreated() {
+        let arrangement2 = Arrangement(
+            machines: arrangement.machines,
+            externalSignals: arrangement.externalSignals,
+            signals: arrangement.signals,
+            clocks: arrangement.clocks
+        )
+        XCTAssertNil(
+            ArrangementRepresentation(arrangement: arrangement2, name: .arrangement1) { _, _ in nil }
+        )
+    }
+
+    /// Test that the representation returns nil when the architecture isn't created.
+    func testInvalidArchitectureReturnsNil() {
+        XCTAssertNil(
+            ArrangementRepresentation(arrangement: arrangement, name: .arrangement1) { machine, _ in
+                MachineRepresentation(machine: machine, name: .pingMachine)
+            }
+        )
     }
 
 }

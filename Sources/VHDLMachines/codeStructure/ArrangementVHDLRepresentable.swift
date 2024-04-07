@@ -55,35 +55,49 @@
 
 import VHDLParsing
 
+/// An arrangement representation in `VHDL`. This type allows multiple representations to be created by
+/// conforming to this protocol.
 public protocol ArrangementVHDLRepresentable {
 
-    associatedtype Representation where Representation: MachineVHDLRepresentable
-
+    /// The name of the arrangement.
     var name: VariableName { get }
 
+    /// The arrangement this represents.
     var arrangement: Arrangement { get }
 
-    var machines: [Representation] { get }
+    /// The machines within the representation.
+    var machines: [any MachineVHDLRepresentable] { get }
 
+    /// The entity of the representation.
     var entity: Entity { get }
 
+    /// The architecture of the representation.
     var architecture: Architecture { get }
 
+    /// The includes of the representation.
     var includes: [Include] { get }
 
+    /// The combined `VHDLFile` of the representation.
     var file: VHDLFile { get }
 
+    /// Create an arrangement representation in `VHDL`.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to represent.
+    ///   - name: The name of the arrangement.
+    ///   - createMachine: A function to create machine representations.
     init?(
         arrangement: Arrangement,
         name: VariableName,
-        createMachine: @escaping (Machine, VariableName) -> Representation?
+        createMachine: @escaping (Machine, VariableName) -> (any MachineVHDLRepresentable)?
     )
 
 }
 
+/// Add default implementation for `file`.
 public extension ArrangementVHDLRepresentable {
 
-    var file: VHDLFile {
+    /// A `file` created from the `entity`, `architecture` and `includes`.
+    @inlinable var file: VHDLFile {
         VHDLFile(architectures: [self.architecture], entities: [self.entity], includes: self.includes)
     }
 

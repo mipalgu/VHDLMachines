@@ -244,14 +244,14 @@ public struct PingPongArrangement {
     public var arrangement: Arrangement {
         Arrangement(
             machines: [
-                VariableName(rawValue: "PingMachine")!: MachineMapping(
+                MachineInstance(name: .pingMachine, type: .pingMachine): MachineMapping(
                     machine: self.pingMachine,
                     mappings: [
                         VariableMapping(source: .ping, destination: .ping),
                         VariableMapping(source: .pong, destination: .pong)
                     ]
                 ),
-                VariableName(rawValue: "PongMachine")!: MachineMapping(
+                MachineInstance(name: .pongMachine, type: .pongMachine): MachineMapping(
                     machine: self.pongMachine,
                     mappings: [
                         VariableMapping(source: .ping, destination: .ping),

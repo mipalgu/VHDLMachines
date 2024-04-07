@@ -62,7 +62,7 @@ extension Arrangement {
     /// A test arrangement.
     public static let testArrangement = Arrangement(
         machines: [
-            .pingMachine: MachineMapping(
+            MachineInstance(name: .pingMachine, type: .pingMachine): MachineMapping(
                 machine: PingPongArrangement().pingMachine,
                 mappings: [
                     VariableMapping(source: .ping, destination: .ping),
@@ -70,7 +70,7 @@ extension Arrangement {
                     VariableMapping(source: .clk, destination: .clk)
                 ]
             ),
-            .pongMachine: MachineMapping(
+            MachineInstance(name: .pongMachine, type: .pongMachine): MachineMapping(
                 machine: PingPongArrangement().pongMachine,
                 mappings: [
                     VariableMapping(source: .ping, destination: .ping),

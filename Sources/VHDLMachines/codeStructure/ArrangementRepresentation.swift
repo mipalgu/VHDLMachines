@@ -55,26 +55,45 @@
 
 import VHDLParsing
 
-public struct ArrangementRepresentation<Representation>: ArrangementVHDLRepresentable,
-    Equatable, Hashable, Codable, Sendable where Representation: MachineVHDLRepresentable,
-    Representation: Equatable, Representation: Hashable, Representation: Codable, Representation: Sendable {
+/// This representation simply instantiates the machines within it's scope. No extra logic is added.
+public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
 
+    /// The name of the representation.
     public let name: VariableName
 
+    /// The arrangement this representation is based on.
     public let arrangement: Arrangement
 
-    public let machines: [Representation]
+    /// The representations of the machines within the `arrangement`.
+    public let machines: [any MachineVHDLRepresentable]
 
+    /// The entity of this representation.
     public let entity: Entity
 
+    /// The architecture of this representation.
     public let architecture: Architecture
 
+    /// The includes in this representation.
     public let includes: [Include]
 
+    /// Create an `ArrangementRepresentation`.
+    /// 
+    /// This initialiser will create a representation for `arrangement` that allows multiple machine
+    /// formats to be used. The `createMachine` method instantiates each machine and may be modified
+    /// to allow for custom machine representations.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to create this representation from.
+    ///   - name: The name of the representation. This will be the name of the entity and architecture.
+    ///   - createMachine: A function to create a machine representation from. The default
+    /// implementation is `MachineRepresentation`.
+    /// - SeeAlso: ``MachineVHDLRepresentable``
+    @inlinable
     public init?(
         arrangement: Arrangement,
         name: VariableName,
-        createMachine: @escaping (Machine, VariableName) -> Representation?
+        createMachine: @escaping (Machine, VariableName) -> (any MachineVHDLRepresentable)? = {
+            MachineRepresentation(machine: $0, name: $1)
+        }
     ) {
         let arrangementExternalVariables = arrangement.externalSignals.map(\.name)
         let arrangementGlobals = arrangement.signals.map(\.name)
@@ -89,11 +108,15 @@ public struct ArrangementRepresentation<Representation>: ArrangementVHDLRepresen
         else {
             return nil
         }
-        let machines = arrangement.machines.compactMap {
-            createMachine($0.1.machine, $0.0)
+        let machinesTuples: [(VariableName, any MachineVHDLRepresentable)] = arrangement.machines
+        .compactMap { instance, mapping in
+            createMachine(mapping.machine, instance.type).flatMap { machine in (instance.name, machine) }
         }
+        guard machinesTuples.count == arrangement.machines.count else {
+            return nil
+        }
+        let machines = Dictionary(uniqueKeysWithValues: machinesTuples)
         guard
-            machines.count == arrangement.machines.count,
             let entity = Entity(arrangement: arrangement, name: name),
             let architecture = Architecture(
                 arrangement: arrangement, machines: machines, name: name
@@ -104,17 +127,26 @@ public struct ArrangementRepresentation<Representation>: ArrangementVHDLRepresen
         self.init(
             name: name,
             arrangement: arrangement,
-            machines: machines,
+            machines: Array(machines.sorted { $0.key < $1.key }.map(\.value)),
             entity: entity,
             architecture: architecture,
             includes: Machine.initial.includes
         )
     }
 
+    /// Create an `ArrangementRepresentation`.
+    /// - Parameters:
+    ///   - name: The name of the representation.
+    ///   - arrangement: The arrangement this representation is based on.
+    ///   - machines: The representations of the machines within the `arrangement`.
+    ///   - entity: The entity of this representation.
+    ///   - architecture: The architecture of this representation.
+    ///   - includes: The includes in this representation.
+    @inlinable
     init(
         name: VariableName,
         arrangement: Arrangement,
-        machines: [Representation],
+        machines: [any MachineVHDLRepresentable],
         entity: Entity,
         architecture: Architecture,
         includes: [Include]
