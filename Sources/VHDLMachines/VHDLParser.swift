@@ -40,6 +40,11 @@ public struct VHDLParser {
         return machine
     }
 
+    /// Parse an arrangement folder `FileWrapper` and retrieve the arrangement within. This structure of the
+    /// `FileWrapper` must be consistent with the structure generated using ``VHDLGenerator``.
+    /// - Parameter wrapper: The `FileWrapper` to the arrangement folder.
+    /// - Returns: An optional ``Arrangement``.
+    @inlinable
     public func parseArrangement(wrapper: FileWrapper) -> Arrangement? {
         guard
             wrapper.isDirectory,
