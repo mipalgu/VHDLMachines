@@ -18,10 +18,10 @@ public struct VHDLGenerator {
     @inlinable
     public init() {}
 
-    /// Generate a `FileWrapper` from a ``Machine``.
-    /// - Parameter machine: The machine to generate a `FileWrapper` from.
+    /// Generate a filesystem model for a ``Machine``.
+    /// - Parameter machine: The machine to generate a model from.
     /// - Parameter name: The name of the machine.
-    /// - Returns: The `FileWrapper` that represents the machine or nil if the machine could not be encoded.
+    /// - Returns: The `FileWrapper` of the machine folder with the model inside.
     @inlinable
     public func generate(machine: Machine, with name: VariableName) -> FileWrapper? {
         let encoder = JSONEncoder()
@@ -36,6 +36,12 @@ public struct VHDLGenerator {
         return folderWrapper
     }
 
+    /// Generate the filesystem model of an ``Arrangement``.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to generate.
+    ///   - name: The name of the arrangement.
+    /// - Returns: A `FileWrapper` of the arrangement folder with the model inside.
+    @inlinable
     public func generate(arrangement: Arrangement, name: VariableName) -> FileWrapper? {
         let encoder = JSONEncoder()
         guard let data = try? encoder.encode(arrangement) else {
