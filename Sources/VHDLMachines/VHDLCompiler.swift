@@ -16,9 +16,22 @@ public struct VHDLCompiler {
     @inlinable
     public init() {}
 
-    public func compile(arrangement: Arrangement, name: VariableName) -> FileWrapper? {
+    /// Compile an arrangement into a VHDL source file within an arrangement folder.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to convert into VHDL.
+    ///   - name: The name of the arrangement.
+    ///   - createRepresentation: A function that creates the VHDL representation used.
+    /// - Returns: A `FileWrapper` consisting of the VHDL source files within an unnamed parent folder.
+    /// - SeeAlso: ``ArrangementVHDLRepresentable``.
+    public func compile<T>(
+        arrangement: Arrangement,
+        name: VariableName,
+        createRepresentation: @escaping (Arrangement, VariableName) -> T? = {
+            ArrangementRepresentation(arrangement: $0, name: $1)
+        }
+    ) -> FileWrapper? where T: ArrangementVHDLRepresentable {
         guard
-            let representation = ArrangementRepresentation(arrangement: arrangement, name: name),
+            let representation = createRepresentation(arrangement, name),
             let data = representation.file.rawValue.data(using: .utf8)
         else {
             return nil
@@ -29,15 +42,23 @@ public struct VHDLCompiler {
         return FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
     }
 
-    /// Compile a machine into a VHDL source file within the machine folder specified by the machines path.
+    /// Compile a machine into a VHDL source file within the machine folder.
     /// - Parameter machine: The machine to compile.
-    /// - Parameter url: The location to the machine folder. This url must end with a `.machine` extension.
-    /// - Returns: Whether the compilation was successful.
+    /// - Parameter name: The name of the machine.
+    /// - Parameter createRepresentation: A function that creates the VHDL representation used.
+    /// - Returns: A `FileWrapper` consisting of the VHDL source files within an unnamed parent folder.
+    /// - SeeAlso: ``MachineVHDLRepresentable``.
     @inlinable
-    public func compile(machine: Machine, name: VariableName) -> FileWrapper? {
+    public func compile<T>(
+        machine: Machine,
+        name: VariableName,
+        createRepresentation: @escaping (Machine, VariableName) -> T? = {
+            MachineRepresentation(machine: $0, name: $1)
+        }
+    ) -> FileWrapper? where T: MachineVHDLRepresentable {
         guard
-            let format = generateVHDLFile(machine: machine, name: name),
-            let data = format.data(using: .utf8)
+            let format = createRepresentation(machine, name),
+            let data = VHDLFile(representation: format).rawValue.data(using: .utf8)
         else {
             return nil
         }
@@ -45,29 +66,6 @@ public struct VHDLCompiler {
         let fileWrapper = FileWrapper(regularFileWithContents: data)
         fileWrapper.preferredFilename = fileName
         return FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
-    }
-
-    /// Generate the VHDL source code for a machine.
-    /// - Parameter machine: The machine to compile.
-    /// - Parameter name: The name of the machine.
-    /// - Parameter createRepresentation: A closure that creates a representation of the machine.
-    /// - Returns: The VHDL source code.
-    @inlinable
-    func generateVHDLFile<T>(
-        machine: Machine, name: VariableName, createRepresentation: @escaping (Machine, VariableName) -> T?
-    ) -> String? where T: MachineVHDLRepresentable {
-        createRepresentation(machine, name).flatMap { VHDLFile(representation: $0).rawValue }
-    }
-
-    /// Generate the VHDL source code for a machine.
-    /// - Parameter machine: The machine to compile.
-    /// - Parameter name: The name of the machine.
-    /// - Returns: The VHDL source code.
-    @inlinable
-    func generateVHDLFile(machine: Machine, name: VariableName) -> String? {
-        generateVHDLFile(machine: machine, name: name) {
-            MachineRepresentation(machine: $0, name: $1)
-        }
     }
 
 }

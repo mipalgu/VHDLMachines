@@ -89,25 +89,36 @@ class VHDLMachinesCompilerTests: XCTestCase {
             return
         }
         XCTAssertEqual(rawValue, VHDLFile(representation: representation).rawValue)
+        let f: (Machine, VariableName) -> MachineRepresentation? = { _, _ in nil }
+        XCTAssertNil(compiler.compile(machine: machine, name: .testMachine, createRepresentation: f))
     }
 
-    /// Test the VHDL code generation is correct for the Ping Machine.
-    func testPingMachineCodeGeneration() {
-        let machine = factory.pingMachine
-        guard let code = compiler.generateVHDLFile(machine: machine, name: .pingMachine) else {
-            XCTFail("Failed to generate code.")
+    /// Test that an arrangement is generated correctly.
+    func testArrangementGeneration() {
+        let arrangement = Arrangement.testArrangement
+        guard let wrapper = compiler.compile(arrangement: arrangement, name: .arrangement1) else {
+            XCTFail("Failed to create arrangement wrapper!")
             return
         }
-        XCTAssertEqual(code, factory.pingCode, "\(code.difference(from: factory.pingCode))")
-    }
-
-    /// Test generated code matches expected.
-    func testGenerateVHDLFile() {
-        guard let code = compiler.generateVHDLFile(machine: machine, name: .testMachine) else {
-            XCTFail("Failed to generate vhdl file.")
+        XCTAssertNil(wrapper.preferredFilename)
+        XCTAssertNil(wrapper.filename)
+        XCTAssertEqual(wrapper.fileWrappers?.count, 1)
+        let file = wrapper.fileWrappers?.first
+        XCTAssertEqual(file?.key, "Arrangement1.vhd")
+        XCTAssertEqual(file?.value.preferredFilename, "Arrangement1.vhd")
+        guard
+            let data = file?.value.regularFileContents,
+            let rawValue = String(data: data, encoding: .utf8),
+            let expected = ArrangementRepresentation(
+                arrangement: arrangement, name: .arrangement1
+            )?.file.rawValue
+        else {
+            XCTFail("File is empty!")
             return
         }
-        XCTAssertEqual(code, vhdl, "\(code.difference(from: vhdl))")
+        XCTAssertEqual(rawValue, expected)
+        let f: (Arrangement, VariableName) -> ArrangementRepresentation? = { _, _ in nil }
+        XCTAssertNil(compiler.compile(arrangement: arrangement, name: .arrangement1, createRepresentation: f))
     }
 
     // swiftlint:disable line_length
