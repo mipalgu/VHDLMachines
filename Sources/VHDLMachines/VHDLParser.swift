@@ -14,6 +14,9 @@ import SwiftUtils
 /// within. The `FileWrapper` must be consistent with the structure generated using ``VHDLGenerator``.
 public struct VHDLParser {
 
+    /// A helper decoder.
+    @usableFromInline let decoder = JSONDecoder()
+
     /// Create a new parser.
     @inlinable
     public init() {}
@@ -25,11 +28,9 @@ public struct VHDLParser {
     /// the structure generated using ``VHDLGenerator``.
     @inlinable
     public func parse(wrapper: FileWrapper) -> Machine? {
-        let decoder = JSONDecoder()
         guard
             wrapper.isDirectory,
-            let files = wrapper.fileWrappers,
-            let machineWrapper = files["machine.json"],
+            let machineWrapper = wrapper.fileWrappers?["machine.json"],
             machineWrapper.isRegularFile,
             let data = machineWrapper.regularFileContents,
             let machine = try? decoder.decode(Machine.self, from: data)
@@ -37,6 +38,24 @@ public struct VHDLParser {
             return nil
         }
         return machine
+    }
+
+    /// Parse an arrangement folder `FileWrapper` and retrieve the arrangement within. This structure of the
+    /// `FileWrapper` must be consistent with the structure generated using ``VHDLGenerator``.
+    /// - Parameter wrapper: The `FileWrapper` to the arrangement folder.
+    /// - Returns: An optional ``Arrangement``.
+    @inlinable
+    public func parseArrangement(wrapper: FileWrapper) -> Arrangement? {
+        guard
+            wrapper.isDirectory,
+            let arrangementWrapper = wrapper.fileWrappers?["arrangement.json"],
+            arrangementWrapper.isRegularFile,
+            let data = arrangementWrapper.regularFileContents,
+            let arrangement = try? decoder.decode(Arrangement.self, from: data)
+        else {
+            return nil
+        }
+        return arrangement
     }
 
 }

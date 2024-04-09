@@ -30,6 +30,12 @@ class VHDLMachinesCompilerTests: XCTestCase {
         Machine.testMachine(directory: testMachinePath)
     }
 
+    /// The representation of the machine.
+    var representation: MachineRepresentation {
+        // swiftlint:disable:next force_unwrapping
+        MachineRepresentation(machine: machine, name: .testMachine)!
+    }
+
     /// Factory generating PingPong arrangements.
     let factory = PingPongArrangement()
 
@@ -42,30 +48,6 @@ class VHDLMachinesCompilerTests: XCTestCase {
     }
 
     // swiftlint:disable type_contents_order
-
-    /// Create test paths for machines.
-    override func setUp() {
-        if !manager.fileExists(atPath: factory.machinesFolder) {
-            _ = try? manager.createDirectory(
-                atPath: factory.machinePath.path, withIntermediateDirectories: false
-            )
-        }
-        if !manager.fileExists(atPath: testMachinePath.path) {
-            guard let wrapper = testMachineFileWrapper else {
-                return
-            }
-            _ = try? wrapper.write(
-                to: factory.machinePath.appendingPathComponent("TestMachine.machine", isDirectory: true),
-                originalContentsURL: nil
-            )
-        }
-    }
-
-    /// Remove test machines.
-    override func tearDown() {
-        _ = try? manager.removeItem(at: testMachinePath)
-        _ = try? manager.removeItem(at: factory.pingMachinePath)
-    }
 
     /// Default state creation.
     private func defaultState(name: String) -> VHDLMachines.State {
@@ -89,84 +71,54 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// Test can compile initial machine.
     func testInitialMachine() {
-        XCTAssertTrue(compiler.compile(machine, location: testMachinePath))
-    }
-
-    /// Test compiler overwrite parent folder.
-    func testCompileWorksWhenParentFolderExists() {
-        if !manager.fileExists(atPath: testMachinePath.path) {
-            guard (
-                try? manager.createDirectory(at: testMachinePath, withIntermediateDirectories: false)
-            ) != nil else {
-                XCTFail("Failed to create directory!")
-                return
-            }
-        }
-        XCTAssertTrue(compiler.compile(machine, location: testMachinePath))
-    }
-
-    /// Test compilation overwrites existing file.
-    func testCompileWorksWhenFileIsPresent() {
-        if !manager.fileExists(atPath: testMachinePath.path) {
-            guard (
-                try? manager.createDirectory(at: testMachinePath, withIntermediateDirectories: false)
-            ) != nil else {
-                XCTFail("Failed to create directory!")
-                return
-            }
-        }
-        let vhdFile = testMachinePath.path + "/\(VariableName.testMachine.rawValue).vhd"
-        if !manager.fileExists(atPath: vhdFile) {
-            XCTAssertTrue(
-                manager.createFile(atPath: vhdFile, contents: "Test Data\n".data(using: .utf8))
-            )
-        }
-        XCTAssertTrue(compiler.compile(machine, location: testMachinePath))
-    }
-
-    /// Test compilation creates intermediate folder.
-    func testCompileWorksInEmptySubdir() {
-        let machine = factory.pingMachine
-        let subdir = factory.machinePath.appendingPathComponent("subdir", isDirectory: true)
-        if !manager.fileExists(atPath: subdir.path) {
-            _ = try? manager.createDirectory(at: subdir, withIntermediateDirectories: false)
-        }
-        defer { _ = try? manager.removeItem(at: subdir) }
-        let newPath = subdir.appendingPathComponent(
-            "PingMachine.machine", isDirectory: true
-        )
-        XCTAssertTrue(compiler.compile(machine, location: newPath))
-        var isDirectory: ObjCBool = false
-        XCTAssertTrue(manager.fileExists(atPath: newPath.path, isDirectory: &isDirectory))
-        XCTAssertTrue(isDirectory.boolValue)
-    }
-
-    /// Test the VHDL code generation is correct for the Ping Machine.
-    func testPingMachineCodeGeneration() {
-        let machine = factory.pingMachine
-        guard let code = compiler.generateVHDLFile(machine: machine, name: .pingMachine) else {
-            XCTFail("Failed to generate code.")
+        guard let wrapper = compiler.compile(machine: machine, name: .testMachine) else {
+            XCTFail("Failed to create wrapper!")
             return
         }
-        XCTAssertEqual(code, factory.pingCode, "\(code.difference(from: factory.pingCode))")
-    }
-
-    /// Test VHDL compilation.
-    func testCompilationForEmptyFolder() {
-        if manager.fileExists(atPath: factory.pingMachinePath.path) {
-            _ = try? manager.removeItem(at: factory.pingMachinePath)
-        }
-        let machine = factory.pingMachine
-        XCTAssertTrue(compiler.compile(machine, location: factory.pingMachinePath))
-    }
-
-    /// Test generated code matches expected.
-    func testGenerateVHDLFile() {
-        guard let code = compiler.generateVHDLFile(machine: machine, name: .testMachine) else {
-            XCTFail("Failed to generate vhdl file.")
+        XCTAssertNil(wrapper.preferredFilename)
+        XCTAssertNil(wrapper.filename)
+        XCTAssertEqual(wrapper.fileWrappers?.count, 1)
+        let file = wrapper.fileWrappers?.first
+        XCTAssertEqual(file?.key, "TestMachine.vhd")
+        XCTAssertEqual(file?.value.preferredFilename, "TestMachine.vhd")
+        guard
+            let data = file?.value.regularFileContents,
+            let rawValue = String(data: data, encoding: .utf8)
+        else {
+            XCTFail("File is empty!")
             return
         }
-        XCTAssertEqual(code, vhdl, "\(code.difference(from: vhdl))")
+        XCTAssertEqual(rawValue, VHDLFile(representation: representation).rawValue)
+        let f: (Machine, VariableName) -> MachineRepresentation? = { _, _ in nil }
+        XCTAssertNil(compiler.compile(machine: machine, name: .testMachine, createRepresentation: f))
+    }
+
+    /// Test that an arrangement is generated correctly.
+    func testArrangementGeneration() {
+        let arrangement = Arrangement.testArrangement
+        guard let wrapper = compiler.compile(arrangement: arrangement, name: .arrangement1) else {
+            XCTFail("Failed to create arrangement wrapper!")
+            return
+        }
+        XCTAssertNil(wrapper.preferredFilename)
+        XCTAssertNil(wrapper.filename)
+        XCTAssertEqual(wrapper.fileWrappers?.count, 1)
+        let file = wrapper.fileWrappers?.first
+        XCTAssertEqual(file?.key, "Arrangement1.vhd")
+        XCTAssertEqual(file?.value.preferredFilename, "Arrangement1.vhd")
+        guard
+            let data = file?.value.regularFileContents,
+            let rawValue = String(data: data, encoding: .utf8),
+            let expected = ArrangementRepresentation(
+                arrangement: arrangement, name: .arrangement1
+            )?.file.rawValue
+        else {
+            XCTFail("File is empty!")
+            return
+        }
+        XCTAssertEqual(rawValue, expected)
+        let f: (Arrangement, VariableName) -> ArrangementRepresentation? = { _, _ in nil }
+        XCTAssertNil(compiler.compile(arrangement: arrangement, name: .arrangement1, createRepresentation: f))
     }
 
     // swiftlint:disable line_length

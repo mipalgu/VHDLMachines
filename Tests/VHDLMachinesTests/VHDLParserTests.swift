@@ -95,4 +95,29 @@ final class VHDLParserTests: XCTestCase {
         XCTAssertNil(parser.parse(wrapper: wrapper))
     }
 
+    /// Test that an arrangement is parsed correctly.
+    func testParseArrangement() throws {
+        let arrangement = Arrangement.testArrangement
+        guard
+            let wrapper = generator.generate(arrangement: arrangement, name: .arrangement1),
+            let parsedArrangement = parser.parseArrangement(wrapper: wrapper),
+            let emptydata = "".data(using: .utf8)
+        else {
+            XCTFail("Couldn't generate wrapper!")
+            return
+        }
+        XCTAssertEqual(arrangement, parsedArrangement)
+        XCTAssertNil(
+            parser.parseArrangement(wrapper: FileWrapper(regularFileWithContents: emptydata))
+        )
+        XCTAssertNil(parser.parseArrangement(wrapper: FileWrapper(directoryWithFileWrappers: [:])))
+        XCTAssertNil(parser.parseArrangement(
+            wrapper: FileWrapper(
+                directoryWithFileWrappers: [
+                    "arrangement.json": FileWrapper(regularFileWithContents: emptydata)
+                ]
+            )
+        ))
+    }
+
 }
