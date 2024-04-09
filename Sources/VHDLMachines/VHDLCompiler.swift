@@ -5,11 +5,8 @@
 //  Created by Morgan McColl on 19/5/21.
 //
 
-#if os(macOS)
 import Foundation
-#else
 import SwiftUtils
-#endif
 import VHDLParsing
 
 /// A struct that compiles a VHDL machine into a VHDL source file (vhd). The source file is located
