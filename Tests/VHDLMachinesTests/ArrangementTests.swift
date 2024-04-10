@@ -102,6 +102,12 @@ final class ArrangementTests: XCTestCase {
             mode: .output,
             defaultValue: .literal(value: .logic(value: .low)),
             comment: Comment.signalY
+        ),
+        PortSignal(
+            type: .stdLogic,
+            name: VariableName.z,
+            mode: .output,
+            defaultValue: .literal(value: .logic(value: .low))
         )
     ]
 
@@ -109,7 +115,7 @@ final class ArrangementTests: XCTestCase {
     let signals = [
         LocalSignal(
             type: .stdLogic,
-            name: VariableName.z,
+            name: VariableName.a,
             defaultValue: .literal(value: .logic(value: .low)),
             comment: Comment.signalZ
         )
@@ -126,7 +132,8 @@ final class ArrangementTests: XCTestCase {
         machines: machines,
         externalSignals: externalSignals,
         signals: signals,
-        clocks: clocks
+        clocks: clocks,
+        globalMappings: [VariableMapping(source: .z, destination: .a)]
     )
 
     /// Initialises the arrangement to test.
@@ -135,7 +142,8 @@ final class ArrangementTests: XCTestCase {
             machines: machines,
             externalSignals: externalSignals,
             signals: signals,
-            clocks: clocks
+            clocks: clocks,
+            globalMappings: [VariableMapping(source: .z, destination: .a)]
         )
     }
 
@@ -145,13 +153,18 @@ final class ArrangementTests: XCTestCase {
         XCTAssertEqual(self.arrangement.externalSignals, self.externalSignals)
         XCTAssertEqual(self.arrangement.signals, self.signals)
         XCTAssertEqual(self.arrangement.clocks, self.clocks)
+        XCTAssertEqual(self.arrangement.globalMappings, [VariableMapping(source: .z, destination: .a)])
     }
 
     /// Test that the public init sets the stored properties for a valid arrangement.
     func testPublicInit() {
         XCTAssertEqual(
             Arrangement(
-                mappings: machines, externalSignals: externalSignals, signals: signals, clocks: clocks
+                mappings: machines,
+                externalSignals: externalSignals,
+                signals: signals,
+                clocks: clocks,
+                globalMappings: [VariableMapping(source: .z, destination: .a)]
             ),
             arrangement
         )
@@ -191,6 +204,44 @@ final class ArrangementTests: XCTestCase {
             clocks: clocks
         )
         XCTAssertNil(arrangement)
+    }
+
+    /// Test that global mappings are always between external variable to global variable.
+    func testIncorrectGlobalMappingsReturnNil() {
+        let arrangement = Arrangement(
+            mappings: machines,
+            externalSignals: externalSignals,
+            signals: signals,
+            clocks: clocks,
+            globalMappings: [VariableMapping(source: .x, destination: .a)]
+        )
+        XCTAssertNil(arrangement)
+        let arrangement2 = Arrangement(
+            mappings: machines,
+            externalSignals: externalSignals,
+            signals: signals,
+            clocks: clocks,
+            globalMappings: [VariableMapping(source: .z, destination: .x)]
+        )
+        XCTAssertNil(arrangement2)
+        let arrangement3 = Arrangement(
+            mappings: machines,
+            externalSignals: externalSignals,
+            signals: signals,
+            clocks: clocks,
+            globalMappings: [
+                VariableMapping(source: .z, destination: .a), VariableMapping(source: .z, destination: .a)
+            ]
+        )
+        XCTAssertNil(arrangement3)
+        let arrangement4 = Arrangement(
+            mappings: machines,
+            externalSignals: externalSignals,
+            signals: signals,
+            clocks: clocks,
+            globalMappings: [VariableMapping(source: .a, destination: .z)]
+        )
+        XCTAssertNil(arrangement4)
     }
 
     // /// Tests getters and setters update properties correctly.
