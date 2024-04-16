@@ -102,6 +102,12 @@ final class ArrangementTests: XCTestCase {
             mode: .output,
             defaultValue: .literal(value: .logic(value: .low)),
             comment: Comment.signalY
+        ),
+        PortSignal(
+            type: .stdLogic,
+            name: VariableName.z,
+            mode: .output,
+            defaultValue: .literal(value: .logic(value: .low))
         )
     ]
 
@@ -109,7 +115,7 @@ final class ArrangementTests: XCTestCase {
     let signals = [
         LocalSignal(
             type: .stdLogic,
-            name: VariableName.z,
+            name: VariableName.a,
             defaultValue: .literal(value: .logic(value: .low)),
             comment: Comment.signalZ
         )
@@ -151,7 +157,10 @@ final class ArrangementTests: XCTestCase {
     func testPublicInit() {
         XCTAssertEqual(
             Arrangement(
-                mappings: machines, externalSignals: externalSignals, signals: signals, clocks: clocks
+                mappings: machines,
+                externalSignals: externalSignals,
+                signals: signals,
+                clocks: clocks
             ),
             arrangement
         )

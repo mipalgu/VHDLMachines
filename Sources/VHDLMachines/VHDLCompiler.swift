@@ -13,53 +13,60 @@ import VHDLParsing
 /// within the machine folder at <machine_name>.vhd.
 public struct VHDLCompiler {
 
-    /// A file helper.
-    @usableFromInline let manager = FileManager.default
-
     /// Create a VHDL compiler.
     @inlinable
     public init() {}
 
-    /// Compile a machine into a VHDL source file within the machine folder specified by the machines path.
-    /// - Parameter machine: The machine to compile.
-    /// - Parameter url: The location to the machine folder. This url must end with a `.machine` extension.
-    /// - Returns: Whether the compilation was successful.
-    @inlinable
-    public func compile(_ machine: Machine, location url: URL) -> Bool {
-        let name = url.lastPathComponent
+    /// Compile an arrangement into a VHDL source file within an arrangement folder.
+    /// - Parameters:
+    ///   - arrangement: The arrangement to convert into VHDL.
+    ///   - name: The name of the arrangement.
+    ///   - createRepresentation: A function that creates the VHDL representation used.
+    /// - Returns: A `FileWrapper` consisting of the VHDL source files within an unnamed parent folder.
+    /// - SeeAlso: ``ArrangementVHDLRepresentable``.
+    public func compile<T>(
+        arrangement: Arrangement,
+        name: VariableName,
+        createRepresentation: @escaping (Arrangement, VariableName) -> T? = {
+            ArrangementRepresentation(arrangement: $0, name: $1)
+        }
+    ) -> FileWrapper? where T: ArrangementVHDLRepresentable {
         guard
-            name.hasSuffix(".machine"),
-            let nameVar = VariableName(rawValue: String(name.dropLast(8))),
-            let format = generateVHDLFile(machine: machine, name: nameVar)
+            let representation = createRepresentation(arrangement, name),
+            let data = representation.file.rawValue.data(using: .utf8)
         else {
-            return false
-        }
-        let fileName = "\(nameVar.rawValue).vhd"
-        guard let data = format.data(using: .utf8) else {
-            return false
-        }
-        let fileWrapper = FileWrapper(regularFileWithContents: data)
-        fileWrapper.preferredFilename = fileName
-        let folderWrapper = FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
-        var isDirectory: ObjCBool = false
-        if manager.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue {
-            guard (try? manager.removeItem(at: url)) != nil else {
-                return false
-            }
-        }
-        return (try? folderWrapper.write(to: url, options: .atomic, originalContentsURL: nil)) != nil
-    }
-
-    /// Generate the VHDL source code for a machine.
-    /// - Parameter machine: The machine to compile.
-    /// - Parameter name: The name of the machine.
-    /// - Returns: The VHDL source code.
-    @inlinable
-    func generateVHDLFile(machine: Machine, name: VariableName) -> String? {
-        guard let representation = MachineRepresentation(machine: machine, name: name) else {
             return nil
         }
-        return VHDLFile(representation: representation).rawValue
+        let fileName = "\(name.rawValue).vhd"
+        let fileWrapper = FileWrapper(regularFileWithContents: data)
+        fileWrapper.preferredFilename = fileName
+        return FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
+    }
+
+    /// Compile a machine into a VHDL source file within the machine folder.
+    /// - Parameter machine: The machine to compile.
+    /// - Parameter name: The name of the machine.
+    /// - Parameter createRepresentation: A function that creates the VHDL representation used.
+    /// - Returns: A `FileWrapper` consisting of the VHDL source files within an unnamed parent folder.
+    /// - SeeAlso: ``MachineVHDLRepresentable``.
+    @inlinable
+    public func compile<T>(
+        machine: Machine,
+        name: VariableName,
+        createRepresentation: @escaping (Machine, VariableName) -> T? = {
+            MachineRepresentation(machine: $0, name: $1)
+        }
+    ) -> FileWrapper? where T: MachineVHDLRepresentable {
+        guard
+            let format = createRepresentation(machine, name),
+            let data = VHDLFile(representation: format).rawValue.data(using: .utf8)
+        else {
+            return nil
+        }
+        let fileName = "\(name.rawValue).vhd"
+        let fileWrapper = FileWrapper(regularFileWithContents: data)
+        fileWrapper.preferredFilename = fileName
+        return FileWrapper(directoryWithFileWrappers: [fileName: fileWrapper])
     }
 
 }

@@ -135,4 +135,29 @@ final class VHDLGeneratorTests: XCTestCase {
         XCTAssertEqual(factory.pingMachine, newMachine)
     }
 
+    /// Test that an arrangement is generated correctly.
+    func testGenerateArrangement() throws {
+        let arrangement = Arrangement.testArrangement
+        guard let wrapper = generator.generate(arrangement: arrangement, name: .arrangement1) else {
+            XCTFail("Failed to create wrapper!")
+            return
+        }
+        XCTAssertTrue(wrapper.isDirectory)
+        XCTAssertEqual(wrapper.fileWrappers?.count, 1)
+        XCTAssertEqual(wrapper.preferredFilename, "Arrangement1.arrangement")
+        XCTAssertNil(wrapper.filename)
+        guard
+            let file = wrapper.fileWrappers?.first?.value,
+            file.isRegularFile,
+            let fileData = file.regularFileContents
+        else {
+            XCTFail("File is empty")
+            return
+        }
+        XCTAssertEqual(file.preferredFilename, "arrangement.json")
+        XCTAssertNil(file.filename)
+        let newArrangement = try decoder.decode(Arrangement.self, from: fileData)
+        XCTAssertEqual(arrangement, newArrangement)
+    }
+
 }

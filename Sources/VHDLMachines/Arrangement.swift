@@ -48,7 +48,11 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
         clocks: [Clock]
     ) {
         let instanceNames = mappings.map(\.key.name)
-        guard instanceNames.count == Set(instanceNames).count else {
+        let allExternals = Set(externalSignals.map(\.name))
+        let allGlobals = Set(signals.map(\.name))
+        guard
+            allGlobals.isDisjoint(with: allExternals), instanceNames.count == Set(instanceNames).count
+        else {
             return nil
         }
         var mappingsDictionary: [VariableName: [MachineMapping]] = [:]
@@ -62,7 +66,12 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
         guard mappingsDictionary.allSatisfy({ Set($1).count == 1 }) else {
             return nil
         }
-        self.init(machines: mappings, externalSignals: externalSignals, signals: signals, clocks: clocks)
+        self.init(
+            machines: mappings,
+            externalSignals: externalSignals,
+            signals: signals,
+            clocks: clocks
+        )
     }
 
     /// Initialises the arrangement with the given values.

@@ -182,7 +182,7 @@ final class ConstantSignalTests: XCTestCase {
             ConstantSignal(
                 name: .clockPeriod,
                 type: .real,
-                value: .literal(value: .decimal(value: Double(clock.period.picoseconds_d))),
+                value: .literal(value: .decimal(value: clock.period.picoseconds)),
                 // swiftlint:disable:next force_unwrapping
                 comment: Comment(rawValue: "-- ps")!
             )
