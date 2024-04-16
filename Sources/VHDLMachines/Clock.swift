@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import GUUnits
 import VHDLParsing
 
 /// A clock represents an oscillating signal with a constant frequency/period.
