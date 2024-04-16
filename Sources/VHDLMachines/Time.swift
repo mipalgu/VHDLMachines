@@ -53,7 +53,7 @@
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
-public enum Time: Equatable, Hashable, Codable, Sendable {
+public enum Time: Equatable, Hashable, Codable, Sendable, Comparable {
 
     case seconds(_ value: Double)
 
@@ -138,6 +138,10 @@ public enum Time: Equatable, Hashable, Codable, Sendable {
         case .picoseconds(let value):
             return value
         }
+    }
+
+    public static func < (lhs: Time, rhs: Time) -> Bool {
+        lhs.picoseconds < rhs.picoseconds
     }
 
 }
