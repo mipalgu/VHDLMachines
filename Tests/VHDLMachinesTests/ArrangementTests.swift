@@ -132,8 +132,7 @@ final class ArrangementTests: XCTestCase {
         machines: machines,
         externalSignals: externalSignals,
         signals: signals,
-        clocks: clocks,
-        globalMappings: [VariableMapping(source: .z, destination: .a)]
+        clocks: clocks
     )
 
     /// Initialises the arrangement to test.
@@ -142,8 +141,7 @@ final class ArrangementTests: XCTestCase {
             machines: machines,
             externalSignals: externalSignals,
             signals: signals,
-            clocks: clocks,
-            globalMappings: [VariableMapping(source: .z, destination: .a)]
+            clocks: clocks
         )
     }
 
@@ -153,7 +151,6 @@ final class ArrangementTests: XCTestCase {
         XCTAssertEqual(self.arrangement.externalSignals, self.externalSignals)
         XCTAssertEqual(self.arrangement.signals, self.signals)
         XCTAssertEqual(self.arrangement.clocks, self.clocks)
-        XCTAssertEqual(self.arrangement.globalMappings, [VariableMapping(source: .z, destination: .a)])
     }
 
     /// Test that the public init sets the stored properties for a valid arrangement.
@@ -163,8 +160,7 @@ final class ArrangementTests: XCTestCase {
                 mappings: machines,
                 externalSignals: externalSignals,
                 signals: signals,
-                clocks: clocks,
-                globalMappings: [VariableMapping(source: .z, destination: .a)]
+                clocks: clocks
             ),
             arrangement
         )
@@ -204,44 +200,6 @@ final class ArrangementTests: XCTestCase {
             clocks: clocks
         )
         XCTAssertNil(arrangement)
-    }
-
-    /// Test that global mappings are always between external variable to global variable.
-    func testIncorrectGlobalMappingsReturnNil() {
-        let arrangement = Arrangement(
-            mappings: machines,
-            externalSignals: externalSignals,
-            signals: signals,
-            clocks: clocks,
-            globalMappings: [VariableMapping(source: .x, destination: .a)]
-        )
-        XCTAssertNil(arrangement)
-        let arrangement2 = Arrangement(
-            mappings: machines,
-            externalSignals: externalSignals,
-            signals: signals,
-            clocks: clocks,
-            globalMappings: [VariableMapping(source: .z, destination: .x)]
-        )
-        XCTAssertNil(arrangement2)
-        let arrangement3 = Arrangement(
-            mappings: machines,
-            externalSignals: externalSignals,
-            signals: signals,
-            clocks: clocks,
-            globalMappings: [
-                VariableMapping(source: .z, destination: .a), VariableMapping(source: .z, destination: .a)
-            ]
-        )
-        XCTAssertNil(arrangement3)
-        let arrangement4 = Arrangement(
-            mappings: machines,
-            externalSignals: externalSignals,
-            signals: signals,
-            clocks: clocks,
-            globalMappings: [VariableMapping(source: .a, destination: .z)]
-        )
-        XCTAssertNil(arrangement4)
     }
 
     // /// Tests getters and setters update properties correctly.

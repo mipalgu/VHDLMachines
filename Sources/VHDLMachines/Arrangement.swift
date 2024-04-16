@@ -30,12 +30,6 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
     /// The clocks in the arrangement available to every machine.
     public let clocks: [Clock]
 
-    /// All mappings between external variables and global variables within the arrangement. The `source` of
-    /// each ``VariableMapping`` represents an `externalSignal` that is mapped to a `signal` `destination` in
-    /// the arrangement. This property does not represent mappings to machine signals but rather the *latched*
-    /// signals that are external to the machine driving the signal.
-    public let globalMappings: [VariableMapping]
-
     /// This initialiser will attempt to create an arrangement with the given mapping and signals. Please note
     /// that the types in ``MachineInstance`` (the keys in the `mappings`) must point to the same ``Machine``.
     /// This initialiser will return nil if this is not the case. The instance names must also be unique.
@@ -46,30 +40,18 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
     ///   - clocks: The clocks in the arrangement. It is assumed that clocks are not local to the arrangement.
     /// If you are synthesising clocks (i.e. through PLL or DCM) within the arrangement, then use local
     /// `signals`.
-    ///   - globalMappings: The global mappings between the `externalSignals` and the `signals`.
     @inlinable
     public init?(
         mappings: [MachineInstance: MachineMapping],
         externalSignals: [PortSignal],
         signals: [LocalSignal],
-        clocks: [Clock],
-        globalMappings: [VariableMapping] = []
+        clocks: [Clock]
     ) {
         let instanceNames = mappings.map(\.key.name)
         let allExternals = Set(externalSignals.map(\.name))
         let allGlobals = Set(signals.map(\.name))
-        let globallyMappedExternals = Set(globalMappings.map(\.source))
         guard
-            instanceNames.count == Set(instanceNames).count,
-            Set(globalMappings).count == globalMappings.count,
-            // Check that globally mapped external variables are not multiply driven by machines.
-            mappings.values.allSatisfy({
-                $0.mappings.allSatisfy({ !globallyMappedExternals.contains($0.source) })
-            }),
-            // Check that global mappings are only driving external signals from global variables.
-            globalMappings.allSatisfy({
-                allExternals.contains($0.source) && allGlobals.contains($0.destination)
-            })
+            allGlobals.isDisjoint(with: allExternals), instanceNames.count == Set(instanceNames).count
         else {
             return nil
         }
@@ -88,8 +70,7 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
             machines: mappings,
             externalSignals: externalSignals,
             signals: signals,
-            clocks: clocks,
-            globalMappings: globalMappings
+            clocks: clocks
         )
     }
 
@@ -99,20 +80,17 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
     ///   - externalSignals: The external signals in the arrangement.
     ///   - signals: The local signals in the arrangement.
     ///   - clocks: The clocks in the arrangement.
-    ///   - globalMappings: The mappings between the external and global signals.
     @inlinable
     init(
         machines: [MachineInstance: MachineMapping],
         externalSignals: [PortSignal],
         signals: [LocalSignal],
-        clocks: [Clock],
-        globalMappings: [VariableMapping] = []
+        clocks: [Clock]
     ) {
         self.machines = machines
         self.externalSignals = externalSignals
         self.signals = signals
         self.clocks = clocks
-        self.globalMappings = globalMappings
     }
 
 }
