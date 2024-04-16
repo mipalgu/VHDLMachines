@@ -55,7 +55,6 @@
 // 
 
 import Foundation
-import GUUnits
 import VHDLParsing
 
 /// Helper getters for creating machine constants.
@@ -228,7 +227,7 @@ extension ConstantSignal {
             let constant = ConstantSignal(
                 name: VariableName.clockPeriod,
                 type: .real,
-                value: .literal(value: .decimal(value: Double(period.picoseconds_d))),
+                value: .literal(value: .decimal(value: period.picoseconds)),
                 comment: comment
             )
         else {
