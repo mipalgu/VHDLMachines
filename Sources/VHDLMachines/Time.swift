@@ -53,19 +53,26 @@
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
+/// A type that represents a time value.
 public enum Time: Equatable, Hashable, Codable, Sendable, Comparable {
 
+    /// The value is represented in `seconds`.
     case seconds(_ value: Double)
 
+    /// The value is represented in `milliseconds`.
     case milliseconds(_ value: Double)
 
+    /// The value is represented in `microseconds`.
     case microseconds(_ value: Double)
 
+    /// The value is represented in `nanoseconds`.
     case nanoseconds(_ value: Double)
 
+    /// The value is represented in `picoseconds`.
     case picoseconds(_ value: Double)
 
-    public var seconds: Double {
+    /// The value in seconds.
+    @inlinable public var seconds: Double {
         switch self {
         case .seconds(let value):
             return value
@@ -80,7 +87,8 @@ public enum Time: Equatable, Hashable, Codable, Sendable, Comparable {
         }
     }
 
-    public var milliseconds: Double {
+    /// The value in milliseconds.
+    @inlinable public var milliseconds: Double {
         switch self {
         case .seconds(let value):
             return value * 1_000
@@ -95,7 +103,8 @@ public enum Time: Equatable, Hashable, Codable, Sendable, Comparable {
         }
     }
 
-    public var microseconds: Double {
+    /// The value in microseconds.
+    @inlinable public var microseconds: Double {
         switch self {
         case .seconds(let value):
             return value * 1_000_000
@@ -110,7 +119,8 @@ public enum Time: Equatable, Hashable, Codable, Sendable, Comparable {
         }
     }
 
-    public var nanoseconds: Double {
+    /// The value in nanoseconds.
+    @inlinable public var nanoseconds: Double {
         switch self {
         case .seconds(let value):
             return value * 1_000_000_000
@@ -125,7 +135,8 @@ public enum Time: Equatable, Hashable, Codable, Sendable, Comparable {
         }
     }
 
-    public var picoseconds: Double {
+    /// The value in picoseconds.
+    @inlinable public var picoseconds: Double {
         switch self {
         case .seconds(let value):
             return value * 1_000_000_000_000
@@ -140,6 +151,8 @@ public enum Time: Equatable, Hashable, Codable, Sendable, Comparable {
         }
     }
 
+    /// Compares 2 time values.
+    @inlinable
     public static func < (lhs: Time, rhs: Time) -> Bool {
         lhs.picoseconds < rhs.picoseconds
     }
