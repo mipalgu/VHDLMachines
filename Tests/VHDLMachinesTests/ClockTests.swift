@@ -97,15 +97,15 @@ final class ClockTests: XCTestCase {
 
     /// Test period computed property.
     func testPeriod() {
-        XCTAssertEqual(self.clock.period.milliseconds_t, 10)
+        XCTAssertEqual(self.clock.period.milliseconds, 10)
         self.clock.unit = .kHz
-        XCTAssertEqual(self.clock.period.microseconds_t, 10)
+        XCTAssertEqual(self.clock.period.microseconds, 10)
         self.clock.unit = .MHz
-        XCTAssertEqual(self.clock.period.nanoseconds_t, 10)
+        XCTAssertEqual(self.clock.period.nanoseconds, 10)
         self.clock.unit = .GHz
-        XCTAssertEqual(self.clock.period.picoseconds_t, 10)
+        XCTAssertEqual(self.clock.period.picoseconds, 10)
         self.clock.unit = .THz
-        XCTAssertEqual(self.clock.period.picoseconds_d, 0.01)
+        XCTAssertEqual(self.clock.period.picoseconds, 0.01)
     }
 
 }

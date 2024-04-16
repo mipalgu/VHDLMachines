@@ -65,6 +65,66 @@ public enum Time: Equatable, Hashable, Codable, Sendable {
 
     case picoseconds(_ value: Double)
 
+    public var seconds: Double {
+        switch self {
+        case .seconds(let value):
+            return value
+        case .milliseconds(let value):
+            return value / 1_000
+        case .microseconds(let value):
+            return value / 1_000_000
+        case .nanoseconds(let value):
+            return value / 1_000_000_000
+        case .picoseconds(let value):
+            return value / 1_000_000_000_000
+        }
+    }
+
+    public var milliseconds: Double {
+        switch self {
+        case .seconds(let value):
+            return value * 1_000
+        case .milliseconds(let value):
+            return value
+        case .microseconds(let value):
+            return value / 1_000
+        case .nanoseconds(let value):
+            return value / 1_000_000
+        case .picoseconds(let value):
+            return value / 1_000_000_000
+        }
+    }
+
+    public var microseconds: Double {
+        switch self {
+        case .seconds(let value):
+            return value * 1_000_000
+        case .milliseconds(let value):
+            return value * 1_000
+        case .microseconds(let value):
+            return value
+        case .nanoseconds(let value):
+            return value / 1_000
+        case .picoseconds(let value):
+            return value / 1_000_000
+        }
+    }
+
+    public var nanoseconds: Double {
+        switch self {
+        case .seconds(let value):
+            return value * 1_000_000_000
+        case .milliseconds(let value):
+            return value * 1_000_000
+        case .microseconds(let value):
+            return value * 1_000
+        case .nanoseconds(let value):
+            return value
+        case .picoseconds(let value):
+            return value / 1_000
+        }
+    }
+
     public var picoseconds: Double {
         switch self {
         case .seconds(let value):
