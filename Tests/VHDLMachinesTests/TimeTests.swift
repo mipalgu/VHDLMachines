@@ -127,4 +127,15 @@ final class TimeTests: XCTestCase {
         XCTAssertLessThan(milliseconds, seconds)
     }
 
+    /// Test `Time` is `Codable`.
+    func testCodableConformance() throws {
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+        XCTAssertEqual(seconds, try decoder.decode(Time.self, from: try encoder.encode(seconds)))
+        XCTAssertEqual(milliseconds, try decoder.decode(Time.self, from: try encoder.encode(milliseconds)))
+        XCTAssertEqual(microseconds, try decoder.decode(Time.self, from: try encoder.encode(microseconds)))
+        XCTAssertEqual(nanoseconds, try decoder.decode(Time.self, from: try encoder.encode(nanoseconds)))
+        XCTAssertEqual(picoseconds, try decoder.decode(Time.self, from: try encoder.encode(picoseconds)))
+    }
+
 }
