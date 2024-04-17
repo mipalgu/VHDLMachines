@@ -48,10 +48,14 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
         clocks: [Clock]
     ) {
         let instanceNames = mappings.map(\.key.name)
+        let instanceNamesSet = Set(instanceNames)
+        let machineNames = Set(mappings.map(\.key.type))
         let allExternals = Set(externalSignals.map(\.name))
         let allGlobals = Set(signals.map(\.name))
         guard
-            allGlobals.isDisjoint(with: allExternals), instanceNames.count == Set(instanceNames).count
+            machineNames.isDisjoint(with: instanceNamesSet),
+            allGlobals.isDisjoint(with: allExternals),
+            instanceNames.count == instanceNamesSet.count
         else {
             return nil
         }

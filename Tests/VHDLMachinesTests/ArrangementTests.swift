@@ -202,6 +202,21 @@ final class ArrangementTests: XCTestCase {
         XCTAssertNil(arrangement)
     }
 
+    /// Test that instance names are unique.
+    func testNonUniqueInstanceNamesReturnsNil() {
+        let arrangement = Arrangement(
+            mappings: [
+                MachineInstance(name: .pingMachine, type: .pingMachine): MachineMapping(
+                    machine: PingPongArrangement().pingMachine, mappings: []
+                )
+            ],
+            externalSignals: externalSignals,
+            signals: signals,
+            clocks: clocks
+        )
+        XCTAssertNil(arrangement)
+    }
+
     // /// Tests getters and setters update properties correctly.
     // func testGettersAndSetters() {
     //     let newMachines = [
