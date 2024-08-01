@@ -100,12 +100,12 @@ final class VHDLParserTests: XCTestCase {
         let arrangement = Arrangement.testArrangement
         guard
             let wrapper = generator.generate(arrangement: arrangement, name: .arrangement1),
-            let parsedArrangement = parser.parseArrangement(wrapper: wrapper),
-            let emptydata = "".data(using: .utf8)
+            let parsedArrangement = parser.parseArrangement(wrapper: wrapper)
         else {
             XCTFail("Couldn't generate wrapper!")
             return
         }
+        let emptydata = Data("".utf8)
         XCTAssertEqual(arrangement, parsedArrangement)
         XCTAssertNil(
             parser.parseArrangement(wrapper: FileWrapper(regularFileWithContents: emptydata))
