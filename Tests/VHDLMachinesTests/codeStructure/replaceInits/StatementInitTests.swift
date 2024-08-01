@@ -75,7 +75,7 @@ final class StatementInitTests: XCTestCase {
     // swiftlint:enable force_unwrapping
 
     /// `newX` as an expression.
-    var expNewX: Expression {
+    var expNewX: VHDLParsing.Expression {
         .reference(variable: .variable(reference: .variable(name: newX)))
     }
 

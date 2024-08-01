@@ -5,7 +5,6 @@
 //  Created by Morgan McColl on 19/5/21.
 //
 
-import Foundation
 import VHDLParsing
 
 /// A parameter is a type of external variable that is used to parameterise a machine. It

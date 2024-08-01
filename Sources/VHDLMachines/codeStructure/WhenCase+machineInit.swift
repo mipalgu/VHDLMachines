@@ -130,11 +130,8 @@ extension WhenCase {
         // swiftlint:disable:next closure_body_length
         let stateCases = machine.states.enumerated().compactMap { index, state -> WhenCase? in
             let transitions = machine.transitions.filter { $0.source == index }
-            if
-                transitions.count == 1,
-                case .conditional(let condition) = transitions[0].condition,
-                case .literal(let isTransitioning) = condition
-            {
+            if transitions.count == 1, case .conditional(let condition) = transitions[0].condition,
+                case .literal(let isTransitioning) = condition {
                 guard isTransitioning else {
                     return WhenCase(
                         condition: .expression(
