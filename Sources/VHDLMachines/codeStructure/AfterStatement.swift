@@ -178,13 +178,13 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     }
 
     /// The amount of time to wait before the condition evaluates to `true`.
-    public let amount: Expression
+    public let amount: VHDLParsing.Expression
 
     /// The period of the time to wait before the condition evaluates to `true`.
     public let period: Period
 
     /// The equivalent `VHDL` expression for this after statement.
-    @inlinable public var expression: Expression {
+    @inlinable public var expression: VHDLParsing.Expression {
         Expression(after: self)
     }
 
@@ -198,7 +198,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     ///   - amount: The amount of time to wait before the after statement evaluates to `true`.
     ///   - period: The period of the amount.
     @inlinable
-    public init(amount: Expression, period: Period) {
+    public init(amount: VHDLParsing.Expression, period: Period) {
         self.amount = amount
         self.period = period
     }
@@ -208,7 +208,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     @inlinable
     public init?(rawValue: String) {
         guard
-            let topExpression = Expression(rawValue: rawValue),
+            let topExpression = VHDLParsing.Expression(rawValue: rawValue),
             case .precedence(let precedence) = topExpression,
             case .conditional(condition: let conditional) = precedence,
             case .comparison(let expression) = conditional,
@@ -258,7 +258,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
         guard
             amount.hasPrefix("("),
             amount.hasSuffix(")"),
-            let expression = Expression(rawValue: String(amount.dropFirst().dropLast()))
+            let expression = VHDLParsing.Expression(rawValue: String(amount.dropFirst().dropLast()))
         else {
             return nil
         }
