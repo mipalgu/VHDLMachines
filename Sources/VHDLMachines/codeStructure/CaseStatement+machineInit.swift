@@ -83,6 +83,11 @@ extension CaseStatement {
         )
     }
 
+    /// Create the code that selectively takes snapshots of external variables.
+    /// 
+    /// This statement creates snapshots based on the current state the machine is in. The snapshots
+    /// that are selected are based on the ``State.externalVariables`` property.
+    /// - Parameter machine: The machine to create the case-statement for.
     init?(readSnapshotsFor machine: Machine) {
         let variables = Set(machine.externalSignals.filter { $0.mode != .output }.map(\.name))
         let states = machine.states.filter {
@@ -119,6 +124,11 @@ extension CaseStatement {
         )
     }
 
+    /// Create the code that selectively writes snapshots of external variables.
+    /// 
+    /// This statement creates snapshots based on the current state the machine is in. The snapshots
+    /// that are selected are based on the ``State.externalVariables`` property.
+    /// - Parameter machine: The machine to create the case-statement for.
     init?(writeSnapshotsFor machine: Machine) {
         let variables = Set(machine.externalSignals.filter { $0.mode != .input }.map(\.name))
         let states = machine.states.filter {

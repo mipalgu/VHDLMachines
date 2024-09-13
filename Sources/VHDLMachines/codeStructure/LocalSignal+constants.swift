@@ -8,6 +8,7 @@
 import Foundation
 import VHDLParsing
 
+/// Add helpers for representation creation.
 extension LocalSignal {
 
     /// The ringlet counter variable.

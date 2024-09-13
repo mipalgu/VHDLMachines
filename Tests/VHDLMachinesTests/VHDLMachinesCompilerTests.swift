@@ -85,7 +85,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
             XCTFail("File is empty!")
             return
         }
-        let rawValue = String(decoding: data, as: UTF8.self)
+        let rawValue = String(data: data, encoding: .utf8)
         XCTAssertEqual(rawValue, VHDLFile(representation: representation).rawValue)
         let f: (Machine, VariableName) -> MachineRepresentation? = { _, _ in nil }
         XCTAssertNil(compiler.compile(machine: machine, name: .testMachine, createRepresentation: f))
@@ -106,7 +106,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
         XCTAssertEqual(file?.value.preferredFilename, "Arrangement1.vhd")
         let data = file?.value.regularFileContents
         guard
-            let rawValue = data.flatMap({ String(decoding: $0, as: UTF8.self) }),
+            let rawValue = data.flatMap({ String(data: $0, encoding: .utf8) }),
             let expected = ArrangementRepresentation(
                 arrangement: arrangement, name: .arrangement1
             )?.file.rawValue
