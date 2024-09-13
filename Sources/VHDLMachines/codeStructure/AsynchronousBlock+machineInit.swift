@@ -60,6 +60,7 @@ import VHDLParsing
 extension AsynchronousBlock {
 
     /// Create the top-level asynchronous block that will represent the entire architecture body of a machine.
+    ///
     /// This block represents all of the logic of the machine.
     /// - Parameter machine: The machine to generate the block from.
     init?(machine: Machine) {
@@ -87,6 +88,7 @@ extension AsynchronousBlock {
     }
 
     /// Replace the variable with the value.
+    ///
     /// - Parameters:
     ///   - block: The block containing the variable to replace.
     ///   - variable: The variable to replace.
@@ -150,6 +152,7 @@ extension AsynchronousBlock {
 extension ProcessBlock {
 
     /// Replace the variable with the value.
+    ///
     /// - Parameters:
     ///   - process: The process containing the variable to replace.
     ///   - variable: The variable to replace.
@@ -169,6 +172,7 @@ extension ProcessBlock {
 extension ComponentInstantiation {
 
     /// Replace the variable with the value.
+    ///
     /// - Parameters:
     ///   - component: The component containing the variable to replace.
     ///   - variable: The variable to replace.
@@ -196,6 +200,7 @@ extension ComponentInstantiation {
 extension PortMap {
 
     /// Replace the variable with the value.
+    ///
     /// - Parameters:
     ///   - map: The map containing the variable to replace.
     ///   - variable: The variable to replace.
@@ -217,6 +222,7 @@ extension PortMap {
 extension VariableMap {
 
     /// Replace the variable with the value.
+    ///
     /// - Parameters:
     ///   - map: The map containing the variable to replace.
     ///   - variable: The variable to replace.
@@ -235,6 +241,7 @@ extension VariableMap {
 extension VariableAssignment {
 
     /// Replace the variable with the value.
+    ///
     /// - Parameters:
     ///   - assignment: The assignment containing the variable to replace.
     ///   - variable: The variable to replace.
@@ -264,6 +271,7 @@ extension VariableAssignment {
 extension GenericMap {
 
     /// Replace the variable with the value.
+    ///
     /// - Parameters:
     ///   - map: The map containing the variable to replace.
     ///   - variable: The variable to replace.
@@ -285,6 +293,7 @@ extension GenericMap {
 extension GenericVariableMap {
 
     /// Replace the variable with the value.
+    ///
     /// - Parameters:
     ///   - map: The map containing the variable to replace.
     ///   - variable: The variable to replace.

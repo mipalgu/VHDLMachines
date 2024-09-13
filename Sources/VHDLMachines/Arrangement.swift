@@ -7,7 +7,9 @@
 
 import VHDLParsing
 
-/// An arrangement represents a collection of machines that are executing together. An arrangment has a set of
+/// An arrangement represents a collection of machines that are executing together.
+///
+/// An arrangment has a set of
 /// parent machines which act as entry points into the program. This structure does not infer any execution
 /// order for the machines in this arrangement. Instead, this arrangement simply defines the machines and the
 /// capability of each machine (Suspensible, Parameterised, Custom Ringlets etc).
@@ -30,7 +32,9 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
     /// The clocks in the arrangement available to every machine.
     public let clocks: [Clock]
 
-    /// This initialiser will attempt to create an arrangement with the given mapping and signals. Please note
+    /// This initialiser will attempt to create an arrangement with the given mapping and signals.
+    ///
+    /// Please note
     /// that the types in ``MachineInstance`` (the keys in the `mappings`) must point to the same ``Machine``.
     /// This initialiser will return nil if this is not the case. The instance names must also be unique.
     /// - Parameters:

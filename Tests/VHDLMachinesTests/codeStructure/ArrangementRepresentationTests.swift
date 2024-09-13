@@ -62,7 +62,7 @@ import XCTest
 /// Test class for ``ArrangementRepresentation``.
 final class ArrangementRepresentationTests: XCTestCase {
 
-    /// A test arrangement
+    /// A test arrangement.
     var arrangement = Arrangement.testArrangement
 
     /// The architecture of `arrangement`.

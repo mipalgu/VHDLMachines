@@ -65,10 +65,10 @@ final class TransitionConditionTests: XCTestCase {
     /// A variable `x`.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
-    /// A variable `y`
+    /// A variable `y`.
     let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
-    /// A variable `z`
+    /// A variable `z`.
     let z = Expression.reference(variable: .variable(reference: .variable(name: .z)))
 
     /// Test that raw values are correct.

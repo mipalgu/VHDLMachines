@@ -7,12 +7,15 @@
 
 import Foundation
 
-/// A transition in a state machine. This transitions acts as a guard for a transition from one state to
-/// another. The condition is restricted to be a boolean expression.
+/// A transition in a state machine.
+///
+/// This transitions acts as a guard for a transition from one state to another. The condition is restricted
+/// to be a boolean expression.
 public struct Transition: Codable, Equatable, Hashable, Sendable {
 
-    /// The condition that must be met for the transition to occur. This condition must be a VHDL boolean
-    /// expression.
+    /// The condition that must be met for the transition to occur.
+    ///
+    /// This condition must be a VHDL boolean expression.
     public var condition: TransitionCondition
 
     /// The index of the source state of the transition.
@@ -22,6 +25,7 @@ public struct Transition: Codable, Equatable, Hashable, Sendable {
     public var target: Int
 
     /// Initialises a ``Transition`` with a condition, source and target.
+    ///
     /// - Parameters:
     ///   - condition: The condition that must be met for the transition to occur.
     ///   - source: The index of the source state of the transition.

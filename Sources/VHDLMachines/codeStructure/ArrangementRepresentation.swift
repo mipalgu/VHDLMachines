@@ -55,7 +55,9 @@
 
 import VHDLParsing
 
-/// This representation simply instantiates the machines within it's scope. No extra logic is added.
+/// This representation simply instantiates the machines within it's scope.
+///
+/// No extra logic is added.
 public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
 
     /// The name of the representation.
@@ -137,6 +139,7 @@ public struct ArrangementRepresentation: ArrangementVHDLRepresentable {
     }
 
     /// Create an `ArrangementRepresentation`.
+    ///
     /// - Parameters:
     ///   - name: The name of the representation.
     ///   - arrangement: The arrangement this representation is based on.

@@ -55,8 +55,9 @@
 
 import VHDLParsing
 
-/// An arrangement representation in `VHDL`. This type allows multiple representations to be created by
-/// conforming to this protocol.
+/// An arrangement representation in `VHDL`.
+///
+/// This type allows multiple representations to be created by conforming to this protocol.
 public protocol ArrangementVHDLRepresentable {
 
     /// The name of the arrangement.
@@ -81,6 +82,7 @@ public protocol ArrangementVHDLRepresentable {
     var file: VHDLFile { get }
 
     /// Create an arrangement representation in `VHDL`.
+    ///
     /// - Parameters:
     ///   - arrangement: The arrangement to represent.
     ///   - name: The name of the arrangement.

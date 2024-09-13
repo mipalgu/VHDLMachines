@@ -7,8 +7,9 @@
 
 import VHDLParsing
 
-/// A parameter is a type of external variable that is used to parameterise a machine. It
-/// is a variable that is defined within an entity block in the VHDl representation.
+/// A parameter is a type of external variable that is used to parameterise a machine.
+///
+/// It is a variable that is defined within an entity block in the VHDl representation.
 public struct Parameter: ExternalType, Codable, Equatable, Hashable, Sendable {
 
     /// The mode of the parameter.
@@ -36,6 +37,7 @@ public struct Parameter: ExternalType, Codable, Equatable, Hashable, Sendable {
     public var comment: Comment?
 
     /// Initialises a new parameter with the given type, name, default value and comment.
+    ///
     /// - Parameters:
     ///   - type: The type of the parameter.
     ///   - name: The name of the parameter.

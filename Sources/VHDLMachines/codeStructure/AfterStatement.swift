@@ -57,13 +57,17 @@
 import Foundation
 import VHDLParsing
 
-/// An after statement found commonly on `LLFSM` transitions. The after statements represents a boolean
+/// An after statement found commonly on `LLFSM` transitions.
+///
+/// The after statements represents a boolean
 /// condition that evaluates to `true` when a specified amount of time has elapsed. The supported after
 /// statements for `VHDL` machines are: `after` (seconds), `after_ms` (milliseconds), `after_us`
 /// (microseconds), `after_ns` (nanoseconds), `after_ps` (picoseconds) and `after_rt` (ringlets).
 public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Sendable {
 
-    /// The period of the time in an ``AfterStatement``. This period represents the amount of time elapsed
+    /// The period of the time in an ``AfterStatement``.
+    ///
+    /// This period represents the amount of time elapsed
     /// during an after expression. The time may be a SI-prefixed time or the number of ringlets since the
     /// start of a states execution.
     public enum Period: RawRepresentable, Equatable, Hashable, Codable, Sendable {
@@ -116,6 +120,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
 
         /// Creates a new period from the name of the variable storing the number of ringlets for a unit
         /// period.
+        ///
         /// - Parameter rawValue: The name of the variable storing the number of ringlets per unit period.
         @inlinable
         public init?(rawValue: VariableName) {
@@ -138,6 +143,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
         }
 
         /// Create a new period from the `after` command.
+        ///
         /// - Parameter after: The `after` command, e.g. `after`, `after_ps`, `after_ns`, `after_us`,
         /// `after_ms`, `after_rt`.
         @inlinable
@@ -194,6 +200,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     }
 
     /// Creates a new after statement from the stored properties.
+    ///
     /// - Parameters:
     ///   - amount: The amount of time to wait before the after statement evaluates to `true`.
     ///   - period: The period of the amount.
@@ -204,6 +211,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     }
 
     /// Creates a new after statement from the `VHDL` code.
+    ///
     /// - Parameter rawValue: The `VHDL` code enacting this statement.
     @inlinable
     public init?(rawValue: String) {
@@ -247,6 +255,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     }
 
     /// Creates a new after statement from the `after` command.
+    ///
     /// - Parameter after: The after command that enacts this statement.
     @inlinable
     public init?(after: String) {

@@ -60,6 +60,8 @@ import VHDLParsing
 
 // swiftlint:disable missing_docs
 
+// swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+
 /// Add test constants.
 extension VariableName {
 

@@ -59,7 +59,9 @@ import VHDLParsing
 /// Add replace initialiser.
 extension Transition {
 
-    /// Replace all state variables in `transition` with the new encoded variable names. This encoding
+    /// Replace all state variables in `transition` with the new encoded variable names.
+    ///
+    /// This encoding
     /// prepends the state name to the variable name. For example, the `x` variable in the `Initial` state
     /// would be encoded as `STATE_Initial_x`.
     /// - Parameters:

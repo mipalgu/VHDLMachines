@@ -56,7 +56,9 @@
 
 import VHDLParsing
 
-/// A struct defining the simplest type of `VHDL` representation. This structure is similar to the `VHDL`
+/// A struct defining the simplest type of `VHDL` representation.
+///
+/// This structure is similar to the `VHDL`
 /// representation from my honours paper *High-level Executable Models of Reactive Real-Time Systems with
 /// Logic-Labelled Finite-State Machines and FPGAs* published at ReConfig2018. This format does not contain
 /// any inherent fault tolerance, but does provide mechanisms for after statements, suspension and
@@ -78,12 +80,13 @@ public struct MachineRepresentation: MachineVHDLRepresentable, Equatable, Hashab
     /// The machine this representation is for.
     public let machine: Machine
 
-    /// The includes for this representation
+    /// The includes for this representation.
     @inlinable public var includes: [Include] {
         machine.includes
     }
 
     /// Create the machine representation for the given machine.
+    ///
     /// - Parameter machine: The machine to convert into a `VHDL` file.
     /// - Parameter name: The name of the machine.
     public init?(machine: Machine, name: VariableName) {
@@ -144,6 +147,7 @@ public struct MachineRepresentation: MachineVHDLRepresentable, Equatable, Hashab
     }
 
     /// Create a `MachineRepresentation` from its stored properties.
+    ///
     /// - Parameters:
     ///   - architectureBody: The body of the architecture.
     ///   - architectureHead: The head of the architecture.

@@ -59,8 +59,9 @@ import VHDLParsing
 /// Add init for top-level if-statement in process block.
 extension SynchronousBlock {
 
-    /// Create the top-level if-statement for the rising edge of the driving clock in the machine. This
-    /// block contains all of the logic of the machine.
+    /// Create the top-level if-statement for the rising edge of the driving clock in the machine.
+    ///
+    /// This block contains all of the logic of the machine.
     /// - Parameter machine: The machine to create the if-statement for.
     init?(machine: Machine) {
         guard

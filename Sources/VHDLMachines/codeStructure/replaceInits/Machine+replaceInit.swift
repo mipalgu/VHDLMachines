@@ -57,8 +57,9 @@
 /// Add replace initialiser.
 extension Machine {
 
-    /// Create a new machine where the state code has been replaced with an encoding for state variables. This
-    /// init parses the code within each state and generates new code that encodes the state variables.
+    /// Create a new machine where the state code has been replaced with an encoding for state variables.
+    ///
+    /// This init parses the code within each state and generates new code that encodes the state variables.
     /// - Parameter machine: The machine to replace the state code in.
     @inlinable
     init?(replacingStateRefsIn machine: Machine) {

@@ -55,7 +55,9 @@
 
 import VHDLParsing
 
-/// A `MachineInstance` represents an instance of a machine that lives within an arrangement. The `name` of
+/// A `MachineInstance` represents an instance of a machine that lives within an arrangement.
+///
+/// The `name` of
 /// the instance should be unique to any other instance of the same machine. The `type` property is the type
 /// of the machine, typically derived from a shared path where the machine is located.
 public struct MachineInstance: Equatable, Hashable, Codable, Sendable {
@@ -67,6 +69,7 @@ public struct MachineInstance: Equatable, Hashable, Codable, Sendable {
     public var type: VariableName
 
     /// Creates a new instance of `MachineInstance`.
+    ///
     /// - Parameters:
     ///   - name: The name of the instance.
     ///   - type: The type of the machine this instance was created from.

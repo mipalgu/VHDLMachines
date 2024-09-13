@@ -56,6 +56,8 @@
 @testable import VHDLMachines
 import VHDLParsing
 
+// swift-format-ignore: DontRepeatTypeInStaticProperties
+
 /// Add helpful test data.
 extension Arrangement {
 

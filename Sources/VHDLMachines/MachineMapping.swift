@@ -55,8 +55,9 @@
 
 import VHDLParsing
 
-/// A machine mapping is a mapping of variables to the external interface of the machine. The variables
-/// must be either clocks, external signals, parameters or return variables.
+/// A machine mapping is a mapping of variables to the external interface of the machine.
+///
+/// The variables must be either clocks, external signals, parameters or return variables.
 public struct MachineMapping: Equatable, Hashable, Codable, Sendable {
 
     /// The machine this mapping applies to.
@@ -66,6 +67,7 @@ public struct MachineMapping: Equatable, Hashable, Codable, Sendable {
     public let mappings: [VariableMapping]
 
     /// Creates a new machine mapping.
+    ///
     /// - Parameters:
     ///   - machine: The machine this mapping applies to.
     ///   - mappings: The mapping to the machines external interface.
@@ -81,6 +83,7 @@ public struct MachineMapping: Equatable, Hashable, Codable, Sendable {
     }
 
     /// Creates a new machine mapping.
+    ///
     /// - Parameters:
     ///   - machine: The machine this mapping applies to.
     ///   - mappings: The mapping to the machines external interface.

@@ -14,17 +14,21 @@ public struct State: Codable, Equatable, Hashable, Sendable {
     /// The name of the state.
     public var name: VariableName
 
-    /// The actions in the state. This property includes the code in each action.
+    /// The actions in the state.
+    ///
+    /// This property includes the code in each action.
     public var actions: [ActionName: SynchronousBlock]
 
     /// The machine signals in the state.
     public var signals: [LocalSignal]
 
-    /// The name of the external variables accessed in the state. These variables are defined
-    /// in the arrangement.
+    /// The name of the external variables accessed in the state.
+    ///
+    /// These variables are defined in the arrangement.
     public var externalVariables: [VariableName]
 
     /// Initialises a state with the given properties.
+    ///
     /// - Parameters:
     ///   - name: The name of the state.
     ///   - actions: The actions in the state. This property includes the code in each action.
