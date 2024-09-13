@@ -60,6 +60,7 @@ import TestUtils
 import VHDLParsing
 import XCTest
 
+// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
 /// Test class for `ArchitectureHead` extensions.
@@ -691,3 +692,4 @@ final class ArchitectureHeadTests: XCTestCase {
 }
 
 // swiftlint:enable type_body_length
+// swiftlint:enable file_length

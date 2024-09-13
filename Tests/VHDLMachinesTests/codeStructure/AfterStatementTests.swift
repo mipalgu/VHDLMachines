@@ -199,6 +199,8 @@ final class AfterStatementTests: XCTestCase {
         XCTAssertNil(AfterStatement(after: "afterps(10)"))
     }
 
+    // swiftlint:disable function_body_length
+
     /// Test the expression is correct.
     func testExpression() {
         XCTAssertEqual(
@@ -268,5 +270,7 @@ final class AfterStatementTests: XCTestCase {
             )
         )
     }
+
+    // swiftlint:enable function_body_length
 
 }

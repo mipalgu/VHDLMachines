@@ -59,6 +59,8 @@ import VHDLParsing
 /// Add conversion init.
 extension Expression {
 
+    // swiftlint:disable function_body_length
+
     /// Convert a ``TransitionCondition`` into an `Expression`.
     /// - Parameter condition: The ``TransitionCondition`` to convert.
     @inlinable
@@ -128,6 +130,8 @@ extension Expression {
             self = .reference(variable: .variable(reference: .variable(name: name)))
         }
     }
+
+    // swiftlint:enable function_body_length
 
     /// Convert an ``AfterStatement`` into an `Expression`.
     /// - Parameter after: The statement to convert.

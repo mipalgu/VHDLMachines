@@ -129,8 +129,8 @@ extension WhenCase {
     /// Create the when case for the checkTransition action.
     /// - Parameter machine: The machine to create the action code for.
     private init(checkTransitionMachine machine: Machine) {
-        // swiftlint:disable:next closure_body_length
         let stateCases = machine.states.enumerated()
+            // swiftlint:disable:next closure_body_length
             .compactMap { index, state -> WhenCase? in
                 let transitions = machine.transitions.filter { $0.source == index }
                 if transitions.count == 1, case .conditional(let condition) = transitions[0].condition,
@@ -276,6 +276,8 @@ extension WhenCase {
         self.init(condition: condition, code: .blocks(blocks: [.caseStatement(block: statement), trailer]))
     }
 
+    // swiftlint:disable function_body_length
+
     /// Create the onResume action for a machine.
     /// - Parameter machine: The machine to create the onResume action for.
     private init?(onResumeMachine machine: Machine) {
@@ -331,6 +333,8 @@ extension WhenCase {
         )
         self.init(condition: condition, code: .blocks(blocks: [.caseStatement(block: statement), trailer]))
     }
+
+    // swiftlint:enable function_body_length
 
     /// Create the onSuspend action for a machine.
     /// - Parameter machine: The machine to create the onSuspend action for.
@@ -1242,6 +1246,8 @@ extension Machine {
 /// Add init for creating transition logic.
 extension SynchronousBlock {
 
+    // swiftlint:disable function_body_length
+
     /// Create the transition logic for a state.
     /// - Parameters:
     ///   - transitions: The transition to create the logic for.
@@ -1319,6 +1325,8 @@ extension SynchronousBlock {
             )
         )
     }
+
+    // swiftlint:enable function_body_length
 
 }
 

@@ -59,6 +59,8 @@ import VHDLParsing
 /// Add replace initialiser.
 extension Expression {
 
+    // swiftlint:disable function_body_length
+
     /// Replace all occurances of a `variable` in `expression` with a new `value`.
     /// - Parameters:
     ///   - expression: The expression containing the `variable`'s to replace.
@@ -122,5 +124,7 @@ extension Expression {
             self = .reference(variable: newReference)
         }
     }
+
+    // swiftlint:enable function_body_length
 
 }

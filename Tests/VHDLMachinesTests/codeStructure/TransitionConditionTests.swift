@@ -59,6 +59,8 @@ import TestUtils
 import VHDLParsing
 import XCTest
 
+// swiftlint:disable type_body_length
+
 /// Test class for ``TransitionCondition``.
 final class TransitionConditionTests: XCTestCase {
 
@@ -70,6 +72,8 @@ final class TransitionConditionTests: XCTestCase {
 
     /// A variable `z`.
     let z = Expression.reference(variable: .variable(reference: .variable(name: .z)))
+
+    // swiftlint:disable function_body_length
 
     /// Test that raw values are correct.
     func testRawValue() {
@@ -125,6 +129,8 @@ final class TransitionConditionTests: XCTestCase {
             "x /= y"
         )
     }
+
+    // swiftlint:enable function_body_length
 
     /// Test the raw value init for boolean expressions.
     func testBooleanInit() {
@@ -255,6 +261,8 @@ final class TransitionConditionTests: XCTestCase {
         )
     }
 
+    // swiftlint:disable function_body_length
+
     /// Test the raw value init for after stataments containing conditional operations.
     func testAfterConditionalInit() {
         XCTAssertEqual(
@@ -310,6 +318,8 @@ final class TransitionConditionTests: XCTestCase {
             )
         )
     }
+
+    // swiftlint:enable function_body_length
 
     /// Test nil cases for the raw value init.
     func testFailingRawValueInit() {
@@ -372,6 +382,8 @@ final class TransitionConditionTests: XCTestCase {
         )
     }
 
+    // swiftlint:disable function_body_length
+
     /// Test `hasAfter` computed property.
     func testHasAfter() {
         let after = TransitionCondition.after(statement: AfterStatement(amount: x, period: .ns))
@@ -429,4 +441,8 @@ final class TransitionConditionTests: XCTestCase {
         XCTAssertTrue(TransitionCondition.notEquals(lhs: after, rhs: after).hasAfter)
     }
 
+    // swiftlint:enable function_body_length
+
 }
+
+// swiftlint:enable type_body_length

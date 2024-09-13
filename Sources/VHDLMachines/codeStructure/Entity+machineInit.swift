@@ -59,6 +59,8 @@ import VHDLParsing
 /// Add init from machine.
 extension Entity {
 
+    // swiftlint:disable function_body_length
+
     /// Create the entity declaration for a machine.
     /// - Parameter machine: The machine to convert.
     @inlinable
@@ -117,5 +119,7 @@ extension Entity {
         }
         self.init(name: name, port: port)
     }
+
+    // swiftlint:enable function_body_length
 
 }

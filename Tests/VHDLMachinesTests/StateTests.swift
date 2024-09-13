@@ -117,6 +117,8 @@ final class StateTests: XCTestCase {
         XCTAssertEqual(self.state.externalVariables, self.externalVariables)
     }
 
+    // swiftlint:disable function_body_length
+
     /// Test getters and setters work correctly.
     func testGettersAndSetters() {
         self.state.name = VariableName.s1
@@ -175,5 +177,7 @@ final class StateTests: XCTestCase {
         self.state.externalVariables = [b]
         XCTAssertEqual(self.state.externalVariables, [b])
     }
+
+    // swiftlint:enable function_body_length
 
 }

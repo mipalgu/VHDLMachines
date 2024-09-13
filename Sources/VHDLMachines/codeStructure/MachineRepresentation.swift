@@ -85,6 +85,8 @@ public struct MachineRepresentation: MachineVHDLRepresentable, Equatable, Hashab
         machine.includes
     }
 
+    // swiftlint:disable function_body_length
+
     /// Create the machine representation for the given machine.
     ///
     /// - Parameter machine: The machine to convert into a `VHDL` file.
@@ -145,6 +147,8 @@ public struct MachineRepresentation: MachineVHDLRepresentable, Equatable, Hashab
             machine: newMachine
         )
     }
+
+    // swiftlint:enable function_body_length
 
     /// Create a `MachineRepresentation` from its stored properties.
     ///
