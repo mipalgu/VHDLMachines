@@ -13,7 +13,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
-        .package(url: "https://github.com/mipalgu/VHDLParsing", from: "2.4.1"),
+        .package(url: "https://github.com/mipalgu/VHDLParsing", from: "2.7.0"),
         .package(url: "https://github.com/cpslabgu/SwiftUtils", from: "0.1.0")
     ],
     targets: [

@@ -137,6 +137,8 @@ extension Type {
             }
             self = .alias(name: value)
             return
+        case .member(let components):
+            self = .member(components: components.map { $0 == variable ? value : $0 })
         case .signal:
             self = type
             return
