@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 14/4/21.
 //
@@ -11,7 +11,7 @@ import VHDLParsing
 /// parent machines which act as entry points into the program. This structure does not infer any execution
 /// order for the machines in this arrangement. Instead, this arrangement simply defines the machines and the
 /// capability of each machine (Suspensible, Parameterised, Custom Ringlets etc).
-/// 
+///
 /// A machine is represented with a name and URL to it's location in the file system. From the arrangements
 /// perspective, the only variables defined here are the external variables (and signals), and clocks that
 /// also act as a special external signal. The arrangment variables defined in this struct are available to

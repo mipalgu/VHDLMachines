@@ -1,30 +1,30 @@
 // MachineTests.swift
 // Machines
-// 
+//
 // Created by Morgan McColl.
 // Copyright © 2022 Morgan McColl. All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above
 //    copyright notice, this list of conditions and the following
 //    disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. All advertising materials mentioning features or use of this
 //    software must display the following acknowledgement:
-// 
+//
 //    This product includes software developed by Morgan McColl.
-// 
+//
 // 4. Neither the name of the author nor the names of contributors
 //    may be used to endorse or promote products derived from this
 //    software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -36,23 +36,23 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // -----------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or
 // modify it under the above terms or under the terms of the GNU
 // General Public License as published by the Free Software Foundation;
 // either version 2 of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 
 @testable import VHDLMachines
 import VHDLParsing
@@ -79,7 +79,7 @@ final class MachineTests: XCTestCase {
     var includes: [Include] {
         [
             .include(statement: UseStatement(rawValue: "use IEEE.STD_LOGIC_1164.ALL;")!),
-            .include(statement: UseStatement(rawValue: "use IEEE.NUMERIC_STD.ALL;")!)
+            .include(statement: UseStatement(rawValue: "use IEEE.NUMERIC_STD.ALL;")!),
         ]
     }
 
@@ -116,7 +116,7 @@ final class MachineTests: XCTestCase {
     var dependentMachines: [VariableName: URL] {
         [
             VariableName(rawValue: "M1")!: URL(fileURLWithPath: "/path/to/M1"),
-            VariableName(rawValue: "M2")!: URL(fileURLWithPath: "/path/to/M2")
+            VariableName(rawValue: "M2")!: URL(fileURLWithPath: "/path/to/M2"),
         ]
     }
 
@@ -150,7 +150,9 @@ final class MachineTests: XCTestCase {
     var returnableSignals: [ReturnableVariable] {
         [
             ReturnableVariable(
-                type: .stdLogic, name: VariableName.r, comment: Comment.returnableR
+                type: .stdLogic,
+                name: VariableName.r,
+                comment: Comment.returnableR
             )
         ]
     }
@@ -169,7 +171,7 @@ final class MachineTests: XCTestCase {
                 actions: [:],
                 signals: [],
                 externalVariables: []
-            )
+            ),
         ]
     }
 
@@ -177,7 +179,7 @@ final class MachineTests: XCTestCase {
     var transitions: [Transition] {
         [
             Transition(condition: .conditional(condition: .literal(value: true)), source: 0, target: 1),
-            Transition(condition: .conditional(condition: .literal(value: true)), source: 1, target: 0)
+            Transition(condition: .conditional(condition: .literal(value: true)), source: 1, target: 0),
         ]
     }
 
@@ -202,10 +204,12 @@ final class MachineTests: XCTestCase {
 
     /// The architecture body for the machine.
     var architectureBody: AsynchronousBlock {
-        .statement(statement: .assignment(
-            name: .variable(reference: .variable(name: .s)),
-            value: .expression(value: .literal(value: .bit(value: .high)))
-        ))
+        .statement(
+            statement: .assignment(
+                name: .variable(reference: .variable(name: .s)),
+                value: .expression(value: .literal(value: .bit(value: .high)))
+            )
+        )
     }
 
     /// The default actions in a state.
@@ -291,7 +295,7 @@ final class MachineTests: XCTestCase {
         ]
         let newClocks = [
             Clock(name: VariableName.clk, frequency: 50, unit: .MHz),
-            Clock(name: VariableName.clk2, frequency: 100, unit: .MHz)
+            Clock(name: VariableName.clk2, frequency: 100, unit: .MHz),
         ]
         let newDrivingClock = 1
         let newMachineSignals = [
@@ -331,14 +335,18 @@ final class MachineTests: XCTestCase {
         let newInitialState = 1
         let newSuspendedState = 0
         let newArchitectureHead = [
-            HeadStatement.definition(value: .signal(
-                value: LocalSignal(type: .stdLogic, name: .g, defaultValue: nil, comment: nil)
-            ))
+            HeadStatement.definition(
+                value: .signal(
+                    value: LocalSignal(type: .stdLogic, name: .g, defaultValue: nil, comment: nil)
+                )
+            )
         ]
-        let newArchitectureBody = AsynchronousBlock.statement(statement: .assignment(
-            name: .variable(reference: .variable(name: .g)),
-            value: .expression(value: .literal(value: .bit(value: .low)))
-        ))
+        let newArchitectureBody = AsynchronousBlock.statement(
+            statement: .assignment(
+                name: .variable(reference: .variable(name: .g)),
+                value: .expression(value: .literal(value: .bit(value: .low)))
+            )
+        )
         machine.includes = newIncludes
         machine.externalSignals = newExternalSignals
         machine.clocks = newClocks
@@ -375,7 +383,7 @@ final class MachineTests: XCTestCase {
             includes: [
                 .library(value: VariableName(rawValue: "IEEE")!),
                 .include(statement: UseStatement(rawValue: "use IEEE.std_logic_1164.All;")!),
-                .include(statement: UseStatement(rawValue: "use IEEE.math_real.All;")!)
+                .include(statement: UseStatement(rawValue: "use IEEE.math_real.All;")!),
             ],
             externalSignals: [],
             clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
@@ -396,7 +404,7 @@ final class MachineTests: XCTestCase {
                     actions: [:],
                     signals: [],
                     externalVariables: []
-                )
+                ),
             ],
             transitions: [],
             initialState: 0,

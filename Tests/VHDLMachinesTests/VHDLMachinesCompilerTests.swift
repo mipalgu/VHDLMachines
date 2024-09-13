@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 19/5/21.
 //
@@ -61,7 +61,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
                 VariableName.onExit: SynchronousBlock(rawValue: "x <= '0'; -- \(name) OnExit")!,
                 VariableName.onResume: SynchronousBlock(rawValue: "x <= '0'; -- \(name) OnResume")!,
                 VariableName.onSuspend: SynchronousBlock(rawValue: "xx <= \"11\"; -- \(name) onSuspend")!,
-                VariableName.internal: SynchronousBlock(rawValue: "x <= '1'; -- \(name) Internal")!
+                VariableName.internal: SynchronousBlock(rawValue: "x <= '1'; -- \(name) Internal")!,
             ],
             signals: [],
             externalVariables: []
@@ -108,8 +108,10 @@ class VHDLMachinesCompilerTests: XCTestCase {
         guard
             let rawValue = data.flatMap({ String(data: $0, encoding: .utf8) }),
             let expected = ArrangementRepresentation(
-                arrangement: arrangement, name: .arrangement1
-            )?.file.rawValue
+                arrangement: arrangement,
+                name: .arrangement1
+            )?
+            .file.rawValue
         else {
             XCTFail("File is empty!")
             return

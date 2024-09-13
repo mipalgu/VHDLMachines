@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 14/4/21.
 //
@@ -80,9 +80,13 @@ extension LocalSignal {
             type: stateType,
             name: .previousRinglet,
             defaultValue: .literal(
-                value: .vector(value: .logics(value: LogicVector(
-                    values: [LogicLiteral](repeating: .highImpedance, count: size)
-                )))
+                value: .vector(
+                    value: .logics(
+                        value: LogicVector(
+                            values: [LogicLiteral](repeating: .highImpedance, count: size)
+                        )
+                    )
+                )
             ),
             comment: nil
         )
@@ -107,7 +111,7 @@ extension LocalSignal {
                     defaultValue: initialState,
                     comment: nil
                 ),
-                previousRinglet
+                previousRinglet,
             ]
         }
         let suspendedState = Expression.reference(
@@ -133,7 +137,7 @@ extension LocalSignal {
                 name: .suspendedFrom,
                 defaultValue: initialState,
                 comment: nil
-            )
+            ),
         ]
     }
 

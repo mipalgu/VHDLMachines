@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 14/4/21.
 //
@@ -27,14 +27,14 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
         let defaultActions = [
             VariableName.onEntry,
             VariableName.onExit,
-            VariableName.internal
+            VariableName.internal,
         ]
         return Machine(
             actions: defaultActions,
             includes: [
                 .library(value: ieee),
                 .include(statement: stdLogicImport),
-                .include(statement: mathRealImport)
+                .include(statement: mathRealImport),
             ],
             externalSignals: [],
             clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
@@ -73,14 +73,14 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
             VariableName.onExit,
             VariableName.internal,
             VariableName.onResume,
-            VariableName.onSuspend
+            VariableName.onSuspend,
         ]
         return Machine(
             actions: defaultActions,
             includes: [
                 .library(value: ieee),
                 .include(statement: stdLogicImport),
-                .include(statement: mathRealImport)
+                .include(statement: mathRealImport),
             ],
             externalSignals: [],
             clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
@@ -101,7 +101,7 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
                     actions: [:],
                     signals: [],
                     externalVariables: []
-                )
+                ),
             ],
             transitions: [],
             initialState: 0,

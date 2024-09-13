@@ -1,30 +1,30 @@
 // ArchitectureHead+machineInit.swift
 // Machines
-// 
+//
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above
 //    copyright notice, this list of conditions and the following
 //    disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. All advertising materials mentioning features or use of this
 //    software must display the following acknowledgement:
-// 
+//
 //    This product includes software developed by Morgan McColl.
-// 
+//
 // 4. Neither the name of the author nor the names of contributors
 //    may be used to endorse or promote products derived from this
 //    software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -36,23 +36,23 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // -----------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or
 // modify it under the above terms or under the terms of the GNU
 // General Public License as published by the Free Software Foundation;
 // either version 2 of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 
 import VHDLParsing
 
@@ -97,27 +97,32 @@ extension ArchitectureHead {
         }
         let actionStatements = actions.map { HeadStatement.definition(value: .constant(value: $0)) }
         let internalState = LocalSignal(
-            type: .ranged(type: .stdLogicVector(size: .downto(
-                upper: .literal(value: .integer(value: internalStateBits - 1)),
-                lower: .literal(value: .integer(value: 0))
-            ))),
+            type: .ranged(
+                type: .stdLogicVector(
+                    size: .downto(
+                        upper: .literal(value: .integer(value: internalStateBits - 1)),
+                        lower: .literal(value: .integer(value: 0))
+                    )
+                )
+            ),
             name: .internalState,
             defaultValue: .reference(variable: .variable(reference: .variable(name: .readSnapshot))),
             comment: nil
         )
         let stateRepresentation = machine.states.enumerated()
-        .compactMap {
-            ConstantSignal(state: $0.1, bitsRequired: stateBitsRequired, index: $0.0)
-        }
-        .map { HeadStatement.definition(value: .constant(value: $0)) }
+            .compactMap {
+                ConstantSignal(state: $0.1, bitsRequired: stateBitsRequired, index: $0.0)
+            }
+            .map { HeadStatement.definition(value: .constant(value: $0)) }
         guard stateRepresentation.count == machine.states.count else {
             return nil
         }
         let stateTrackerStatements = stateTrackers.map { Definition.signal(value: $0) }
-        var statements: [HeadStatement] = [.comment(value: internalStateComment)] + actionStatements + [
-            .definition(value: .signal(value: internalState)),
-            .comment(value: stateRepresentationComment)
-        ] + stateRepresentation + stateTrackerStatements.map { HeadStatement.definition(value: $0) }
+        var statements: [HeadStatement] =
+            [.comment(value: internalStateComment)] + actionStatements + [
+                .definition(value: .signal(value: internalState)),
+                .comment(value: stateRepresentationComment),
+            ] + stateRepresentation + stateTrackerStatements.map { HeadStatement.definition(value: $0) }
         if machine.isSuspensible {
             guard let commandsComment = Comment(rawValue: "-- Suspension Commands") else {
                 return nil
@@ -139,42 +144,55 @@ extension ArchitectureHead {
             let ringletConstants = ConstantSignal.ringletConstants.map {
                 HeadStatement.definition(value: .constant(value: $0))
             }
-            statements += [
-                .comment(value: afterComment),
-                .definition(value: .signal(value: .ringletCounter)),
-                .definition(value: .constant(value: period))
-            ] + ringletConstants
+            statements +=
+                [
+                    .comment(value: afterComment),
+                    .definition(value: .signal(value: .ringletCounter)),
+                    .definition(value: .constant(value: period)),
+                ] + ringletConstants
         }
         if !machine.externalSignals.isEmpty {
-            guard let externalSnapshotComment = Comment(
-                rawValue: "-- Snapshot of External Signals and Variables"
-            ) else {
+            guard
+                let externalSnapshotComment = Comment(
+                    rawValue: "-- Snapshot of External Signals and Variables"
+                )
+            else {
                 return nil
             }
-            statements += [.comment(value: externalSnapshotComment)] + machine.externalSignals.map {
-                .definition(value: .signal(value: LocalSignal(snapshot: $0)))
-            }
+            statements +=
+                [.comment(value: externalSnapshotComment)]
+                + machine.externalSignals.map {
+                    .definition(value: .signal(value: LocalSignal(snapshot: $0)))
+                }
         }
         if machine.isParameterised {
             if !machine.parameterSignals.isEmpty {
-                guard let parameterSnapshotComment = Comment(
-                    rawValue: "-- Snapshot of Parameter Signals and Variables"
-                ) else {
+                guard
+                    let parameterSnapshotComment = Comment(
+                        rawValue: "-- Snapshot of Parameter Signals and Variables"
+                    )
+                else {
                     return nil
                 }
-                statements += [.comment(value: parameterSnapshotComment)] + machine.parameterSignals.map {
-                    .definition(value: .signal(value: LocalSignal(snapshot: $0)))
-                }
+                statements +=
+                    [.comment(value: parameterSnapshotComment)]
+                    + machine.parameterSignals.map {
+                        .definition(value: .signal(value: LocalSignal(snapshot: $0)))
+                    }
             }
             if !machine.returnableSignals.isEmpty {
-                guard let outputSnapshotComment = Comment(
+                guard
+                    let outputSnapshotComment = Comment(
                         rawValue: "-- Snapshot of Output Signals and Variables"
-                ) else {
+                    )
+                else {
                     return nil
                 }
-                statements += [.comment(value: outputSnapshotComment)] + machine.returnableSignals.map {
-                    .definition(value: .signal(value: LocalSignal(snapshot: $0)))
-                }
+                statements +=
+                    [.comment(value: outputSnapshotComment)]
+                    + machine.returnableSignals.map {
+                        .definition(value: .signal(value: LocalSignal(snapshot: $0)))
+                    }
             }
         }
         if !machine.machineSignals.isEmpty {
@@ -199,9 +217,16 @@ extension ArchitectureHead {
                 else {
                     return nil
                 }
-                return HeadStatement.definition(value: .signal(value: LocalSignal(
-                    type: $0.1.type, name: newName, defaultValue: $0.1.defaultValue, comment: $0.1.comment
-                )))
+                return HeadStatement.definition(
+                    value: .signal(
+                        value: LocalSignal(
+                            type: $0.1.type,
+                            name: newName,
+                            defaultValue: $0.1.defaultValue,
+                            comment: $0.1.comment
+                        )
+                    )
+                )
             }
             guard stateSignals.count == stateVariables.count else {
                 return nil
@@ -209,9 +234,11 @@ extension ArchitectureHead {
             statements += [.comment(value: machineStateSignalComment)] + stateSignals
         }
         if let head = machine.architectureHead {
-            guard let userCodeComment = Comment(
-                rawValue: "-- User-Specific Code for Architecture Head"
-            ) else {
+            guard
+                let userCodeComment = Comment(
+                    rawValue: "-- User-Specific Code for Architecture Head"
+                )
+            else {
                 return nil
             }
             statements += [.comment(value: userCodeComment)] + head

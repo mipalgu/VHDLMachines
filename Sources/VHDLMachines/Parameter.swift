@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 19/5/21.
 //
@@ -43,7 +43,10 @@ public struct Parameter: ExternalType, Codable, Equatable, Hashable, Sendable {
     ///   - comment: The comment of the parameter.
     @inlinable
     public init(
-        type: SignalType, name: VariableName, defaultValue: Expression? = nil, comment: Comment? = nil
+        type: SignalType,
+        name: VariableName,
+        defaultValue: Expression? = nil,
+        comment: Comment? = nil
     ) {
         self.type = type
         self.name = name

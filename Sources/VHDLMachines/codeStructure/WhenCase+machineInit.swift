@@ -1,30 +1,30 @@
 // WhenCase+machineInit.swift
 // Machines
-// 
+//
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above
 //    copyright notice, this list of conditions and the following
 //    disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. All advertising materials mentioning features or use of this
 //    software must display the following acknowledgement:
-// 
+//
 //    This product includes software developed by Morgan McColl.
-// 
+//
 // 4. Neither the name of the author nor the names of contributors
 //    may be used to endorse or promote products derived from this
 //    software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -36,23 +36,23 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // -----------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or
 // modify it under the above terms or under the terms of the GNU
 // General Public License as published by the Free Software Foundation;
 // either version 2 of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 
 import VHDLParsing
 
@@ -100,9 +100,11 @@ extension WhenCase {
             return nil
         }
         self.init(
-            condition: .expression(expression: .reference(
-                variable: .variable(reference: .variable(name: .name(for: state)))
-            )),
+            condition: .expression(
+                expression: .reference(
+                    variable: .variable(reference: .variable(name: .name(for: state)))
+                )
+            ),
             code: code
         )
     }
@@ -128,63 +130,83 @@ extension WhenCase {
     /// - Parameter machine: The machine to create the action code for.
     private init(checkTransitionMachine machine: Machine) {
         // swiftlint:disable:next closure_body_length
-        let stateCases = machine.states.enumerated().compactMap { index, state -> WhenCase? in
-            let transitions = machine.transitions.filter { $0.source == index }
-            if transitions.count == 1, case .conditional(let condition) = transitions[0].condition,
-                case .literal(let isTransitioning) = condition {
-                guard isTransitioning else {
+        let stateCases = machine.states.enumerated()
+            .compactMap { index, state -> WhenCase? in
+                let transitions = machine.transitions.filter { $0.source == index }
+                if transitions.count == 1, case .conditional(let condition) = transitions[0].condition,
+                    case .literal(let isTransitioning) = condition
+                {
+                    guard isTransitioning else {
+                        return WhenCase(
+                            condition: .expression(
+                                expression: .reference(
+                                    variable: .variable(
+                                        reference: .variable(name: .name(for: state))
+                                    )
+                                )
+                            ),
+                            code: .statement(
+                                statement: .assignment(
+                                    name: .variable(reference: .variable(name: .internalState)),
+                                    value: .reference(
+                                        variable: .variable(reference: .variable(name: .internal))
+                                    )
+                                )
+                            )
+                        )
+                    }
                     return WhenCase(
                         condition: .expression(
-                            expression: .reference(variable: .variable(
-                                reference: .variable(name: .name(for: state))
-                            ))
+                            expression: .reference(
+                                variable: .variable(reference: .variable(name: .name(for: state)))
+                            )
                         ),
-                        code: .statement(statement: .assignment(
-                            name: .variable(reference: .variable(name: .internalState)),
-                            value: .reference(variable: .variable(reference: .variable(name: .internal)))
-                        ))
+                        code: .blocks(blocks: [
+                            .statement(
+                                statement: .assignment(
+                                    name: .variable(reference: .variable(name: .targetState)),
+                                    value: .reference(
+                                        variable: .variable(
+                                            reference: .variable(
+                                                name: .name(for: machine.states[transitions[0].target])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            .statement(
+                                statement: .assignment(
+                                    name: .variable(reference: .variable(name: .internalState)),
+                                    value: .reference(
+                                        variable: .variable(reference: .variable(name: .onExit))
+                                    )
+                                )
+                            ),
+                        ])
                     )
                 }
-                return WhenCase(
-                    condition: .expression(
-                        expression: .reference(
-                            variable: .variable(reference: .variable(name: .name(for: state)))
-                        )
-                    ),
-                    code: .blocks(blocks: [
-                        .statement(statement: .assignment(
-                            name: .variable(reference: .variable(name: .targetState)),
-                            value: .reference(
-                                variable: .variable(reference: .variable(
-                                    name: .name(for: machine.states[transitions[0].target])
-                                ))
-                            )
-                        )),
-                        .statement(statement: .assignment(
-                            name: .variable(reference: .variable(name: .internalState)),
-                            value: .reference(variable: .variable(reference: .variable(name: .onExit)))
-                        ))
-                    ])
-                )
+                return WhenCase(state: state, transitions: transitions, machine: machine)
             }
-            return WhenCase(state: state, transitions: transitions, machine: machine)
-        }
         let statement = CaseStatement(
             condition: .reference(variable: .variable(reference: .variable(name: .currentState))),
             cases: stateCases + [
                 WhenCase(
                     condition: .others,
-                    code: .statement(statement: .assignment(
-                        name: .variable(reference: .variable(name: .internalState)),
-                        value: .reference(variable: .variable(reference: .variable(name: .internal)))
-                    ))
+                    code: .statement(
+                        statement: .assignment(
+                            name: .variable(reference: .variable(name: .internalState)),
+                            value: .reference(variable: .variable(reference: .variable(name: .internal)))
+                        )
+                    )
                 )
             ]
         )
         self.init(
-            condition: .expression(expression: .reference(
-                variable: .variable(reference: .variable(name: .checkTransition))
-            )),
+            condition: .expression(
+                expression: .reference(
+                    variable: .variable(reference: .variable(name: .checkTransition))
+                )
+            ),
             code: .caseStatement(block: statement)
         )
     }
@@ -197,13 +219,17 @@ extension WhenCase {
     ///   - next: The next action.
     private init(nullCurrentAction action: VariableName, nextAction next: VariableName) {
         self.init(
-            condition: .expression(expression: .reference(
-                variable: .variable(reference: .variable(name: action))
-            )),
-            code: .statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .internalState)),
-                value: .reference(variable: .variable(reference: .variable(name: next)))
-            ))
+            condition: .expression(
+                expression: .reference(
+                    variable: .variable(reference: .variable(name: action))
+                )
+            ),
+            code: .statement(
+                statement: .assignment(
+                    name: .variable(reference: .variable(name: .internalState)),
+                    value: .reference(variable: .variable(reference: .variable(name: next)))
+                )
+            )
         )
     }
 
@@ -217,22 +243,28 @@ extension WhenCase {
             let condition = WhenCondition.expression(
                 expression: .reference(variable: .variable(reference: .variable(name: .name(for: $0))))
             )
-            let trailer = SynchronousBlock.statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .ringletCounter)),
-                value: .literal(value: .integer(value: 0))
-            ))
+            let trailer = SynchronousBlock.statement(
+                statement: .assignment(
+                    name: .variable(reference: .variable(name: .ringletCounter)),
+                    value: .literal(value: .integer(value: 0))
+                )
+            )
             guard let code = $0.actions[.onEntry] else {
                 return WhenCase(condition: condition, code: trailer)
             }
             return WhenCase(condition: condition, code: .blocks(blocks: [code, trailer]))
         }
-        let condition = WhenCondition.expression(expression: .reference(
-            variable: .variable(reference: .variable(name: .onEntry))
-        ))
-        let trailer = SynchronousBlock.statement(statement: .assignment(
-            name: .variable(reference: .variable(name: .internalState)),
-            value: .reference(variable: .variable(reference: .variable(name: .checkTransition)))
-        ))
+        let condition = WhenCondition.expression(
+            expression: .reference(
+                variable: .variable(reference: .variable(name: .onEntry))
+            )
+        )
+        let trailer = SynchronousBlock.statement(
+            statement: .assignment(
+                name: .variable(reference: .variable(name: .internalState)),
+                value: .reference(variable: .variable(reference: .variable(name: .checkTransition)))
+            )
+        )
         guard !stateCases.isEmpty else {
             self.init(condition: condition, code: trailer)
             return
@@ -267,22 +299,28 @@ extension WhenCase {
                 }
                 return WhenCase(condition: condition, code: .blocks(blocks: code))
             }
-            let trailer = SynchronousBlock.statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .ringletCounter)),
-                value: .literal(value: .integer(value: 0))
-            ))
+            let trailer = SynchronousBlock.statement(
+                statement: .assignment(
+                    name: .variable(reference: .variable(name: .ringletCounter)),
+                    value: .literal(value: .integer(value: 0))
+                )
+            )
             guard !code.isEmpty else {
                 return WhenCase(condition: condition, code: trailer)
             }
             return WhenCase(condition: condition, code: .blocks(blocks: code + [trailer]))
         }
-        let condition = WhenCondition.expression(expression: .reference(
-            variable: .variable(reference: .variable(name: .onResume))
-        ))
-        let trailer = SynchronousBlock.statement(statement: .assignment(
-            name: .variable(reference: .variable(name: .internalState)),
-            value: .reference(variable: .variable(reference: .variable(name: .checkTransition)))
-        ))
+        let condition = WhenCondition.expression(
+            expression: .reference(
+                variable: .variable(reference: .variable(name: .onResume))
+            )
+        )
+        let trailer = SynchronousBlock.statement(
+            statement: .assignment(
+                name: .variable(reference: .variable(name: .internalState)),
+                value: .reference(variable: .variable(reference: .variable(name: .checkTransition)))
+            )
+        )
         guard !stateCases.isEmpty else {
             self.init(condition: condition, code: trailer)
             return
@@ -306,9 +344,11 @@ extension WhenCase {
                 return nil
             }
             return WhenCase(
-                condition: .expression(expression: .reference(
-                    variable: .variable(reference: .variable(name: .name(for: $0)))
-                )),
+                condition: .expression(
+                    expression: .reference(
+                        variable: .variable(reference: .variable(name: .name(for: $0)))
+                    )
+                ),
                 code: onSuspend
             )
         }
@@ -320,10 +360,12 @@ extension WhenCase {
             trailer += [onEntry]
         }
         trailer += [
-            .statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .internalState)),
-                value: .reference(variable: .variable(reference: .variable(name: .checkTransition)))
-            ))
+            .statement(
+                statement: .assignment(
+                    name: .variable(reference: .variable(name: .internalState)),
+                    value: .reference(variable: .variable(reference: .variable(name: .checkTransition)))
+                )
+            )
         ]
         guard !stateCases.isEmpty else {
             self.init(condition: condition, code: .blocks(blocks: trailer))
@@ -333,10 +375,13 @@ extension WhenCase {
             condition: .reference(variable: .variable(reference: .variable(name: .suspendedFrom))),
             cases: stateCases + [.othersNull]
         )
-        self.init(condition: condition, code: .blocks(blocks: [
-            .caseStatement(block: statement),
-            .blocks(blocks: trailer)
-        ]))
+        self.init(
+            condition: condition,
+            code: .blocks(blocks: [
+                .caseStatement(block: statement),
+                .blocks(blocks: trailer),
+            ])
+        )
     }
 
     /// Create the internal action.
@@ -349,25 +394,33 @@ extension WhenCase {
             let condition = WhenCondition.expression(
                 expression: .reference(variable: .variable(reference: .variable(name: .name(for: $0))))
             )
-            let trailer = SynchronousBlock.statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .ringletCounter)),
-                value: .binary(operation: .addition(
-                    lhs: .reference(variable: .variable(reference: .variable(name: .ringletCounter))),
-                    rhs: .literal(value: .integer(value: 1))
-                ))
-            ))
+            let trailer = SynchronousBlock.statement(
+                statement: .assignment(
+                    name: .variable(reference: .variable(name: .ringletCounter)),
+                    value: .binary(
+                        operation: .addition(
+                            lhs: .reference(variable: .variable(reference: .variable(name: .ringletCounter))),
+                            rhs: .literal(value: .integer(value: 1))
+                        )
+                    )
+                )
+            )
             guard let code = $0.actions[.internal] else {
                 return WhenCase(condition: condition, code: trailer)
             }
             return WhenCase(condition: condition, code: .blocks(blocks: [code, trailer]))
         }
-        let condition = WhenCondition.expression(expression: .reference(
-            variable: .variable(reference: .variable(name: .internal))
-        ))
-        let trailer = SynchronousBlock.statement(statement: .assignment(
-            name: .variable(reference: .variable(name: .internalState)),
-            value: .reference(variable: .variable(reference: .variable(name: .writeSnapshot)))
-        ))
+        let condition = WhenCondition.expression(
+            expression: .reference(
+                variable: .variable(reference: .variable(name: .internal))
+            )
+        )
+        let trailer = SynchronousBlock.statement(
+            statement: .assignment(
+                name: .variable(reference: .variable(name: .internalState)),
+                value: .reference(variable: .variable(reference: .variable(name: .writeSnapshot)))
+            )
+        )
         guard !stateCases.isEmpty else {
             self.init(condition: condition, code: trailer)
             return
@@ -391,10 +444,12 @@ extension WhenCase {
         let condition = WhenCondition.expression(
             expression: .reference(variable: .variable(reference: .variable(name: normalAction)))
         )
-        let trailer = SynchronousBlock.statement(statement: .assignment(
-            name: .variable(reference: .variable(name: .internalState)),
-            value: .reference(variable: .variable(reference: .variable(name: nextAction)))
-        ))
+        let trailer = SynchronousBlock.statement(
+            statement: .assignment(
+                name: .variable(reference: .variable(name: .internalState)),
+                value: .reference(variable: .variable(reference: .variable(name: nextAction)))
+            )
+        )
         guard !stateCases.isEmpty else {
             self.init(condition: condition, code: trailer)
             return
@@ -424,20 +479,26 @@ extension WhenCase {
         let snapshots = [SynchronousBlock.caseStatement(block: snapshotsCase)]
         // OnEntry semantics. Only perform OnEntry when previousRinglet != currentState.
         let onEntryBlock = IfBlock.ifElse(
-            condition: .conditional(condition: .comparison(
-                value: .notEquals(
-                    lhs: .reference(variable: .variable(reference: .variable(name: .previousRinglet))),
-                    rhs: .reference(variable: .variable(reference: .variable(name: .currentState)))
+            condition: .conditional(
+                condition: .comparison(
+                    value: .notEquals(
+                        lhs: .reference(variable: .variable(reference: .variable(name: .previousRinglet))),
+                        rhs: .reference(variable: .variable(reference: .variable(name: .currentState)))
+                    )
                 )
-            )),
-            ifBlock: .statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .internalState)),
-                value: .reference(variable: .variable(reference: .variable(name: .onEntry)))
-            )),
-            elseBlock: .statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .internalState)),
-                value: .reference(variable: .variable(reference: .variable(name: .noOnEntry)))
-            ))
+            ),
+            ifBlock: .statement(
+                statement: .assignment(
+                    name: .variable(reference: .variable(name: .internalState)),
+                    value: .reference(variable: .variable(reference: .variable(name: .onEntry)))
+                )
+            ),
+            elseBlock: .statement(
+                statement: .assignment(
+                    name: .variable(reference: .variable(name: .internalState)),
+                    value: .reference(variable: .variable(reference: .variable(name: .noOnEntry)))
+                )
+            )
         )
         guard
             let suspendedIndex = machine.suspendedState,
@@ -455,325 +516,629 @@ extension WhenCase {
         /// Parameterised snapshot semantics.
         if machine.isParameterised {
             let parameterSnapshots = machine.parameterSignals.map {
-                SynchronousBlock.statement(statement: .assignment(
-                    name: .variable(reference: .variable(name: $0.name)),
-                    value: .reference(variable: .variable(reference: .variable(name: .name(for: $0))))
-                ))
+                SynchronousBlock.statement(
+                    statement: .assignment(
+                        name: .variable(reference: .variable(name: $0.name)),
+                        value: .reference(variable: .variable(reference: .variable(name: .name(for: $0))))
+                    )
+                )
             }
-            blocks.append(SynchronousBlock.ifStatement(block: .ifStatement(
-                // Perform snapshot of parameters on restart command.
-                condition: .conditional(condition: .comparison(value: .equality(
-                    lhs: .reference(variable: .variable(reference: .variable(name: .command))),
-                    rhs: .reference(variable: .variable(reference: .variable(name: .restartCommand)))
-                ))),
-                ifBlock: .blocks(blocks: parameterSnapshots)
-            )))
+            blocks.append(
+                SynchronousBlock.ifStatement(
+                    block: .ifStatement(
+                        // Perform snapshot of parameters on restart command.
+                        condition: .conditional(
+                            condition: .comparison(
+                                value: .equality(
+                                    lhs: .reference(
+                                        variable: .variable(reference: .variable(name: .command))
+                                    ),
+                                    rhs: .reference(
+                                        variable: .variable(reference: .variable(name: .restartCommand))
+                                    )
+                                )
+                            )
+                        ),
+                        ifBlock: .blocks(blocks: parameterSnapshots)
+                    )
+                )
+            )
         }
         // Suspension semantics.
         blocks += [
             .ifStatement(
                 block: .ifElse(
                     // Restart semantics.
-                    condition: .logical(operation: .and(
-                        lhs: .precedence(value: .conditional(condition: .comparison(value: .equality(
-                            lhs: .reference(variable: .variable(reference: .variable(name: .command))),
-                            rhs: .reference(variable: .variable(reference: .variable(name: .restartCommand)))
-                        )))),
-                        rhs: .precedence(value: .conditional(condition: .comparison(value: .notEquals(
-                            lhs: .reference(variable: .variable(reference: .variable(name: .currentState))),
-                            rhs: .reference(
-                                variable: .variable(reference: .variable(name: .name(for: initialState)))
+                    condition: .logical(
+                        operation: .and(
+                            lhs: .precedence(
+                                value: .conditional(
+                                    condition: .comparison(
+                                        value: .equality(
+                                            lhs: .reference(
+                                                variable: .variable(reference: .variable(name: .command))
+                                            ),
+                                            rhs: .reference(
+                                                variable: .variable(
+                                                    reference: .variable(name: .restartCommand)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            rhs: .precedence(
+                                value: .conditional(
+                                    condition: .comparison(
+                                        value: .notEquals(
+                                            lhs: .reference(
+                                                variable: .variable(reference: .variable(name: .currentState))
+                                            ),
+                                            rhs: .reference(
+                                                variable: .variable(
+                                                    reference: .variable(name: .name(for: initialState))
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
                             )
-                        ))))
-                    )),
+                        )
+                    ),
                     ifBlock: .blocks(blocks: [
                         // Set current state to the initial state.
-                        .statement(statement: .assignment(
-                            name: .variable(reference: .variable(name: .currentState)),
-                            value: .reference(
-                                variable: .variable(reference: .variable(name: .name(for: initialState)))
-                            )
-                        )),
-                        .statement(statement: .assignment(
-                            name: .variable(reference: .variable(name: .suspended)),
-                            value: .literal(value: .bit(value: .low))
-                        )),
-                        .statement(statement: .assignment(
-                            name: .variable(reference: .variable(name: .suspendedFrom)),
-                            value: .reference(
-                                variable: .variable(reference: .variable(name: .name(for: initialState)))
-                            )
-                        )),
-                        .statement(statement: .assignment(
-                            name: .variable(reference: .variable(name: .targetState)),
-                            value: .reference(
-                                variable: .variable(reference: .variable(name: .name(for: initialState)))
-                            )
-                        )),
-                        // If previously suspended perform OnResume, else perform OnEntry.
-                        .ifStatement(block: .ifElse(
-                            condition: .conditional(condition: .comparison(value: .equality(
-                                lhs: .reference(
-                                    variable: .variable(reference: .variable(name: .previousRinglet))
-                                ),
-                                rhs: .reference(variable: .variable(
-                                    reference: .variable(name: .name(for: suspendedState))
-                                ))
-                            ))),
-                            ifBlock: .statement(statement: .assignment(
-                                name: .variable(reference: .variable(name: .internalState)),
-                                value: .reference(variable: .variable(reference: .variable(name: .onResume)))
-                            )),
-                            elseBlock: .ifStatement(block: .ifElse(
-                                condition: .conditional(condition: .comparison(value: .equality(
-                                    lhs: .reference(variable: .variable(
-                                        reference: .variable(name: .previousRinglet)
-                                    )),
-                                    rhs: .reference(variable: .variable(
-                                        reference: .variable(name: .name(for: initialState))
-                                    ))
-                                ))),
-                                ifBlock: .statement(statement: .assignment(
-                                    name: .variable(reference: .variable(name: .internalState)),
-                                    value: .reference(variable: .variable(
-                                        reference: .variable(name: .noOnEntry)
-                                    ))
-                                )),
-                                elseBlock: .statement(statement: .assignment(
-                                    name: .variable(reference: .variable(name: .internalState)),
-                                    value: .reference(
-                                        variable: .variable(reference: .variable(name: .onEntry))
-                                    )
-                                ))
-                            ))
-                        ))
-                    ]),
-                    elseBlock: .ifStatement(block: .ifElse(
-                        // Resume semantics.
-                        condition: .logical(operation: .and(
-                            lhs: .precedence(value: .conditional(condition: .comparison(value: .equality(
-                                lhs: .reference(variable: .variable(reference: .variable(name: .command))),
-                                rhs: .reference(
-                                    variable: .variable(reference: .variable(name: .resumeCommand))
-                                )
-                            )))),
-                            rhs: .precedence(value: .logical(operation: .and(
-                                lhs: .precedence(value: .conditional(condition: .comparison(value: .equality(
-                                    lhs: .reference(
-                                        variable: .variable(reference: .variable(name: .currentState))
-                                    ),
-                                    rhs: .reference(variable: .variable(
-                                        reference: .variable(name: .name(for: suspendedState))
-                                    ))
-                                )))),
-                                rhs: .precedence(value: .conditional(condition: .comparison(value: .notEquals(
-                                    lhs: .reference(
-                                        variable: .variable(reference: .variable(name: .suspendedFrom))
-                                    ),
-                                    rhs: .reference(variable: .variable(
-                                        reference: .variable(name: .name(for: suspendedState))
-                                    ))
-                                ))))
-                            )))
-                        )),
-                        // Set current state to the state the machine was suspended from.
-                        ifBlock: .blocks(blocks: [
-                            .statement(statement: .assignment(
-                                name: .variable(reference: .variable(name: .suspended)),
-                                value: .literal(value: .bit(value: .low))
-                            )),
-                            .statement(statement: .assignment(
+                        .statement(
+                            statement: .assignment(
                                 name: .variable(reference: .variable(name: .currentState)),
                                 value: .reference(
-                                    variable: .variable(reference: .variable(name: .suspendedFrom))
+                                    variable: .variable(reference: .variable(name: .name(for: initialState)))
                                 )
-                            )),
-                            .statement(statement: .assignment(
+                            )
+                        ),
+                        .statement(
+                            statement: .assignment(
+                                name: .variable(reference: .variable(name: .suspended)),
+                                value: .literal(value: .bit(value: .low))
+                            )
+                        ),
+                        .statement(
+                            statement: .assignment(
+                                name: .variable(reference: .variable(name: .suspendedFrom)),
+                                value: .reference(
+                                    variable: .variable(reference: .variable(name: .name(for: initialState)))
+                                )
+                            )
+                        ),
+                        .statement(
+                            statement: .assignment(
                                 name: .variable(reference: .variable(name: .targetState)),
                                 value: .reference(
-                                    variable: .variable(reference: .variable(name: .suspendedFrom))
+                                    variable: .variable(reference: .variable(name: .name(for: initialState)))
                                 )
-                            )),
-                            // If previous state was suspended perform OnResume, else perform NoOnEntry.
-                            .ifStatement(block: .ifElse(
-                                condition: .conditional(condition: .comparison(value: .equality(
-                                    lhs: .reference(
-                                        variable: .variable(reference: .variable(name: .previousRinglet))
+                            )
+                        ),
+                        // If previously suspended perform OnResume, else perform OnEntry.
+                        .ifStatement(
+                            block: .ifElse(
+                                condition: .conditional(
+                                    condition: .comparison(
+                                        value: .equality(
+                                            lhs: .reference(
+                                                variable: .variable(
+                                                    reference: .variable(name: .previousRinglet)
+                                                )
+                                            ),
+                                            rhs: .reference(
+                                                variable: .variable(
+                                                    reference: .variable(name: .name(for: suspendedState))
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                                ifBlock: .statement(
+                                    statement: .assignment(
+                                        name: .variable(reference: .variable(name: .internalState)),
+                                        value: .reference(
+                                            variable: .variable(reference: .variable(name: .onResume))
+                                        )
+                                    )
+                                ),
+                                elseBlock: .ifStatement(
+                                    block: .ifElse(
+                                        condition: .conditional(
+                                            condition: .comparison(
+                                                value: .equality(
+                                                    lhs: .reference(
+                                                        variable: .variable(
+                                                            reference: .variable(name: .previousRinglet)
+                                                        )
+                                                    ),
+                                                    rhs: .reference(
+                                                        variable: .variable(
+                                                            reference: .variable(
+                                                                name: .name(for: initialState)
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        ifBlock: .statement(
+                                            statement: .assignment(
+                                                name: .variable(reference: .variable(name: .internalState)),
+                                                value: .reference(
+                                                    variable: .variable(
+                                                        reference: .variable(name: .noOnEntry)
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        elseBlock: .statement(
+                                            statement: .assignment(
+                                                name: .variable(reference: .variable(name: .internalState)),
+                                                value: .reference(
+                                                    variable: .variable(reference: .variable(name: .onEntry))
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                    ]),
+                    elseBlock: .ifStatement(
+                        block: .ifElse(
+                            // Resume semantics.
+                            condition: .logical(
+                                operation: .and(
+                                    lhs: .precedence(
+                                        value: .conditional(
+                                            condition: .comparison(
+                                                value: .equality(
+                                                    lhs: .reference(
+                                                        variable: .variable(
+                                                            reference: .variable(name: .command)
+                                                        )
+                                                    ),
+                                                    rhs: .reference(
+                                                        variable: .variable(
+                                                            reference: .variable(name: .resumeCommand)
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
                                     ),
-                                    rhs: .reference(
-                                        variable: .variable(reference: .variable(name: .suspendedFrom))
+                                    rhs: .precedence(
+                                        value: .logical(
+                                            operation: .and(
+                                                lhs: .precedence(
+                                                    value: .conditional(
+                                                        condition: .comparison(
+                                                            value: .equality(
+                                                                lhs: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(
+                                                                            name: .currentState
+                                                                        )
+                                                                    )
+                                                                ),
+                                                                rhs: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(
+                                                                            name: .name(for: suspendedState)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                rhs: .precedence(
+                                                    value: .conditional(
+                                                        condition: .comparison(
+                                                            value: .notEquals(
+                                                                lhs: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(
+                                                                            name: .suspendedFrom
+                                                                        )
+                                                                    )
+                                                                ),
+                                                                rhs: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(
+                                                                            name: .name(for: suspendedState)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
                                     )
-                                ))),
-                                ifBlock: .statement(statement: .assignment(
-                                    name: .variable(reference: .variable(name: .internalState)),
-                                    value: .reference(
-                                        variable: .variable(reference: .variable(name: .noOnEntry))
-                                    )
-                                )),
-                                elseBlock: .statement(statement: .assignment(
-                                    name: .variable(reference: .variable(name: .internalState)),
-                                    value: .reference(
-                                        variable: .variable(reference: .variable(name: .onResume))
-                                    )
-                                ))
-                            ))
-                        ]),
-                        elseBlock: .ifStatement(block: .ifElse(
-                            // Suspend semantics.
-                            condition: .logical(operation: .and(
-                                lhs: .precedence(value: .conditional(condition: .comparison(value: .equality(
-                                    lhs: .reference(
-                                        variable: .variable(reference: .variable(name: .command))
-                                    ),
-                                    rhs: .reference(
-                                        variable: .variable(reference: .variable(name: .suspendCommand))
-                                    )
-                                )))),
-                                rhs: .precedence(value: .conditional(condition: .comparison(value: .notEquals(
-                                    lhs: .reference(
-                                        variable: .variable(reference: .variable(name: .currentState))
-                                    ),
-                                    rhs: .reference(variable: .variable(
-                                        reference: .variable(name: .name(for: suspendedState))
-                                    ))
-                                ))))
-                            )),
+                                )
+                            ),
+                            // Set current state to the state the machine was suspended from.
                             ifBlock: .blocks(blocks: [
-                                // Set current state to the suspended state.
-                                .statement(statement: .assignment(
-                                    name: .variable(reference: .variable(name: .suspendedFrom)),
-                                    value: .reference(
-                                        variable: .variable(reference: .variable(name: .currentState))
-                                    )
-                                )),
-                                .statement(statement: .assignment(
-                                    name: .variable(reference: .variable(name: .suspended)),
-                                    value: .literal(value: .bit(value: .high))
-                                )),
-                                .statement(statement: .assignment(
-                                    name: .variable(reference: .variable(name: .currentState)),
-                                    value: .reference(variable: .variable(
-                                        reference: .variable(name: .name(for: suspendedState))
-                                    ))
-                                )),
-                                .statement(statement: .assignment(
-                                    name: .variable(reference: .variable(name: .targetState)),
-                                    value: .reference(variable: .variable(
-                                        reference: .variable(name: .name(for: suspendedState))
-                                    ))
-                                )),
-                                // Perform OnSuspend if not in the suspended state previously.
-                                .ifStatement(block: .ifElse(
-                                    condition: .conditional(condition: .comparison(value: .equality(
-                                        lhs: .reference(variable: .variable(
-                                            reference: .variable(name: .previousRinglet)
-                                        )),
-                                        rhs: .reference(variable: .variable(
-                                            reference: .variable(name: .name(for: suspendedState))
-                                        ))
-                                    ))),
-                                    ifBlock: .statement(statement: .assignment(
-                                        name: .variable(reference: .variable(name: .internalState)),
-                                        value: .reference(
-                                            variable: .variable(reference: .variable(name: .noOnEntry))
-                                        )
-                                    )),
-                                    elseBlock: .statement(statement: .assignment(
-                                        name: .variable(reference: .variable(name: .internalState)),
-                                        value: .reference(
-                                            variable: .variable(reference: .variable(name: .onSuspend))
-                                        )
-                                    ))
-                                ))
-                            ]),
-                            // Suspended state execution.
-                            elseBlock: .ifStatement(block: .ifElse(
-                                condition: .conditional(condition: .comparison(value: .equality(
-                                    lhs: .reference(
-                                        variable: .variable(reference: .variable(name: .currentState))
-                                    ),
-                                    rhs: .reference(variable: .variable(
-                                        reference: .variable(name: .name(for: suspendedState))
-                                    ))
-                                ))),
-                                // Set suspended flag to logic high.
-                                ifBlock: .blocks(blocks: [
-                                    .statement(statement: .assignment(
+                                .statement(
+                                    statement: .assignment(
                                         name: .variable(reference: .variable(name: .suspended)),
-                                        value: .literal(value: .bit(value: .high))
-                                    )),
-                                    // Execute OnSuspend if not in the suspended state previously.
-                                    .ifStatement(block: .ifElse(
-                                        condition: .conditional(condition: .comparison(value: .notEquals(
-                                            lhs: .reference(variable: .variable(
-                                                reference: .variable(name: .previousRinglet)
-                                            )),
-                                            rhs: .reference(variable: .variable(
-                                                reference: .variable(name: .name(for: suspendedState))
-                                            ))
-                                        ))),
-                                        ifBlock: .statement(statement: .assignment(
-                                            name: .variable(reference: .variable(name: .internalState)),
-                                            value: .reference(
-                                                variable: .variable(reference: .variable(name: .onSuspend))
+                                        value: .literal(value: .bit(value: .low))
+                                    )
+                                ),
+                                .statement(
+                                    statement: .assignment(
+                                        name: .variable(reference: .variable(name: .currentState)),
+                                        value: .reference(
+                                            variable: .variable(reference: .variable(name: .suspendedFrom))
+                                        )
+                                    )
+                                ),
+                                .statement(
+                                    statement: .assignment(
+                                        name: .variable(reference: .variable(name: .targetState)),
+                                        value: .reference(
+                                            variable: .variable(reference: .variable(name: .suspendedFrom))
+                                        )
+                                    )
+                                ),
+                                // If previous state was suspended perform OnResume, else perform NoOnEntry.
+                                .ifStatement(
+                                    block: .ifElse(
+                                        condition: .conditional(
+                                            condition: .comparison(
+                                                value: .equality(
+                                                    lhs: .reference(
+                                                        variable: .variable(
+                                                            reference: .variable(name: .previousRinglet)
+                                                        )
+                                                    ),
+                                                    rhs: .reference(
+                                                        variable: .variable(
+                                                            reference: .variable(name: .suspendedFrom)
+                                                        )
+                                                    )
+                                                )
                                             )
-                                        )),
-                                        elseBlock: .statement(statement: .assignment(
-                                            name: .variable(reference: .variable(name: .internalState)),
-                                            value: .reference(
-                                                variable: .variable(reference: .variable(name: .noOnEntry))
+                                        ),
+                                        ifBlock: .statement(
+                                            statement: .assignment(
+                                                name: .variable(reference: .variable(name: .internalState)),
+                                                value: .reference(
+                                                    variable: .variable(
+                                                        reference: .variable(name: .noOnEntry)
+                                                    )
+                                                )
                                             )
-                                        ))
-                                    ))
-                                ]),
-                                // Transition from Suspended.
-                                elseBlock: .ifStatement(block: .ifElse(
-                                    condition: .conditional(condition: .comparison(value: .equality(
-                                        lhs: .reference(variable: .variable(
-                                            reference: .variable(name: .previousRinglet)
-                                        )),
-                                        rhs: .reference(variable: .variable(
-                                            reference: .variable(name: .name(for: suspendedState))
-                                        ))
-                                    ))),
-                                    // Execute onResume.
+                                        ),
+                                        elseBlock: .statement(
+                                            statement: .assignment(
+                                                name: .variable(reference: .variable(name: .internalState)),
+                                                value: .reference(
+                                                    variable: .variable(reference: .variable(name: .onResume))
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                            ]),
+                            elseBlock: .ifStatement(
+                                block: .ifElse(
+                                    // Suspend semantics.
+                                    condition: .logical(
+                                        operation: .and(
+                                            lhs: .precedence(
+                                                value: .conditional(
+                                                    condition: .comparison(
+                                                        value: .equality(
+                                                            lhs: .reference(
+                                                                variable: .variable(
+                                                                    reference: .variable(name: .command)
+                                                                )
+                                                            ),
+                                                            rhs: .reference(
+                                                                variable: .variable(
+                                                                    reference: .variable(
+                                                                        name: .suspendCommand
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            rhs: .precedence(
+                                                value: .conditional(
+                                                    condition: .comparison(
+                                                        value: .notEquals(
+                                                            lhs: .reference(
+                                                                variable: .variable(
+                                                                    reference: .variable(name: .currentState)
+                                                                )
+                                                            ),
+                                                            rhs: .reference(
+                                                                variable: .variable(
+                                                                    reference: .variable(
+                                                                        name: .name(for: suspendedState)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
                                     ifBlock: .blocks(blocks: [
-                                        .statement(statement: .assignment(
-                                            name: .variable(reference: .variable(name: .internalState)),
-                                            value: .reference(
-                                                variable: .variable(reference: .variable(name: .onResume))
+                                        // Set current state to the suspended state.
+                                        .statement(
+                                            statement: .assignment(
+                                                name: .variable(reference: .variable(name: .suspendedFrom)),
+                                                value: .reference(
+                                                    variable: .variable(
+                                                        reference: .variable(name: .currentState)
+                                                    )
+                                                )
                                             )
-                                        )),
-                                        .statement(statement: .assignment(
-                                            name: .variable(reference: .variable(name: .suspended)),
-                                            value: .literal(value: .bit(value: .low))
-                                        )),
-                                        .statement(statement: .assignment(
-                                            name: .variable(reference: .variable(name: .suspendedFrom)),
-                                            value: .reference(
-                                                variable: .variable(reference: .variable(name: .currentState))
+                                        ),
+                                        .statement(
+                                            statement: .assignment(
+                                                name: .variable(reference: .variable(name: .suspended)),
+                                                value: .literal(value: .bit(value: .high))
                                             )
-                                        ))
+                                        ),
+                                        .statement(
+                                            statement: .assignment(
+                                                name: .variable(reference: .variable(name: .currentState)),
+                                                value: .reference(
+                                                    variable: .variable(
+                                                        reference: .variable(name: .name(for: suspendedState))
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        .statement(
+                                            statement: .assignment(
+                                                name: .variable(reference: .variable(name: .targetState)),
+                                                value: .reference(
+                                                    variable: .variable(
+                                                        reference: .variable(name: .name(for: suspendedState))
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        // Perform OnSuspend if not in the suspended state previously.
+                                        .ifStatement(
+                                            block: .ifElse(
+                                                condition: .conditional(
+                                                    condition: .comparison(
+                                                        value: .equality(
+                                                            lhs: .reference(
+                                                                variable: .variable(
+                                                                    reference: .variable(
+                                                                        name: .previousRinglet
+                                                                    )
+                                                                )
+                                                            ),
+                                                            rhs: .reference(
+                                                                variable: .variable(
+                                                                    reference: .variable(
+                                                                        name: .name(for: suspendedState)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                ifBlock: .statement(
+                                                    statement: .assignment(
+                                                        name: .variable(
+                                                            reference: .variable(name: .internalState)
+                                                        ),
+                                                        value: .reference(
+                                                            variable: .variable(
+                                                                reference: .variable(name: .noOnEntry)
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                elseBlock: .statement(
+                                                    statement: .assignment(
+                                                        name: .variable(
+                                                            reference: .variable(name: .internalState)
+                                                        ),
+                                                        value: .reference(
+                                                            variable: .variable(
+                                                                reference: .variable(name: .onSuspend)
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
                                     ]),
-                                    // Normal execution.
-                                    elseBlock: .blocks(blocks: [
-                                        .statement(statement: .assignment(
-                                            name: .variable(reference: .variable(name: .suspended)),
-                                            value: .literal(value: .bit(value: .low))
-                                        )),
-                                        .statement(statement: .assignment(
-                                            name: .variable(reference: .variable(name: .suspendedFrom)),
-                                            value: .reference(
-                                                variable: .variable(reference: .variable(name: .currentState))
+                                    // Suspended state execution.
+                                    elseBlock: .ifStatement(
+                                        block: .ifElse(
+                                            condition: .conditional(
+                                                condition: .comparison(
+                                                    value: .equality(
+                                                        lhs: .reference(
+                                                            variable: .variable(
+                                                                reference: .variable(name: .currentState)
+                                                            )
+                                                        ),
+                                                        rhs: .reference(
+                                                            variable: .variable(
+                                                                reference: .variable(
+                                                                    name: .name(for: suspendedState)
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            // Set suspended flag to logic high.
+                                            ifBlock: .blocks(blocks: [
+                                                .statement(
+                                                    statement: .assignment(
+                                                        name: .variable(
+                                                            reference: .variable(name: .suspended)
+                                                        ),
+                                                        value: .literal(value: .bit(value: .high))
+                                                    )
+                                                ),
+                                                // Execute OnSuspend if not in the suspended state previously.
+                                                .ifStatement(
+                                                    block: .ifElse(
+                                                        condition: .conditional(
+                                                            condition: .comparison(
+                                                                value: .notEquals(
+                                                                    lhs: .reference(
+                                                                        variable: .variable(
+                                                                            reference: .variable(
+                                                                                name: .previousRinglet
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    rhs: .reference(
+                                                                        variable: .variable(
+                                                                            reference: .variable(
+                                                                                name: .name(
+                                                                                    for: suspendedState
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        ifBlock: .statement(
+                                                            statement: .assignment(
+                                                                name: .variable(
+                                                                    reference: .variable(name: .internalState)
+                                                                ),
+                                                                value: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(name: .onSuspend)
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        elseBlock: .statement(
+                                                            statement: .assignment(
+                                                                name: .variable(
+                                                                    reference: .variable(name: .internalState)
+                                                                ),
+                                                                value: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(name: .noOnEntry)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                            ]),
+                                            // Transition from Suspended.
+                                            elseBlock: .ifStatement(
+                                                block: .ifElse(
+                                                    condition: .conditional(
+                                                        condition: .comparison(
+                                                            value: .equality(
+                                                                lhs: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(
+                                                                            name: .previousRinglet
+                                                                        )
+                                                                    )
+                                                                ),
+                                                                rhs: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(
+                                                                            name: .name(for: suspendedState)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    ),
+                                                    // Execute onResume.
+                                                    ifBlock: .blocks(blocks: [
+                                                        .statement(
+                                                            statement: .assignment(
+                                                                name: .variable(
+                                                                    reference: .variable(name: .internalState)
+                                                                ),
+                                                                value: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(name: .onResume)
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        .statement(
+                                                            statement: .assignment(
+                                                                name: .variable(
+                                                                    reference: .variable(name: .suspended)
+                                                                ),
+                                                                value: .literal(value: .bit(value: .low))
+                                                            )
+                                                        ),
+                                                        .statement(
+                                                            statement: .assignment(
+                                                                name: .variable(
+                                                                    reference: .variable(name: .suspendedFrom)
+                                                                ),
+                                                                value: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(
+                                                                            name: .currentState
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                    ]),
+                                                    // Normal execution.
+                                                    elseBlock: .blocks(blocks: [
+                                                        .statement(
+                                                            statement: .assignment(
+                                                                name: .variable(
+                                                                    reference: .variable(name: .suspended)
+                                                                ),
+                                                                value: .literal(value: .bit(value: .low))
+                                                            )
+                                                        ),
+                                                        .statement(
+                                                            statement: .assignment(
+                                                                name: .variable(
+                                                                    reference: .variable(name: .suspendedFrom)
+                                                                ),
+                                                                value: .reference(
+                                                                    variable: .variable(
+                                                                        reference: .variable(
+                                                                            name: .currentState
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        // Decide whether to perform OnEntry.
+                                                        .ifStatement(block: onEntryBlock),
+                                                    ])
+                                                )
                                             )
-                                        )),
-                                        // Decide whether to perform OnEntry.
-                                        .ifStatement(block: onEntryBlock)
-                                    ])
-                                ))
-                            ))
-                        ))
-                    ))
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
             )
         ]
@@ -787,29 +1152,38 @@ extension WhenCase {
             return nil
         }
         let snapshots = [SynchronousBlock.caseStatement(block: snapshotCase)]
-        var blocks = snapshots + [
-            .statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .internalState)),
-                value: .reference(variable: .variable(reference: .variable(name: .readSnapshot)))
-            )),
-            .statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .previousRinglet)),
-                value: .reference(variable: .variable(reference: .variable(name: .currentState)))
-            )),
-            .statement(statement: .assignment(
-                name: .variable(reference: .variable(name: .currentState)),
-                value: .reference(variable: .variable(reference: .variable(name: .targetState)))
-            ))
-        ]
+        var blocks =
+            snapshots + [
+                .statement(
+                    statement: .assignment(
+                        name: .variable(reference: .variable(name: .internalState)),
+                        value: .reference(variable: .variable(reference: .variable(name: .readSnapshot)))
+                    )
+                ),
+                .statement(
+                    statement: .assignment(
+                        name: .variable(reference: .variable(name: .previousRinglet)),
+                        value: .reference(variable: .variable(reference: .variable(name: .currentState)))
+                    )
+                ),
+                .statement(
+                    statement: .assignment(
+                        name: .variable(reference: .variable(name: .currentState)),
+                        value: .reference(variable: .variable(reference: .variable(name: .targetState)))
+                    )
+                ),
+            ]
         let condition = WhenCondition.expression(
             expression: .reference(variable: .variable(reference: .variable(name: .writeSnapshot)))
         )
         if machine.isParameterised {
             let outputs = machine.returnableSignals.map {
-                SynchronousBlock.statement(statement: .assignment(
-                    name: .variable(reference: .variable(name: .name(for: $0))),
-                    value: .reference(variable: .variable(reference: .variable(name: $0.name)))
-                ))
+                SynchronousBlock.statement(
+                    statement: .assignment(
+                        name: .variable(reference: .variable(name: .name(for: $0))),
+                        value: .reference(variable: .variable(reference: .variable(name: $0.name)))
+                    )
+                )
             }
             guard !outputs.isEmpty else {
                 self.init(condition: condition, code: .blocks(blocks: blocks))
@@ -820,15 +1194,25 @@ extension WhenCase {
             }
             let suspendedState = machine.states[index]
             blocks += [
-                .ifStatement(block: .ifStatement(
-                    condition: .conditional(condition: .comparison(value: .equality(
-                        lhs: .reference(variable: .variable(reference: .variable(name: .currentState))),
-                        rhs: .reference(variable: .variable(
-                            reference: .variable(name: .name(for: suspendedState))
-                        ))
-                    ))),
-                    ifBlock: .blocks(blocks: outputs)
-                ))
+                .ifStatement(
+                    block: .ifStatement(
+                        condition: .conditional(
+                            condition: .comparison(
+                                value: .equality(
+                                    lhs: .reference(
+                                        variable: .variable(reference: .variable(name: .currentState))
+                                    ),
+                                    rhs: .reference(
+                                        variable: .variable(
+                                            reference: .variable(name: .name(for: suspendedState))
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        ifBlock: .blocks(blocks: outputs)
+                    )
+                )
             ]
         }
         self.init(condition: condition, code: .blocks(blocks: blocks))
@@ -839,12 +1223,12 @@ extension WhenCase {
 }
 
 /// Add `hasAfter` function.
-private extension Machine {
+extension Machine {
 
     /// Check whether a state contains a transition with an after condition.
     /// - Parameter state: The state to check.
     /// - Returns: Whether this state contains a transition with an after condition.
-    func hasAfter(state: State) -> Bool {
+    fileprivate func hasAfter(state: State) -> Bool {
         guard let index = self.states.firstIndex(of: state) else {
             return false
         }
@@ -856,61 +1240,84 @@ private extension Machine {
 }
 
 /// Add init for creating transition logic.
-private extension SynchronousBlock {
+extension SynchronousBlock {
 
     /// Create the transition logic for a state.
     /// - Parameters:
     ///   - transitions: The transition to create the logic for.
     ///   - machine: The machine containing the transition targets.
-    init?(transitions: [Transition], machine: Machine) {
+    fileprivate init?(transitions: [Transition], machine: Machine) {
         guard let transition = transitions.first else {
             return nil
         }
         guard transitions.count > 1 else {
-            self = .ifStatement(block: .ifElse(
-                condition: Expression(condition: transition.condition),
-                ifBlock: .blocks(blocks: [
-                    .statement(statement: .assignment(
-                        name: .variable(reference: .variable(name: .targetState)),
-                        value: .reference(variable: .variable(
-                            reference: .variable(name: .name(for: machine.states[transition.target]))
-                        ))
-                    )),
-                    .statement(statement: .assignment(
-                        name: .variable(reference: .variable(name: .internalState)),
-                        value: .reference(variable: .variable(reference: .variable(name: .onExit)))
-                    ))
-                ]),
-                elseBlock: .statement(statement: .assignment(
-                    name: .variable(reference: .variable(name: .internalState)),
-                    value: .reference(variable: .variable(reference: .variable(name: .internal)))
-                ))
-            ))
+            self = .ifStatement(
+                block: .ifElse(
+                    condition: Expression(condition: transition.condition),
+                    ifBlock: .blocks(blocks: [
+                        .statement(
+                            statement: .assignment(
+                                name: .variable(reference: .variable(name: .targetState)),
+                                value: .reference(
+                                    variable: .variable(
+                                        reference: .variable(
+                                            name: .name(for: machine.states[transition.target])
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        .statement(
+                            statement: .assignment(
+                                name: .variable(reference: .variable(name: .internalState)),
+                                value: .reference(variable: .variable(reference: .variable(name: .onExit)))
+                            )
+                        ),
+                    ]),
+                    elseBlock: .statement(
+                        statement: .assignment(
+                            name: .variable(reference: .variable(name: .internalState)),
+                            value: .reference(variable: .variable(reference: .variable(name: .internal)))
+                        )
+                    )
+                )
+            )
             return
         }
-        guard let remainingTransitions = SynchronousBlock(
-            transitions: Array(transitions.dropFirst()), machine: machine
-        ) else {
+        guard
+            let remainingTransitions = SynchronousBlock(
+                transitions: Array(transitions.dropFirst()),
+                machine: machine
+            )
+        else {
             return nil
         }
-        self = .ifStatement(block: .ifElse(
-            condition: Expression(condition: transition.condition),
-            ifBlock: .blocks(blocks: [
-                .statement(statement: .assignment(
-                    name: .variable(reference: .variable(name: .targetState)),
-                    value: .reference(
-                        variable: .variable(reference: .variable(
-                            name: .name(for: machine.states[transition.target])
-                        ))
-                    )
-                )),
-                .statement(statement: .assignment(
-                    name: .variable(reference: .variable(name: .internalState)),
-                    value: .reference(variable: .variable(reference: .variable(name: .onExit)))
-                ))
-            ]),
-            elseBlock: remainingTransitions
-        ))
+        self = .ifStatement(
+            block: .ifElse(
+                condition: Expression(condition: transition.condition),
+                ifBlock: .blocks(blocks: [
+                    .statement(
+                        statement: .assignment(
+                            name: .variable(reference: .variable(name: .targetState)),
+                            value: .reference(
+                                variable: .variable(
+                                    reference: .variable(
+                                        name: .name(for: machine.states[transition.target])
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    .statement(
+                        statement: .assignment(
+                            name: .variable(reference: .variable(name: .internalState)),
+                            value: .reference(variable: .variable(reference: .variable(name: .onExit)))
+                        )
+                    ),
+                ]),
+                elseBlock: remainingTransitions
+            )
+        )
     }
 
 }
