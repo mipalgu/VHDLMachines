@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 14/4/21.
 //
@@ -10,6 +10,8 @@ import VHDLParsing
 
 /// A clock represents an oscillating signal with a constant frequency/period.
 public struct Clock: Codable, Equatable, Hashable, Sendable {
+
+    // swift-format-ignore: AlwaysUseLowerCamelCase
 
     /// The units of frequency.
     public enum FrequencyUnit: String, CaseIterable, Codable, Sendable {

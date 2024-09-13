@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 14/4/21.
 //
@@ -8,6 +8,7 @@
 import Foundation
 import VHDLParsing
 
+/// Add helpers for representation creation.
 extension LocalSignal {
 
     /// The ringlet counter variable.
@@ -79,9 +80,13 @@ extension LocalSignal {
             type: stateType,
             name: .previousRinglet,
             defaultValue: .literal(
-                value: .vector(value: .logics(value: LogicVector(
-                    values: [LogicLiteral](repeating: .highImpedance, count: size)
-                )))
+                value: .vector(
+                    value: .logics(
+                        value: LogicVector(
+                            values: [LogicLiteral](repeating: .highImpedance, count: size)
+                        )
+                    )
+                )
             ),
             comment: nil
         )
@@ -106,7 +111,7 @@ extension LocalSignal {
                     defaultValue: initialState,
                     comment: nil
                 ),
-                previousRinglet
+                previousRinglet,
             ]
         }
         let suspendedState = Expression.reference(
@@ -132,7 +137,7 @@ extension LocalSignal {
                 name: .suspendedFrom,
                 defaultValue: initialState,
                 comment: nil
-            )
+            ),
         ]
     }
 

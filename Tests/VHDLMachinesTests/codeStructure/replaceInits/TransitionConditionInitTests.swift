@@ -1,30 +1,30 @@
 // TransitionConditionInitTests.swift
 // VHDLMachines
-// 
+//
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above
 //    copyright notice, this list of conditions and the following
 //    disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. All advertising materials mentioning features or use of this
 //    software must display the following acknowledgement:
-// 
+//
 //    This product includes software developed by Morgan McColl.
-// 
+//
 // 4. Neither the name of the author nor the names of contributors
 //    may be used to endorse or promote products derived from this
 //    software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -36,23 +36,23 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // -----------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or
 // modify it under the above terms or under the terms of the GNU
 // General Public License as published by the Free Software Foundation;
 // either version 2 of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 
 @testable import VHDLMachines
 import VHDLParsing
@@ -95,7 +95,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.after(statement: AfterStatement(amount: x, period: .ns))
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.after(statement: AfterStatement(amount: expNewX, period: .ns))
+            result,
+            TransitionCondition.after(statement: AfterStatement(amount: expNewX, period: .ns))
         )
     }
 
@@ -104,7 +105,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.and(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.and(lhs: tcNewX, rhs: yC)
+            result,
+            TransitionCondition.and(lhs: tcNewX, rhs: yC)
         )
     }
 
@@ -113,7 +115,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.boolean(expression: BooleanExpression.not(value: x))
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.boolean(expression: .not(value: expNewX))
+            result,
+            TransitionCondition.boolean(expression: .not(value: expNewX))
         )
     }
 
@@ -122,7 +125,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.conditional(condition: .edge(value: .rising(expression: x)))
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.conditional(condition: .edge(value: .rising(expression: expNewX)))
+            result,
+            TransitionCondition.conditional(condition: .edge(value: .rising(expression: expNewX)))
         )
     }
 
@@ -131,7 +135,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.equals(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.equals(lhs: tcNewX, rhs: yC)
+            result,
+            TransitionCondition.equals(lhs: tcNewX, rhs: yC)
         )
     }
 
@@ -140,7 +145,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.nand(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.nand(lhs: tcNewX, rhs: yC)
+            result,
+            TransitionCondition.nand(lhs: tcNewX, rhs: yC)
         )
     }
 
@@ -149,7 +155,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.nor(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.nor(lhs: tcNewX, rhs: yC)
+            result,
+            TransitionCondition.nor(lhs: tcNewX, rhs: yC)
         )
     }
 
@@ -158,7 +165,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.not(value: xC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.not(value: tcNewX)
+            result,
+            TransitionCondition.not(value: tcNewX)
         )
     }
 
@@ -167,7 +175,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.notEquals(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.notEquals(lhs: tcNewX, rhs: yC)
+            result,
+            TransitionCondition.notEquals(lhs: tcNewX, rhs: yC)
         )
     }
 
@@ -176,7 +185,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.or(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.or(lhs: tcNewX, rhs: yC)
+            result,
+            TransitionCondition.or(lhs: tcNewX, rhs: yC)
         )
     }
 
@@ -185,7 +195,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.precedence(condition: xC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.precedence(condition: tcNewX)
+            result,
+            TransitionCondition.precedence(condition: tcNewX)
         )
     }
 
@@ -194,7 +205,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.variable(name: .x)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.variable(name: newX)
+            result,
+            TransitionCondition.variable(name: newX)
         )
     }
 
@@ -203,7 +215,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.xnor(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.xnor(lhs: tcNewX, rhs: yC)
+            result,
+            TransitionCondition.xnor(lhs: tcNewX, rhs: yC)
         )
     }
 
@@ -212,7 +225,8 @@ final class TransitionConditionInitTests: XCTestCase {
         let original = TransitionCondition.xor(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
         XCTAssertEqual(
-            result, TransitionCondition.xor(lhs: tcNewX, rhs: yC)
+            result,
+            TransitionCondition.xor(lhs: tcNewX, rhs: yC)
         )
     }
 

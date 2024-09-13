@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 19/5/21.
 //
@@ -9,8 +9,9 @@ import Foundation
 import SwiftUtils
 import VHDLParsing
 
-/// A struct that compiles a VHDL machine into a VHDL source file (vhd). The source file is located
-/// within the machine folder at <machine_name>.vhd.
+/// A struct that compiles a VHDL machine into a VHDL source file (vhd).
+///
+/// The source file is located within the machine folder at <machine_name>.vhd.
 public struct VHDLCompiler {
 
     /// Create a VHDL compiler.
@@ -18,6 +19,7 @@ public struct VHDLCompiler {
     public init() {}
 
     /// Compile an arrangement into a VHDL source file within an arrangement folder.
+    ///
     /// - Parameters:
     ///   - arrangement: The arrangement to convert into VHDL.
     ///   - name: The name of the arrangement.
@@ -44,6 +46,7 @@ public struct VHDLCompiler {
     }
 
     /// Compile a machine into a VHDL source file within the machine folder.
+    ///
     /// - Parameter machine: The machine to compile.
     /// - Parameter name: The name of the machine.
     /// - Parameter createRepresentation: A function that creates the VHDL representation used.

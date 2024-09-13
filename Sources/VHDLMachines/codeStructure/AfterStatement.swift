@@ -1,30 +1,30 @@
 // AfterStatement.swift
 // Machines
-// 
+//
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above
 //    copyright notice, this list of conditions and the following
 //    disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. All advertising materials mentioning features or use of this
 //    software must display the following acknowledgement:
-// 
+//
 //    This product includes software developed by Morgan McColl.
-// 
+//
 // 4. Neither the name of the author nor the names of contributors
 //    may be used to endorse or promote products derived from this
 //    software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -36,34 +36,38 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // -----------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or
 // modify it under the above terms or under the terms of the GNU
 // General Public License as published by the Free Software Foundation;
 // either version 2 of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 
 import Foundation
 import VHDLParsing
 
-/// An after statement found commonly on `LLFSM` transitions. The after statements represents a boolean
+/// An after statement found commonly on `LLFSM` transitions.
+///
+/// The after statements represents a boolean
 /// condition that evaluates to `true` when a specified amount of time has elapsed. The supported after
 /// statements for `VHDL` machines are: `after` (seconds), `after_ms` (milliseconds), `after_us`
 /// (microseconds), `after_ns` (nanoseconds), `after_ps` (picoseconds) and `after_rt` (ringlets).
 public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Sendable {
 
-    /// The period of the time in an ``AfterStatement``. This period represents the amount of time elapsed
+    /// The period of the time in an ``AfterStatement``.
+    ///
+    /// This period represents the amount of time elapsed
     /// during an after expression. The time may be a SI-prefixed time or the number of ringlets since the
     /// start of a states execution.
     public enum Period: RawRepresentable, Equatable, Hashable, Codable, Sendable {
@@ -116,6 +120,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
 
         /// Creates a new period from the name of the variable storing the number of ringlets for a unit
         /// period.
+        ///
         /// - Parameter rawValue: The name of the variable storing the number of ringlets per unit period.
         @inlinable
         public init?(rawValue: VariableName) {
@@ -138,6 +143,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
         }
 
         /// Create a new period from the `after` command.
+        ///
         /// - Parameter after: The `after` command, e.g. `after`, `after_ps`, `after_ns`, `after_us`,
         /// `after_ms`, `after_rt`.
         @inlinable
@@ -194,6 +200,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     }
 
     /// Creates a new after statement from the stored properties.
+    ///
     /// - Parameters:
     ///   - amount: The amount of time to wait before the after statement evaluates to `true`.
     ///   - period: The period of the amount.
@@ -204,6 +211,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     }
 
     /// Creates a new after statement from the `VHDL` code.
+    ///
     /// - Parameter rawValue: The `VHDL` code enacting this statement.
     @inlinable
     public init?(rawValue: String) {
@@ -247,6 +255,7 @@ public struct AfterStatement: RawRepresentable, Equatable, Hashable, Codable, Se
     }
 
     /// Creates a new after statement from the `after` command.
+    ///
     /// - Parameter after: The after command that enacts this statement.
     @inlinable
     public init?(after: String) {

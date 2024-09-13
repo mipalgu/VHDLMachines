@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 14/4/21.
 //
@@ -13,9 +13,10 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
 
     // swiftlint:disable closure_body_length
 
-    /// Creates an initial machine containing an Initial state
-    /// with the default actions (OnEntry, OnExit, Internald). This new
-    /// machine is not parameterised or suspensible.
+    /// Creates an initial machine containing an Initial state with the default actions (OnEntry, OnExit,
+    /// Internal).
+    ///
+    /// This new machine is not parameterised or suspensible.
     public static let initial: Machine = {
         guard
             let ieee = VariableName(rawValue: "IEEE"),
@@ -27,14 +28,14 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
         let defaultActions = [
             VariableName.onEntry,
             VariableName.onExit,
-            VariableName.internal
+            VariableName.internal,
         ]
         return Machine(
             actions: defaultActions,
             includes: [
                 .library(value: ieee),
                 .include(statement: stdLogicImport),
-                .include(statement: mathRealImport)
+                .include(statement: mathRealImport),
             ],
             externalSignals: [],
             clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
@@ -57,9 +58,10 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
         )
     }()
 
-    /// Creates an initial machine containing an Initial and
-    /// Suspended state with the default actions (OnEntry, OnExit, Internal, OnResume, OnSuspend). This new
-    /// machine is not parameterised, but does include the suspension semantics.
+    /// Creates an initial machine containing an Initial and Suspended state with the default actions
+    /// (OnEntry, OnExit, Internal, OnResume, OnSuspend).
+    ///
+    /// This new machine is not parameterised, but does include the suspension semantics.
     public static let initialSuspensible: Machine = {
         guard
             let ieee = VariableName(rawValue: "IEEE"),
@@ -73,14 +75,14 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
             VariableName.onExit,
             VariableName.internal,
             VariableName.onResume,
-            VariableName.onSuspend
+            VariableName.onSuspend,
         ]
         return Machine(
             actions: defaultActions,
             includes: [
                 .library(value: ieee),
                 .include(statement: stdLogicImport),
-                .include(statement: mathRealImport)
+                .include(statement: mathRealImport),
             ],
             externalSignals: [],
             clocks: [Clock(name: VariableName.clk, frequency: 50, unit: .MHz)],
@@ -101,7 +103,7 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
                     actions: [:],
                     signals: [],
                     externalVariables: []
-                )
+                ),
             ],
             transitions: [],
             initialState: 0,
@@ -156,7 +158,9 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
     /// Whether the machine is parameterised.
     private var _isParameterised: Bool
 
-    /// Whether the machine is parameterised. Setting this value to `true` will not necessarily make the
+    /// Whether the machine is parameterised.
+    ///
+    /// Setting this value to `true` will not necessarily make the
     /// machine parameterised. The machine must also have a suspended state for this to be `true`.
     public var isParameterised: Bool {
         get {
@@ -174,7 +178,8 @@ public struct Machine: Codable, Equatable, Hashable, Sendable {
         suspendedState != nil
     }
 
-    /// Initialise a machine
+    /// Initialise a machine.
+    ///
     /// - Parameters:
     ///   - actions: The actions in the machine.
     ///   - name: The name of the machine.

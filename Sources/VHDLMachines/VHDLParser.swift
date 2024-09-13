@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Morgan McColl on 12/6/21.
 //
@@ -10,7 +10,9 @@ import Foundation
 import SwiftUtils
 #endif
 
-/// A parser for VHDL machines. This struct reads the contents of a `FileWrapper` and parses the machine
+/// A parser for VHDL machines.
+///
+/// This struct reads the contents of a `FileWrapper` and parses the machine
 /// within. The `FileWrapper` must be consistent with the structure generated using ``VHDLGenerator``.
 public struct VHDLParser {
 
@@ -21,8 +23,10 @@ public struct VHDLParser {
     @inlinable
     public init() {}
 
-    /// Parse a FileWrapper and return the machine within. This structure of the `FileWrapper` must be
-    /// consistent with the structure generated using ``VHDLGenerator``.
+    /// Parse a FileWrapper and return the machine within.
+    ///
+    /// This structure of the `FileWrapper` must be consistent with the structure generated using
+    /// ``VHDLGenerator``.
     /// - Parameter wrapper: The `FileWrapper` to parse.
     /// - Returns: The machine within the `FileWrapper` or `nil` if the `FileWrapper` is not consistent with
     /// the structure generated using ``VHDLGenerator``.
@@ -40,8 +44,10 @@ public struct VHDLParser {
         return machine
     }
 
-    /// Parse an arrangement folder `FileWrapper` and retrieve the arrangement within. This structure of the
-    /// `FileWrapper` must be consistent with the structure generated using ``VHDLGenerator``.
+    /// Parse an arrangement folder `FileWrapper` and retrieve the arrangement within.
+    ///
+    /// This structure of the `FileWrapper` must be consistent with the structure generated using
+    /// ``VHDLGenerator``.
     /// - Parameter wrapper: The `FileWrapper` to the arrangement folder.
     /// - Returns: An optional ``Arrangement``.
     @inlinable

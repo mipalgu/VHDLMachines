@@ -1,30 +1,30 @@
 // TransitionConditionTests.swift
 // Machines
-// 
+//
 // Created by Morgan McColl.
 // Copyright © 2023 Morgan McColl. All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above
 //    copyright notice, this list of conditions and the following
 //    disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. All advertising materials mentioning features or use of this
 //    software must display the following acknowledgement:
-// 
+//
 //    This product includes software developed by Morgan McColl.
-// 
+//
 // 4. Neither the name of the author nor the names of contributors
 //    may be used to endorse or promote products derived from this
 //    software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -36,28 +36,30 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // -----------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or
 // modify it under the above terms or under the terms of the GNU
 // General Public License as published by the Free Software Foundation;
 // either version 2 of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see http://www.gnu.org/licenses/
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 
 import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
 import XCTest
+
+// swiftlint:disable type_body_length
 
 /// Test class for ``TransitionCondition``.
 final class TransitionConditionTests: XCTestCase {
@@ -65,11 +67,13 @@ final class TransitionConditionTests: XCTestCase {
     /// A variable `x`.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
 
-    /// A variable `y`
+    /// A variable `y`.
     let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
-    /// A variable `z`
+    /// A variable `z`.
     let z = Expression.reference(variable: .variable(reference: .variable(name: .z)))
+
+    // swiftlint:disable function_body_length
 
     /// Test that raw values are correct.
     func testRawValue() {
@@ -77,42 +81,56 @@ final class TransitionConditionTests: XCTestCase {
         XCTAssertEqual(TransitionCondition.after(statement: after).rawValue, after.rawValue)
         XCTAssertEqual(TransitionCondition.conditional(condition: .literal(value: true)).rawValue, "true")
         XCTAssertEqual(
-            TransitionCondition.boolean(expression: .and(
-                lhs: .literal(value: .boolean(value: true)), rhs: x
-            )).rawValue,
+            TransitionCondition.boolean(
+                expression: .and(
+                    lhs: .literal(value: .boolean(value: true)),
+                    rhs: x
+                )
+            )
+            .rawValue,
             "true and x"
         )
         XCTAssertEqual(TransitionCondition.variable(name: .x).rawValue, "x")
         XCTAssertEqual(TransitionCondition.precedence(condition: .variable(name: .x)).rawValue, "(x)")
         XCTAssertEqual(
-            TransitionCondition.and(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue, "x and y"
+            TransitionCondition.and(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue,
+            "x and y"
         )
         XCTAssertEqual(
-            TransitionCondition.or(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue, "x or y"
+            TransitionCondition.or(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue,
+            "x or y"
         )
         XCTAssertEqual(
-            TransitionCondition.nand(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue, "x nand y"
+            TransitionCondition.nand(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue,
+            "x nand y"
         )
         XCTAssertEqual(
-            TransitionCondition.nor(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue, "x nor y"
+            TransitionCondition.nor(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue,
+            "x nor y"
         )
         XCTAssertEqual(
-            TransitionCondition.xor(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue, "x xor y"
+            TransitionCondition.xor(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue,
+            "x xor y"
         )
         XCTAssertEqual(
-            TransitionCondition.xnor(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue, "x xnor y"
+            TransitionCondition.xnor(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue,
+            "x xnor y"
         )
         XCTAssertEqual(
-            TransitionCondition.not(value: .variable(name: .x)).rawValue, "not x"
+            TransitionCondition.not(value: .variable(name: .x)).rawValue,
+            "not x"
         )
         XCTAssertEqual(
-            TransitionCondition.equals(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue, "x = y"
+            TransitionCondition.equals(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue,
+            "x = y"
         )
         XCTAssertEqual(
             TransitionCondition.notEquals(lhs: .variable(name: .x), rhs: .variable(name: .y)).rawValue,
             "x /= y"
         )
     }
+
+    // swiftlint:enable function_body_length
 
     /// Test the raw value init for boolean expressions.
     func testBooleanInit() {
@@ -129,18 +147,25 @@ final class TransitionConditionTests: XCTestCase {
         XCTAssertEqual(TransitionCondition(rawValue: "not x"), .boolean(expression: .not(value: x)))
         XCTAssertEqual(
             TransitionCondition(rawValue: "x and (y or z)"),
-            .boolean(expression: .and(
-                lhs: x, rhs: .precedence(value: .logical(operation: .or(lhs: y, rhs: z)))
-            ))
+            .boolean(
+                expression: .and(
+                    lhs: x,
+                    rhs: .precedence(value: .logical(operation: .or(lhs: y, rhs: z)))
+                )
+            )
         )
         XCTAssertEqual(
             TransitionCondition(rawValue: "(x > y) or z"),
-            .boolean(expression: .or(
-                lhs: .precedence(value: .conditional(
-                    condition: .comparison(value: .greaterThan(lhs: x, rhs: y))
-                )),
-                rhs: z
-            ))
+            .boolean(
+                expression: .or(
+                    lhs: .precedence(
+                        value: .conditional(
+                            condition: .comparison(value: .greaterThan(lhs: x, rhs: y))
+                        )
+                    ),
+                    rhs: z
+                )
+            )
         )
     }
 
@@ -148,7 +173,8 @@ final class TransitionConditionTests: XCTestCase {
     func testConditionalInit() {
         XCTAssertEqual(TransitionCondition(rawValue: "true"), .conditional(condition: .literal(value: true)))
         XCTAssertEqual(
-            TransitionCondition(rawValue: "false"), .conditional(condition: .literal(value: false))
+            TransitionCondition(rawValue: "false"),
+            .conditional(condition: .literal(value: false))
         )
         XCTAssertEqual(
             TransitionCondition(rawValue: "x > y"),
@@ -208,61 +234,92 @@ final class TransitionConditionTests: XCTestCase {
             TransitionCondition(rawValue: "y and (z or after_ns(x))"),
             .and(
                 lhs: .variable(name: .y),
-                rhs: .precedence(condition: .or(
-                    lhs: .variable(name: .z), rhs: .after(statement: AfterStatement(amount: x, period: .ns))
-                ))
+                rhs: .precedence(
+                    condition: .or(
+                        lhs: .variable(name: .z),
+                        rhs: .after(statement: AfterStatement(amount: x, period: .ns))
+                    )
+                )
             )
         )
         XCTAssertEqual(
             TransitionCondition(rawValue: "(x or y) and (z or after_ns(10))"),
             .and(
                 lhs: .precedence(condition: .boolean(expression: .or(lhs: x, rhs: y))),
-                rhs: .precedence(condition: .or(
-                    lhs: .variable(name: .z),
-                    rhs: .after(statement: AfterStatement(
-                        amount: .literal(value: .integer(value: 10)), period: .ns
-                    ))
-                ))
+                rhs: .precedence(
+                    condition: .or(
+                        lhs: .variable(name: .z),
+                        rhs: .after(
+                            statement: AfterStatement(
+                                amount: .literal(value: .integer(value: 10)),
+                                period: .ns
+                            )
+                        )
+                    )
+                )
             )
         )
     }
+
+    // swiftlint:disable function_body_length
 
     /// Test the raw value init for after stataments containing conditional operations.
     func testAfterConditionalInit() {
         XCTAssertEqual(
             TransitionCondition(rawValue: "(x = y) and (z or after_ns(10))"),
             .and(
-                lhs: .precedence(condition: .conditional(
-                    condition: .comparison(value: .equality(lhs: x, rhs: y))
-                )),
-                rhs: .precedence(condition: .or(
-                    lhs: .variable(name: .z),
-                    rhs: .after(statement: AfterStatement(
-                        amount: .literal(value: .integer(value: 10)), period: .ns
-                    ))
-                ))
+                lhs: .precedence(
+                    condition: .conditional(
+                        condition: .comparison(value: .equality(lhs: x, rhs: y))
+                    )
+                ),
+                rhs: .precedence(
+                    condition: .or(
+                        lhs: .variable(name: .z),
+                        rhs: .after(
+                            statement: AfterStatement(
+                                amount: .literal(value: .integer(value: 10)),
+                                period: .ns
+                            )
+                        )
+                    )
+                )
             )
         )
         XCTAssertEqual(
             TransitionCondition(rawValue: "(x = y) and ((z or after_ns(10)) or after_ms(1))"),
             .and(
-                lhs: .precedence(condition: .conditional(
-                    condition: .comparison(value: .equality(lhs: x, rhs: y))
-                )),
-                rhs: .precedence(condition: .or(
-                    lhs: .precedence(condition: .or(
-                        lhs: .variable(name: .z),
-                        rhs: .after(statement: AfterStatement(
-                            amount: .literal(value: .integer(value: 10)), period: .ns
-                        ))
-                    )),
-                    rhs: .after(statement: AfterStatement(
-                        amount: .literal(value: .integer(value: 1)), period: .ms
-                    ))
-                ))
+                lhs: .precedence(
+                    condition: .conditional(
+                        condition: .comparison(value: .equality(lhs: x, rhs: y))
+                    )
+                ),
+                rhs: .precedence(
+                    condition: .or(
+                        lhs: .precedence(
+                            condition: .or(
+                                lhs: .variable(name: .z),
+                                rhs: .after(
+                                    statement: AfterStatement(
+                                        amount: .literal(value: .integer(value: 10)),
+                                        period: .ns
+                                    )
+                                )
+                            )
+                        ),
+                        rhs: .after(
+                            statement: AfterStatement(
+                                amount: .literal(value: .integer(value: 1)),
+                                period: .ms
+                            )
+                        )
+                    )
+                )
             )
         )
     }
+
+    // swiftlint:enable function_body_length
 
     /// Test nil cases for the raw value init.
     func testFailingRawValueInit() {
@@ -307,19 +364,25 @@ final class TransitionConditionTests: XCTestCase {
         XCTAssertEqual(
             TransitionCondition(rawValue: "y /= after_ns(x)"),
             .notEquals(
-                lhs: .variable(name: .y), rhs: .after(statement: AfterStatement(amount: x, period: .ns))
+                lhs: .variable(name: .y),
+                rhs: .after(statement: AfterStatement(amount: x, period: .ns))
             )
         )
         XCTAssertEqual(
             TransitionCondition(rawValue: "(y /= after_ns(x)) or z"),
             .or(
-                lhs: .precedence(condition: .notEquals(
-                    lhs: .variable(name: .y), rhs: .after(statement: AfterStatement(amount: x, period: .ns))
-                )),
+                lhs: .precedence(
+                    condition: .notEquals(
+                        lhs: .variable(name: .y),
+                        rhs: .after(statement: AfterStatement(amount: x, period: .ns))
+                    )
+                ),
                 rhs: .variable(name: .z)
             )
         )
     }
+
+    // swiftlint:disable function_body_length
 
     /// Test `hasAfter` computed property.
     func testHasAfter() {
@@ -327,9 +390,13 @@ final class TransitionConditionTests: XCTestCase {
         XCTAssertFalse(TransitionCondition.conditional(condition: .literal(value: true)).hasAfter)
         XCTAssertFalse(TransitionCondition.variable(name: .x).hasAfter)
         XCTAssertFalse(
-            TransitionCondition.boolean(expression: .or(
-                lhs: .literal(value: .boolean(value: true)), rhs: .literal(value: .boolean(value: false))
-            )).hasAfter
+            TransitionCondition.boolean(
+                expression: .or(
+                    lhs: .literal(value: .boolean(value: true)),
+                    rhs: .literal(value: .boolean(value: false))
+                )
+            )
+            .hasAfter
         )
         XCTAssertTrue(after.hasAfter)
         XCTAssertFalse(TransitionCondition.or(lhs: .variable(name: .x), rhs: .variable(name: .y)).hasAfter)
@@ -374,4 +441,8 @@ final class TransitionConditionTests: XCTestCase {
         XCTAssertTrue(TransitionCondition.notEquals(lhs: after, rhs: after).hasAfter)
     }
 
+    // swiftlint:enable function_body_length
+
 }
+
+// swiftlint:enable type_body_length
