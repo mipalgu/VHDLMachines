@@ -90,7 +90,7 @@ extension ArchitectureHead {
             let internalStateBits = BitLiteral.bitsRequired(for: actions.count - 1),
             internalStateBits > 0,
             let stateRepresentationComment = Comment(rawValue: "-- State Representation Bits"),
-            let stateBitsRequired = BitLiteral.bitsRequired(for: machine.states.count - 1),
+            let stateBitsRequired = BitLiteral.bitsRequired(for: max(machine.states.count - 1, 1)),
             let stateTrackers = LocalSignal.stateTrackers(machine: machine)
         else {
             return nil

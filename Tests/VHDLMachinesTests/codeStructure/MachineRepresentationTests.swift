@@ -134,4 +134,14 @@ final class MachineRepresentationTests: XCTestCase {
         XCTAssertEqual(representation.machine, machine)
     }
 
+    /// Test that a machine with 1 state still compiles correctly.
+    func testSingleStateMachine() {
+        var machine = Machine.testMachine()
+        machine.states = [machine.states[0]]
+        machine.transitions = []
+        machine.suspendedState = nil
+        let representation = MachineRepresentation(machine: machine, name: .testMachine)
+        XCTAssertNotNil(representation)
+    }
+
 }
