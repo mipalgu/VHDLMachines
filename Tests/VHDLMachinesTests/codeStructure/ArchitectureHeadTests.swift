@@ -342,7 +342,7 @@ final class ArchitectureHeadTests: XCTestCase {
                         name: .previousRinglet,
                         defaultValue: .literal(
                             value: .vector(
-                                value: .logics(value: LogicVector(values: [.highImpedance, .highImpedance]))
+                                value: .logics(value: LogicVector(values: [.high, .high]))
                             )
                         ),
                         comment: nil

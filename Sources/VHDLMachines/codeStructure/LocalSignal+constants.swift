@@ -73,9 +73,15 @@ extension LocalSignal {
         let initialState = Expression.reference(
             variable: .variable(reference: .variable(name: .name(for: states[machine.initialState])))
         )
-        guard let size = range.size else {
-            return nil
-        }
+        let initialStateEncoding = BitLiteral.bitVersion(of: machine.initialState, bitsRequired: bitsRequired)
+            .map {
+                switch $0 {
+                case .high:
+                    return LogicLiteral.low
+                case .low:
+                    return LogicLiteral.high
+                }
+            }
         let previousRinglet = LocalSignal(
             type: stateType,
             name: .previousRinglet,
@@ -83,7 +89,7 @@ extension LocalSignal {
                 value: .vector(
                     value: .logics(
                         value: LogicVector(
-                            values: [LogicLiteral](repeating: .highImpedance, count: size)
+                            values: initialStateEncoding
                         )
                     )
                 )
