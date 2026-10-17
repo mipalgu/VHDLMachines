@@ -62,11 +62,11 @@ import Testing
 struct MachineInstanceTests {
 
     /// The instance to test.
-    var instance = MachineInstance(name: .testMachine, type: .pongMachine)
+    var instance: MachineInstance
 
     /// Initialise the instance before every test.
     init() {
-        instance = MachineInstance(name: .testMachine, type: .pongMachine)
+        self.instance = MachineInstance(name: .testMachine, type: .pongMachine)
     }
 
     /// Test init sets properties correctly.

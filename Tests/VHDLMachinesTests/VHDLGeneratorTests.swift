@@ -61,7 +61,7 @@ import TestUtils
 import Testing
 
 /// A test case for the ``VHDLGenerator``.
-@Suite
+@Suite(.serialized)
 final class VHDLGeneratorTests {
 
     /// The ``VHDLGenerator`` to test.

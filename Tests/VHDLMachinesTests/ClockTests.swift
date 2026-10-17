@@ -63,7 +63,7 @@ import Testing
 struct ClockTests {
 
     /// The clock under test.
-    var clock = Clock(name: VariableName.clk, frequency: 100, unit: .Hz)
+    var clock: Clock
 
     /// Initialise the clock before every test.
     init() {
@@ -81,6 +81,7 @@ struct ClockTests {
     }
 
     /// Test init sets stored properties correctly.
+    @Test
     func testInit() {
         #expect(self.clock.name == VariableName.clk)
         #expect(self.clock.frequency == 100)
