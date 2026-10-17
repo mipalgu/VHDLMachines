@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `ForLoop` replace initialiser.
-final class ForLoopInitTests: XCTestCase {
+@Suite
+struct ForLoopInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,6 +81,7 @@ final class ForLoopInitTests: XCTestCase {
     }
 
     /// Test replace init replaces the correct variables in range.
+    @Test
     func testRange() {
         let original = ForLoop(
             iterator: .z,
@@ -87,17 +89,18 @@ final class ForLoopInitTests: XCTestCase {
             body: .statement(statement: .null)
         )
         let result = ForLoop(loop: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            ForLoop(
-                iterator: .z,
-                range: .downto(upper: y, lower: expNewX),
-                body: .statement(statement: .null)
-            )
+        #expect(
+            result
+                == ForLoop(
+                    iterator: .z,
+                    range: .downto(upper: y, lower: expNewX),
+                    body: .statement(statement: .null)
+                )
         )
     }
 
     /// Test body is replaced correctly.
+    @Test
     func testBody() {
         let range = VectorSize.to(
             lower: .literal(value: .integer(value: 0)),
@@ -114,18 +117,18 @@ final class ForLoopInitTests: XCTestCase {
             )
         )
         let result = ForLoop(loop: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            ForLoop(
-                iterator: .z,
-                range: range,
-                body: .statement(
-                    statement: .assignment(
-                        name: .variable(reference: .variable(name: .y)),
-                        value: expNewX
+        #expect(
+            result
+                == ForLoop(
+                    iterator: .z,
+                    range: range,
+                    body: .statement(
+                        statement: .assignment(
+                            name: .variable(reference: .variable(name: .y)),
+                            value: expNewX
+                        )
                     )
                 )
-            )
         )
     }
 

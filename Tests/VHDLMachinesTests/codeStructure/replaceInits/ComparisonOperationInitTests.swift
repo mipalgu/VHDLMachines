@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `ComparisonOperation` replace initialiser.
-final class ComparisonOperationInitTests: XCTestCase {
+@Suite
+struct ComparisonOperationInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,51 +81,57 @@ final class ComparisonOperationInitTests: XCTestCase {
     }
 
     /// Test `equality` operation.
+    @Test
     func testEquality() {
         let equality = ComparisonOperation.equality(lhs: x, rhs: y)
         let result = ComparisonOperation(operation: equality, replacing: .x, with: newX)
         let expected = ComparisonOperation.equality(lhs: expNewX, rhs: y)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test `greaterThan` operation.
+    @Test
     func testGreaterThan() {
         let greaterThan = ComparisonOperation.greaterThan(lhs: x, rhs: y)
         let result = ComparisonOperation(operation: greaterThan, replacing: .x, with: newX)
         let expected = ComparisonOperation.greaterThan(lhs: expNewX, rhs: y)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test `greaterThanOrEqual` operation.
+    @Test
     func testGreaterThanOrEqual() {
         let greaterThanOrEqual = ComparisonOperation.greaterThanOrEqual(lhs: x, rhs: y)
         let result = ComparisonOperation(operation: greaterThanOrEqual, replacing: .x, with: newX)
         let expected = ComparisonOperation.greaterThanOrEqual(lhs: expNewX, rhs: y)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test `lessThan` operation.
+    @Test
     func testLessThan() {
         let lessThan = ComparisonOperation.lessThan(lhs: x, rhs: y)
         let result = ComparisonOperation(operation: lessThan, replacing: .x, with: newX)
         let expected = ComparisonOperation.lessThan(lhs: expNewX, rhs: y)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test `lessThanOrEqual` operation.
+    @Test
     func testLessThanOrEqual() {
         let lessThanOrEqual = ComparisonOperation.lessThanOrEqual(lhs: x, rhs: y)
         let result = ComparisonOperation(operation: lessThanOrEqual, replacing: .x, with: newX)
         let expected = ComparisonOperation.lessThanOrEqual(lhs: expNewX, rhs: y)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test `notEquals` operation.
+    @Test
     func testNotEquals() {
         let notEquals = ComparisonOperation.notEquals(lhs: x, rhs: y)
         let result = ComparisonOperation(operation: notEquals, replacing: .x, with: newX)
         let expected = ComparisonOperation.notEquals(lhs: expNewX, rhs: y)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
 }

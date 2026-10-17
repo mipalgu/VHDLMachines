@@ -56,35 +56,37 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `SynchronousBlock` extensions.
-final class SynchronousBlockTests: XCTestCase {
+@Suite
+struct SynchronousBlockTests {
 
     /// Test machiine initialiser.
+    @Test
     func testMachineInit() {
         let machine = Machine.testMachine()
         let result = SynchronousBlock(machine: machine)
         guard let statement = CaseStatement(machine: machine) else {
-            XCTFail("Failed to get statement")
+            Issue.record("Failed to get statement")
             return
         }
-        XCTAssertEqual(
-            result,
-            .ifStatement(
-                block: .ifStatement(
-                    condition: .conditional(
-                        condition: .edge(
-                            value: .rising(
-                                expression: .reference(
-                                    variable: .variable(reference: .variable(name: .clk))
+        #expect(
+            result
+                == .ifStatement(
+                    block: .ifStatement(
+                        condition: .conditional(
+                            condition: .edge(
+                                value: .rising(
+                                    expression: .reference(
+                                        variable: .variable(reference: .variable(name: .clk))
+                                    )
                                 )
                             )
-                        )
-                    ),
-                    ifBlock: .caseStatement(block: statement)
+                        ),
+                        ifBlock: .caseStatement(block: statement)
+                    )
                 )
-            )
         )
     }
 

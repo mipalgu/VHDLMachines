@@ -56,14 +56,16 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `FunctionImplementation` extensions.
-final class FunctionImplementationTests: XCTestCase {
+@Suite
+struct FunctionImplementationTests {
 
     // swiftlint:disable function_body_length
 
     /// Test replace init.
+    @Test
     func testReplaceInit() {
         let original = FunctionImplementation(
             name: .g,
@@ -86,7 +88,7 @@ final class FunctionImplementationTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(replaceG, expected)
+        #expect(replaceG == expected)
         let replaceX = FunctionImplementation(function: original, replacing: .x, with: .xs)
         let expected2 = FunctionImplementation(
             name: .g,
@@ -98,7 +100,7 @@ final class FunctionImplementationTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(replaceX, expected2)
+        #expect(replaceX == expected2)
         let replaceY = FunctionImplementation(function: original, replacing: .y, with: .clk2)
         let expected3 = FunctionImplementation(
             name: .g,
@@ -110,7 +112,7 @@ final class FunctionImplementationTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(replaceY, expected3)
+        #expect(replaceY == expected3)
         let replaceZ = FunctionImplementation(function: original, replacing: .z, with: .command)
         let expected4 = FunctionImplementation(
             name: .g,
@@ -122,7 +124,7 @@ final class FunctionImplementationTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(replaceZ, expected4)
+        #expect(replaceZ == expected4)
         let replaceA = FunctionImplementation(function: original, replacing: .a, with: .internal)
         let expected5 = FunctionImplementation(
             name: .g,
@@ -134,10 +136,10 @@ final class FunctionImplementationTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(replaceA, expected5)
-        XCTAssertEqual(
-            original,
-            FunctionImplementation(function: original, replacing: .xx, with: .targetState)
+        #expect(replaceA == expected5)
+        #expect(
+            original
+                == FunctionImplementation(function: original, replacing: .xx, with: .targetState)
         )
     }
 

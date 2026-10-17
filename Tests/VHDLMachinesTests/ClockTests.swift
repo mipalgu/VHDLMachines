@@ -56,56 +56,60 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``Clock``.
-final class ClockTests: XCTestCase {
+@Suite
+struct ClockTests {
 
     /// The clock under test.
     var clock = Clock(name: VariableName.clk, frequency: 100, unit: .Hz)
 
     /// Initialise the clock before every test.
-    override func setUp() {
+    init() {
         self.clock = Clock(name: VariableName.clk, frequency: 100, unit: .Hz)
     }
 
     /// Test frequency unit raw values.
+    @Test
     func testFrequencyUnit() {
-        XCTAssertEqual(Clock.FrequencyUnit.Hz.rawValue, "Hz")
-        XCTAssertEqual(Clock.FrequencyUnit.kHz.rawValue, "kHz")
-        XCTAssertEqual(Clock.FrequencyUnit.MHz.rawValue, "MHz")
-        XCTAssertEqual(Clock.FrequencyUnit.GHz.rawValue, "GHz")
-        XCTAssertEqual(Clock.FrequencyUnit.THz.rawValue, "THz")
+        #expect(Clock.FrequencyUnit.Hz.rawValue == "Hz")
+        #expect(Clock.FrequencyUnit.kHz.rawValue == "kHz")
+        #expect(Clock.FrequencyUnit.MHz.rawValue == "MHz")
+        #expect(Clock.FrequencyUnit.GHz.rawValue == "GHz")
+        #expect(Clock.FrequencyUnit.THz.rawValue == "THz")
     }
 
     /// Test init sets stored properties correctly.
     func testInit() {
-        XCTAssertEqual(self.clock.name, VariableName.clk)
-        XCTAssertEqual(self.clock.frequency, 100)
-        XCTAssertEqual(self.clock.unit, .Hz)
+        #expect(self.clock.name == VariableName.clk)
+        #expect(self.clock.frequency == 100)
+        #expect(self.clock.unit == .Hz)
     }
 
     /// Test getters and setters work correctly.
-    func testGettersAndSetters() {
+    @Test
+    mutating func testGettersAndSetters() {
         self.clock.name = VariableName.clk2
-        XCTAssertEqual(self.clock.name, VariableName.clk2)
+        #expect(self.clock.name == VariableName.clk2)
         self.clock.frequency = 200
-        XCTAssertEqual(self.clock.frequency, 200)
+        #expect(self.clock.frequency == 200)
         self.clock.unit = .kHz
-        XCTAssertEqual(self.clock.unit, .kHz)
+        #expect(self.clock.unit == .kHz)
     }
 
     /// Test period computed property.
-    func testPeriod() {
-        XCTAssertEqual(self.clock.period.milliseconds, 10)
+    @Test
+    mutating func testPeriod() {
+        #expect(self.clock.period.milliseconds == 10)
         self.clock.unit = .kHz
-        XCTAssertEqual(self.clock.period.microseconds, 10)
+        #expect(self.clock.period.microseconds == 10)
         self.clock.unit = .MHz
-        XCTAssertEqual(self.clock.period.nanoseconds, 10)
+        #expect(self.clock.period.nanoseconds == 10)
         self.clock.unit = .GHz
-        XCTAssertEqual(self.clock.period.picoseconds, 10)
+        #expect(self.clock.period.picoseconds == 10)
         self.clock.unit = .THz
-        XCTAssertEqual(self.clock.period.picoseconds, 0.01)
+        #expect(self.clock.period.picoseconds == 0.01)
     }
 
 }

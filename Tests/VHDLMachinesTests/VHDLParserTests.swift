@@ -57,12 +57,14 @@
 #if os(Linux) || os(Windows)
 import SwiftUtils
 #endif
+import Foundation
 import TestUtils
 @testable import VHDLMachines
-import XCTest
+import Testing
 
 /// Tests the ``VHDLParser``.
-final class VHDLParserTests: XCTestCase {
+@Suite
+struct VHDLParserTests {
 
     /// The parser under test.
     let parser = VHDLParser()
@@ -74,51 +76,52 @@ final class VHDLParserTests: XCTestCase {
     let generator = VHDLGenerator()
 
     /// Test parse function works correctly.
+    @Test
     func testParse() throws {
         guard
             let machineWrapper = generator.generate(machine: factory.pingMachine, with: .pingMachine),
             let machine = parser.parse(wrapper: machineWrapper)
         else {
-            XCTFail("Failed to parse machine.")
+            Issue.record("Failed to parse machine.")
             return
         }
-        XCTAssertEqual(machine, factory.pingMachine)
+        #expect(machine == factory.pingMachine)
     }
 
     /// Test parse function returns nil for invalid data.
+    @Test
     func testEmptyWrapper() {
         guard let data = Data(base64Encoded: "") else {
-            XCTFail("Failed to decode empty data.")
+            Issue.record("Failed to decode empty data.")
             return
         }
         let wrapper = FileWrapper(regularFileWithContents: data)
-        XCTAssertNil(parser.parse(wrapper: wrapper))
+        #expect(parser.parse(wrapper: wrapper) == nil)
     }
 
     /// Test that an arrangement is parsed correctly.
+    @Test
     func testParseArrangement() throws {
         let arrangement = Arrangement.testArrangement
         guard
             let wrapper = generator.generate(arrangement: arrangement, name: .arrangement1),
             let parsedArrangement = parser.parseArrangement(wrapper: wrapper)
         else {
-            XCTFail("Couldn't generate wrapper!")
+            Issue.record("Couldn't generate wrapper!")
             return
         }
         let emptydata = Data("".utf8)
-        XCTAssertEqual(arrangement, parsedArrangement)
-        XCTAssertNil(
-            parser.parseArrangement(wrapper: FileWrapper(regularFileWithContents: emptydata))
-        )
-        XCTAssertNil(parser.parseArrangement(wrapper: FileWrapper(directoryWithFileWrappers: [:])))
-        XCTAssertNil(
+        #expect(arrangement == parsedArrangement)
+        #expect(parser.parseArrangement(wrapper: FileWrapper(regularFileWithContents: emptydata)) == nil)
+        #expect(parser.parseArrangement(wrapper: FileWrapper(directoryWithFileWrappers: [:])) == nil)
+        #expect(
             parser.parseArrangement(
                 wrapper: FileWrapper(
                     directoryWithFileWrappers: [
                         "arrangement.json": FileWrapper(regularFileWithContents: emptydata)
                     ]
                 )
-            )
+            ) == nil
         )
     }
 

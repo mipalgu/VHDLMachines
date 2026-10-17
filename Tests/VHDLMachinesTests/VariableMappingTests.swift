@@ -56,27 +56,30 @@
 import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``VariableMapping``.
-final class VariableMappingTests: XCTestCase {
+@Suite
+struct VariableMappingTests {
 
     /// Test init sets stored properties correctly.
+    @Test
     func testInit() {
         let mapping = VariableMapping(source: .x, destination: .y)
-        XCTAssertEqual(mapping.source, .x)
-        XCTAssertEqual(mapping.destination, .y)
+        #expect(mapping.source == .x)
+        #expect(mapping.destination == .y)
     }
 
     /// Test setters mutate properties correctly.
-    func testSetters() {
+    @Test
+    mutating func testSetters() {
         var mapping = VariableMapping(source: .x, destination: .y)
         mapping.source = .xs
-        XCTAssertEqual(mapping.source, .xs)
-        XCTAssertEqual(mapping.destination, .y)
+        #expect(mapping.source == .xs)
+        #expect(mapping.destination == .y)
         mapping.destination = .z
-        XCTAssertEqual(mapping.source, .xs)
-        XCTAssertEqual(mapping.destination, .z)
+        #expect(mapping.source == .xs)
+        #expect(mapping.destination == .z)
     }
 
 }

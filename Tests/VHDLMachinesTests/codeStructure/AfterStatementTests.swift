@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``AfterStatement``.
-final class AfterStatementTests: XCTestCase {
+@Suite
+struct AfterStatementTests {
 
     /// A variable `x`.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -74,159 +75,172 @@ final class AfterStatementTests: XCTestCase {
     )
 
     /// Test ``AfterStatement.Period`` `rawValue`.
+    @Test
     func testPeriodRawValue() {
-        XCTAssertEqual(AfterStatement.Period.ps.rawValue, .ringletPerPs)
-        XCTAssertEqual(AfterStatement.Period.ns.rawValue, .ringletPerNs)
-        XCTAssertEqual(AfterStatement.Period.us.rawValue, .ringletPerUs)
-        XCTAssertEqual(AfterStatement.Period.ms.rawValue, .ringletPerMs)
-        XCTAssertEqual(AfterStatement.Period.s.rawValue, .ringletPerS)
-        XCTAssertEqual(AfterStatement.Period.ringlet.rawValue, .ringletCounter)
+        #expect(AfterStatement.Period.ps.rawValue == .ringletPerPs)
+        #expect(AfterStatement.Period.ns.rawValue == .ringletPerNs)
+        #expect(AfterStatement.Period.us.rawValue == .ringletPerUs)
+        #expect(AfterStatement.Period.ms.rawValue == .ringletPerMs)
+        #expect(AfterStatement.Period.s.rawValue == .ringletPerS)
+        #expect(AfterStatement.Period.ringlet.rawValue == .ringletCounter)
     }
 
     /// Test the `afterLength` property on ``AfterStatement.Period`` is the length of the `after_` statement.
+    @Test
     func testPeriodAfterLength() {
-        XCTAssertEqual(AfterStatement.Period.ps.afterLength, 8)
-        XCTAssertEqual(AfterStatement.Period.ns.afterLength, 8)
-        XCTAssertEqual(AfterStatement.Period.us.afterLength, 8)
-        XCTAssertEqual(AfterStatement.Period.ms.afterLength, 8)
-        XCTAssertEqual(AfterStatement.Period.s.afterLength, 5)
-        XCTAssertEqual(AfterStatement.Period.ringlet.afterLength, 8)
+        #expect(AfterStatement.Period.ps.afterLength == 8)
+        #expect(AfterStatement.Period.ns.afterLength == 8)
+        #expect(AfterStatement.Period.us.afterLength == 8)
+        #expect(AfterStatement.Period.ms.afterLength == 8)
+        #expect(AfterStatement.Period.s.afterLength == 5)
+        #expect(AfterStatement.Period.ringlet.afterLength == 8)
     }
 
     /// Test ``AfterStatement.Period`` `init(rawValue:)` correclty creates the right case.
+    @Test
     func testPeriodRawValueInit() {
-        XCTAssertEqual(AfterStatement.Period(rawValue: .ringletPerPs), .ps)
-        XCTAssertEqual(AfterStatement.Period(rawValue: .ringletPerNs), .ns)
-        XCTAssertEqual(AfterStatement.Period(rawValue: .ringletPerUs), .us)
-        XCTAssertEqual(AfterStatement.Period(rawValue: .ringletPerMs), .ms)
-        XCTAssertEqual(AfterStatement.Period(rawValue: .ringletPerS), .s)
-        XCTAssertEqual(AfterStatement.Period(rawValue: .ringletCounter), .ringlet)
-        XCTAssertNil(AfterStatement.Period(rawValue: .clk))
+        #expect(AfterStatement.Period(rawValue: .ringletPerPs) == .ps)
+        #expect(AfterStatement.Period(rawValue: .ringletPerNs) == .ns)
+        #expect(AfterStatement.Period(rawValue: .ringletPerUs) == .us)
+        #expect(AfterStatement.Period(rawValue: .ringletPerMs) == .ms)
+        #expect(AfterStatement.Period(rawValue: .ringletPerS) == .s)
+        #expect(AfterStatement.Period(rawValue: .ringletCounter) == .ringlet)
+        #expect(AfterStatement.Period(rawValue: .clk) == nil)
     }
 
     /// Test ``AfterStatement.Period`` `init(after:)` correclty creates the right case.
+    @Test
     func testPeriodAfterInit() {
-        XCTAssertEqual(AfterStatement.Period(after: "after_ps"), .ps)
-        XCTAssertEqual(AfterStatement.Period(after: "after_ns"), .ns)
-        XCTAssertEqual(AfterStatement.Period(after: "after_us"), .us)
-        XCTAssertEqual(AfterStatement.Period(after: "after_ms"), .ms)
-        XCTAssertEqual(AfterStatement.Period(after: "after"), .s)
-        XCTAssertEqual(AfterStatement.Period(after: "after("), .s)
-        XCTAssertEqual(AfterStatement.Period(after: "after_rt"), .ringlet)
-        XCTAssertEqual(AfterStatement.Period(after: "AFTER_PS"), .ps)
-        XCTAssertNil(AfterStatement.Period(after: "_after"))
-        XCTAssertNil(AfterStatement.Period(after: "after_"))
-        XCTAssertNil(AfterStatement.Period(after: "after_fs"))
+        #expect(AfterStatement.Period(after: "after_ps") == .ps)
+        #expect(AfterStatement.Period(after: "after_ns") == .ns)
+        #expect(AfterStatement.Period(after: "after_us") == .us)
+        #expect(AfterStatement.Period(after: "after_ms") == .ms)
+        #expect(AfterStatement.Period(after: "after") == .s)
+        #expect(AfterStatement.Period(after: "after(") == .s)
+        #expect(AfterStatement.Period(after: "after_rt") == .ringlet)
+        #expect(AfterStatement.Period(after: "AFTER_PS") == .ps)
+        #expect(AfterStatement.Period(after: "_after") == nil)
+        #expect(AfterStatement.Period(after: "after_") == nil)
+        #expect(AfterStatement.Period(after: "after_fs") == nil)
     }
 
     /// Test the stored properties are set correctly.
+    @Test
     func testPropertyInit() {
-        XCTAssertEqual(statement.amount, .literal(value: .integer(value: 10)))
-        XCTAssertEqual(statement.period, .us)
+        #expect(statement.amount == .literal(value: .integer(value: 10)))
+        #expect(statement.period == .us)
     }
 
     /// Test `rawValue` generates the correct `VHDL` code.
+    @Test
     func testRawValue() {
-        XCTAssertEqual(
-            statement.rawValue,
-            "(\(VariableName.ringletCounter) >= integer(ceil(real(10) * \(VariableName.ringletPerUs))))"
+        #expect(
+            statement.rawValue
+                == "(\(VariableName.ringletCounter) >= integer(ceil(real(10) * \(VariableName.ringletPerUs))))"
         )
-        XCTAssertEqual(
-            AfterStatement(amount: x, period: .ringlet).rawValue,
-            "(\(VariableName.ringletCounter) >= integer(ceil(real(\(x.rawValue)))))"
+        #expect(
+            AfterStatement(amount: x, period: .ringlet).rawValue
+                == "(\(VariableName.ringletCounter) >= integer(ceil(real(\(x.rawValue)))))"
         )
     }
 
     /// Test `init(rawValue:)` correctly creates the object.
+    @Test
     func testRawValueInit() {
-        XCTAssertEqual(
+        #expect(
             AfterStatement(
                 rawValue: "(\(VariableName.ringletCounter) >= integer(ceil(real(10) * "
                     + "\(VariableName.ringletPerUs))))"
-            ),
-            statement
+            ) == statement
         )
-        XCTAssertEqual(
+        #expect(
             AfterStatement(
                 rawValue: "(\(VariableName.ringletCounter) >= integer(ceil(real(10))))"
-            ),
-            AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ringlet)
+            ) == AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ringlet)
         )
-        XCTAssertNil(
+        #expect(
             AfterStatement(
                 rawValue: "(\(VariableName.ringletCounter) >= integer(ceil(real(10) / "
                     + "\(VariableName.ringletPerUs))))"
-            )
+            ) == nil
         )
-        XCTAssertNil(
+        #expect(
             AfterStatement(
                 rawValue: "(\(VariableName.ringletCounter) >= integer(ceil(integer(10))))"
-            )
+            ) == nil
         )
     }
 
     /// Test the after statements are parsed correctly.
+    @Test
     func testAfterInit() {
-        XCTAssertEqual(
-            AfterStatement(after: "after_ps(10)"),
-            AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ps)
+        #expect(
+            AfterStatement(after: "after_ps(10)")
+                == AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ps)
         )
-        XCTAssertEqual(
-            AfterStatement(after: "after_ns(10)"),
-            AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ns)
+        #expect(
+            AfterStatement(after: "after_ns(10)")
+                == AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ns)
         )
-        XCTAssertEqual(AfterStatement(after: "after_us(10)"), statement)
-        XCTAssertEqual(
-            AfterStatement(after: "after_ms(10)"),
-            AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ms)
+        #expect(AfterStatement(after: "after_us(10)") == statement)
+        #expect(
+            AfterStatement(after: "after_ms(10)")
+                == AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ms)
         )
-        XCTAssertEqual(
-            AfterStatement(after: "after(10)"),
-            AfterStatement(amount: .literal(value: .integer(value: 10)), period: .s)
+        #expect(
+            AfterStatement(after: "after(10)")
+                == AfterStatement(amount: .literal(value: .integer(value: 10)), period: .s)
         )
-        XCTAssertEqual(
-            AfterStatement(after: "after((10))"),
-            AfterStatement(amount: .precedence(value: .literal(value: .integer(value: 10))), period: .s)
+        #expect(
+            AfterStatement(after: "after((10))")
+                == AfterStatement(
+                    amount: .precedence(value: .literal(value: .integer(value: 10))),
+                    period: .s
+                )
         )
-        XCTAssertEqual(
-            AfterStatement(after: "after_rt(10)"),
-            AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ringlet)
+        #expect(
+            AfterStatement(after: "after_rt(10)")
+                == AfterStatement(amount: .literal(value: .integer(value: 10)), period: .ringlet)
         )
-        XCTAssertNil(AfterStatement(after: "after(10))"))
-        XCTAssertNil(AfterStatement(after: "after((10)"))
-        XCTAssertNil(AfterStatement(after: "after(1\(String(repeating: "0", count: 256)))"))
-        XCTAssertNil(AfterStatement(after: "after_fs(10)"))
-        XCTAssertNil(AfterStatement(after: "afterps(10)"))
+        #expect(AfterStatement(after: "after(10))") == nil)
+        #expect(AfterStatement(after: "after((10)") == nil)
+        #expect(AfterStatement(after: "after(1\(String(repeating: "0", count: 256)))") == nil)
+        #expect(AfterStatement(after: "after_fs(10)") == nil)
+        #expect(AfterStatement(after: "afterps(10)") == nil)
     }
 
     // swiftlint:disable function_body_length
 
     /// Test the expression is correct.
+    @Test
     func testExpression() {
-        XCTAssertEqual(
-            statement.expression,
-            .precedence(
-                value: .conditional(
-                    condition: .comparison(
-                        value: .greaterThanOrEqual(
-                            lhs: .reference(variable: .variable(reference: .variable(name: .ringletCounter))),
-                            rhs: .cast(
-                                operation: .integer(
-                                    expression: .functionCall(
-                                        call: .mathReal(
-                                            function: .ceil(
-                                                expression: .binary(
-                                                    operation: .multiplication(
-                                                        lhs: .cast(
-                                                            operation: .real(
-                                                                expression: .literal(
-                                                                    value: .integer(value: 10)
+        #expect(
+            statement.expression
+                == .precedence(
+                    value: .conditional(
+                        condition: .comparison(
+                            value: .greaterThanOrEqual(
+                                lhs: .reference(
+                                    variable: .variable(reference: .variable(name: .ringletCounter))
+                                ),
+                                rhs: .cast(
+                                    operation: .integer(
+                                        expression: .functionCall(
+                                            call: .mathReal(
+                                                function: .ceil(
+                                                    expression: .binary(
+                                                        operation: .multiplication(
+                                                            lhs: .cast(
+                                                                operation: .real(
+                                                                    expression: .literal(
+                                                                        value: .integer(value: 10)
+                                                                    )
                                                                 )
-                                                            )
-                                                        ),
-                                                        rhs: .reference(
-                                                            variable: .variable(
-                                                                reference: .variable(name: .ringletPerUs)
+                                                            ),
+                                                            rhs: .reference(
+                                                                variable: .variable(
+                                                                    reference: .variable(name: .ringletPerUs)
+                                                                )
                                                             )
                                                         )
                                                     )
@@ -239,24 +253,26 @@ final class AfterStatementTests: XCTestCase {
                         )
                     )
                 )
-            )
         )
         let ringletStatement = AfterStatement(amount: .literal(value: .integer(value: 5)), period: .ringlet)
-        XCTAssertEqual(
-            ringletStatement.expression,
-            .precedence(
-                value: .conditional(
-                    condition: .comparison(
-                        value: .greaterThanOrEqual(
-                            lhs: .reference(variable: .variable(reference: .variable(name: .ringletCounter))),
-                            rhs: .cast(
-                                operation: .integer(
-                                    expression: .functionCall(
-                                        call: .mathReal(
-                                            function: .ceil(
-                                                expression: .cast(
-                                                    operation: .real(
-                                                        expression: .literal(value: .integer(value: 5))
+        #expect(
+            ringletStatement.expression
+                == .precedence(
+                    value: .conditional(
+                        condition: .comparison(
+                            value: .greaterThanOrEqual(
+                                lhs: .reference(
+                                    variable: .variable(reference: .variable(name: .ringletCounter))
+                                ),
+                                rhs: .cast(
+                                    operation: .integer(
+                                        expression: .functionCall(
+                                            call: .mathReal(
+                                                function: .ceil(
+                                                    expression: .cast(
+                                                        operation: .real(
+                                                            expression: .literal(value: .integer(value: 5))
+                                                        )
                                                     )
                                                 )
                                             )
@@ -267,7 +283,6 @@ final class AfterStatementTests: XCTestCase {
                         )
                     )
                 )
-            )
         )
     }
 

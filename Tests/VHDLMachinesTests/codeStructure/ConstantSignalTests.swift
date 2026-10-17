@@ -56,14 +56,16 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``ConstantSignal``.
-final class ConstantSignalTests: XCTestCase {
+@Suite
+struct ConstantSignalTests {
 
     // swiftlint:disable function_body_length
 
     /// Test that the action bit representations are correct.
+    @Test
     func testActionConstants() {
         let actions: [VariableName] = [.onEntry, .onExit, .internal, .onResume, .onSuspend]
         let constants = [
@@ -232,55 +234,59 @@ final class ConstantSignalTests: XCTestCase {
         ]
         .compactMap { $0 }
         guard constants.count == 9 else {
-            XCTFail("Incorrect number of constants")
+            Issue.record("Incorrect number of constants")
             return
         }
-        XCTAssertEqual(ConstantSignal.constants(for: actions), constants)
+        #expect(ConstantSignal.constants(for: actions) == constants)
     }
 
     // swiftlint:enable function_body_length
 
     /// Test clock period is generated correctly.
+    @Test
     func testClockPeriod() {
         let machine = Machine.testMachine()
         guard machine.drivingClock >= 0, machine.drivingClock < machine.clocks.count else {
-            XCTFail("Could not get driving clock.")
+            Issue.record("Could not get driving clock.")
             return
         }
         let clock = machine.clocks[machine.drivingClock]
-        let result = ConstantSignal.clockPeriod(period: clock.period)
-        XCTAssertNotNil(result)
-        XCTAssertEqual(
-            result,
-            ConstantSignal(
-                name: .clockPeriod,
-                type: .real,
-                value: .literal(value: .decimal(value: clock.period.picoseconds)),
-                // swiftlint:disable:next force_unwrapping
-                comment: Comment(rawValue: "-- ps")!
-            )
+        guard let result = ConstantSignal.clockPeriod(period: clock.period) else {
+            Issue.record("Could not create clock period constant signal.")
+            return
+        }
+        #expect(
+            result
+                == ConstantSignal(
+                    name: .clockPeriod,
+                    type: .real,
+                    value: .literal(value: .decimal(value: clock.period.picoseconds)),
+                    // swiftlint:disable:next force_unwrapping
+                    comment: Comment(rawValue: "-- ps")!
+                )
         )
     }
 
     /// Test the state init creates the constant signal correctly.
+    @Test
     func testStateInit() {
         let state = State(name: .initial, actions: [:], signals: [], externalVariables: [])
         let result = ConstantSignal(state: state, bitsRequired: 2, index: 1)
-        XCTAssertNotNil(result)
-        XCTAssertEqual(
-            result,
-            ConstantSignal(
-                name: .name(for: state),
-                type: .ranged(
-                    type: .stdLogicVector(
-                        size: .downto(
-                            upper: .literal(value: .integer(value: 1)),
-                            lower: .literal(value: .integer(value: 0))
+        #expect(result != nil)
+        #expect(
+            result
+                == ConstantSignal(
+                    name: .name(for: state),
+                    type: .ranged(
+                        type: .stdLogicVector(
+                            size: .downto(
+                                upper: .literal(value: .integer(value: 1)),
+                                lower: .literal(value: .integer(value: 0))
+                            )
                         )
-                    )
-                ),
-                value: .literal(value: .vector(value: .bits(value: BitVector(values: [.low, .high]))))
-            )
+                    ),
+                    value: .literal(value: .vector(value: .bits(value: BitVector(values: [.low, .high]))))
+                )
         )
     }
 

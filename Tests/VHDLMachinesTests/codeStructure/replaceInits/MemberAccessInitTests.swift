@@ -56,29 +56,31 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `MemberAccess` replace extensions.
-final class MemberAccessInitTests: XCTestCase {
+@Suite
+struct MemberAccessInitTests {
 
     /// Test replace init.
+    @Test
     func testReplaceInit() {
         let access = MemberAccess(record: .x, member: .variable(name: .y))
-        XCTAssertEqual(
-            MemberAccess(access: access, replacing: .x, with: .xs),
-            MemberAccess(record: .xs, member: .variable(name: .y))
+        #expect(
+            MemberAccess(access: access, replacing: .x, with: .xs)
+                == MemberAccess(record: .xs, member: .variable(name: .y))
         )
-        XCTAssertEqual(
-            MemberAccess(access: access, replacing: .y, with: .z),
-            MemberAccess(record: .x, member: .variable(name: .z))
+        #expect(
+            MemberAccess(access: access, replacing: .y, with: .z)
+                == MemberAccess(record: .x, member: .variable(name: .z))
         )
-        XCTAssertEqual(
+        #expect(
             MemberAccess(
                 access: MemberAccess(record: .x, member: .variable(name: .x)),
                 replacing: .x,
                 with: .y
-            ),
-            MemberAccess(record: .y, member: .variable(name: .y))
+            )
+                == MemberAccess(record: .y, member: .variable(name: .y))
         )
     }
 

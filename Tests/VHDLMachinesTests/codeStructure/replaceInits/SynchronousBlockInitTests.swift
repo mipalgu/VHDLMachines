@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `SynchronousBlock` replace initialiser.
-final class SynchronousBlockInitTests: XCTestCase {
+@Suite
+struct SynchronousBlockInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,39 +81,41 @@ final class SynchronousBlockInitTests: XCTestCase {
     }
 
     /// Test that all blocks are replaced correctly.
+    @Test
     func testBlock() {
         let original = SynchronousBlock.blocks(blocks: [
             .statement(statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)),
             .statement(statement: .assignment(name: .variable(reference: .variable(name: .y)), value: x)),
         ])
         let result = SynchronousBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            SynchronousBlock.blocks(blocks: [
-                .statement(
-                    statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
-                ),
-                .statement(
-                    statement: .assignment(
-                        name: .variable(reference: .variable(name: .y)),
-                        value: expNewX
-                    )
-                ),
-            ])
+        #expect(
+            result
+                == SynchronousBlock.blocks(blocks: [
+                    .statement(
+                        statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
+                    ),
+                    .statement(
+                        statement: .assignment(
+                            name: .variable(reference: .variable(name: .y)),
+                            value: expNewX
+                        )
+                    ),
+                ])
         )
     }
 
     /// Test case statement.
+    @Test
     func testCaseStatement() {
         let original = SynchronousBlock.caseStatement(block: CaseStatement(condition: x, cases: []))
         let result = SynchronousBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            SynchronousBlock.caseStatement(block: CaseStatement(condition: expNewX, cases: []))
+        #expect(
+            result == SynchronousBlock.caseStatement(block: CaseStatement(condition: expNewX, cases: []))
         )
     }
 
     /// Test for loop.
+    @Test
     func testForLoop() {
         let original = SynchronousBlock.forLoop(
             loop: ForLoop(
@@ -122,43 +125,45 @@ final class SynchronousBlockInitTests: XCTestCase {
             )
         )
         let result = SynchronousBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            SynchronousBlock.forLoop(
-                loop: ForLoop(
-                    iterator: .z,
-                    range: .downto(upper: y, lower: expNewX),
-                    body: .statement(statement: .null)
+        #expect(
+            result
+                == SynchronousBlock.forLoop(
+                    loop: ForLoop(
+                        iterator: .z,
+                        range: .downto(upper: y, lower: expNewX),
+                        body: .statement(statement: .null)
+                    )
                 )
-            )
         )
     }
 
     /// Test if statement.
+    @Test
     func testIfStatement() {
         let original = SynchronousBlock.ifStatement(
             block: .ifStatement(condition: x, ifBlock: .statement(statement: .null))
         )
         let result = SynchronousBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            SynchronousBlock.ifStatement(
-                block: .ifStatement(condition: expNewX, ifBlock: .statement(statement: .null))
-            )
+        #expect(
+            result
+                == SynchronousBlock.ifStatement(
+                    block: .ifStatement(condition: expNewX, ifBlock: .statement(statement: .null))
+                )
         )
     }
 
     /// Test statement.
+    @Test
     func testStatement() {
         let original = SynchronousBlock.statement(
             statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)
         )
         let result = SynchronousBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            SynchronousBlock.statement(
-                statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
-            )
+        #expect(
+            result
+                == SynchronousBlock.statement(
+                    statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
+                )
         )
     }
 

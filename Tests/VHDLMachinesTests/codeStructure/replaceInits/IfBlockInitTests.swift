@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `IfBlock` replacable initialiser.
-final class IfBlockInitTests: XCTestCase {
+@Suite
+struct IfBlockInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,13 +81,15 @@ final class IfBlockInitTests: XCTestCase {
     }
 
     /// Test simple statement condition.
+    @Test
     func testStatementCondition() {
         let original = IfBlock.ifStatement(condition: x, ifBlock: .statement(statement: .null))
         let result = IfBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, IfBlock.ifStatement(condition: expNewX, ifBlock: .statement(statement: .null)))
+        #expect(result == IfBlock.ifStatement(condition: expNewX, ifBlock: .statement(statement: .null)))
     }
 
     /// Test statement block.
+    @Test
     func testStatementBlock() {
         let original = IfBlock.ifStatement(
             condition: y,
@@ -98,21 +101,22 @@ final class IfBlockInitTests: XCTestCase {
             )
         )
         let result = IfBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            IfBlock.ifStatement(
-                condition: y,
-                ifBlock: .statement(
-                    statement: .assignment(
-                        name: .variable(reference: .variable(name: newX)),
-                        value: y
+        #expect(
+            result
+                == IfBlock.ifStatement(
+                    condition: y,
+                    ifBlock: .statement(
+                        statement: .assignment(
+                            name: .variable(reference: .variable(name: newX)),
+                            value: y
+                        )
                     )
                 )
-            )
         )
     }
 
     /// Test ifElse condition.
+    @Test
     func testIfElseCondition() {
         let original = IfBlock.ifElse(
             condition: x,
@@ -120,17 +124,18 @@ final class IfBlockInitTests: XCTestCase {
             elseBlock: .statement(statement: .null)
         )
         let result = IfBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            IfBlock.ifElse(
-                condition: expNewX,
-                ifBlock: .statement(statement: .null),
-                elseBlock: .statement(statement: .null)
-            )
+        #expect(
+            result
+                == IfBlock.ifElse(
+                    condition: expNewX,
+                    ifBlock: .statement(statement: .null),
+                    elseBlock: .statement(statement: .null)
+                )
         )
     }
 
     /// Test ifElse statement block.
+    @Test
     func testIfElseStatement() {
         let original = IfBlock.ifElse(
             condition: y,
@@ -143,19 +148,20 @@ final class IfBlockInitTests: XCTestCase {
             elseBlock: .statement(statement: .null)
         )
         let result = IfBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            IfBlock.ifElse(
-                condition: y,
-                ifBlock: .statement(
-                    statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
-                ),
-                elseBlock: .statement(statement: .null)
-            )
+        #expect(
+            result
+                == IfBlock.ifElse(
+                    condition: y,
+                    ifBlock: .statement(
+                        statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
+                    ),
+                    elseBlock: .statement(statement: .null)
+                )
         )
     }
 
     /// Test ifElse else block.
+    @Test
     func testIfElseElseBlock() {
         let original = IfBlock.ifElse(
             condition: y,
@@ -165,15 +171,15 @@ final class IfBlockInitTests: XCTestCase {
             )
         )
         let result = IfBlock(block: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            IfBlock.ifElse(
-                condition: y,
-                ifBlock: .statement(statement: .null),
-                elseBlock: .statement(
-                    statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
+        #expect(
+            result
+                == IfBlock.ifElse(
+                    condition: y,
+                    ifBlock: .statement(statement: .null),
+                    elseBlock: .statement(
+                        statement: .assignment(name: .variable(reference: .variable(name: newX)), value: y)
+                    )
                 )
-            )
         )
     }
 

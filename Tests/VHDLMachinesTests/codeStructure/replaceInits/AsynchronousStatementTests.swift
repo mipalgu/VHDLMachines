@@ -56,12 +56,14 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `AsynchronousStatement` extensions.
-final class AsynchronousStatementTests: XCTestCase {
+@Suite
+struct AsynchronousStatementTests {
 
     /// Test replace init.
+    @Test
     func testReplaceInit() {
         let original = AsynchronousStatement.assignment(
             name: .variable(reference: .variable(name: .x)),
@@ -72,20 +74,19 @@ final class AsynchronousStatementTests: XCTestCase {
             name: .variable(reference: .variable(name: .xs)),
             value: .expression(value: .reference(variable: .variable(reference: .variable(name: .y))))
         )
-        XCTAssertEqual(replaceX, expected)
+        #expect(replaceX == expected)
         let replaceY = AsynchronousStatement(statement: original, replacing: .y, with: .clk)
         let expected2 = AsynchronousStatement.assignment(
             name: .variable(reference: .variable(name: .x)),
             value: .expression(value: .reference(variable: .variable(reference: .variable(name: .clk))))
         )
-        XCTAssertEqual(replaceY, expected2)
+        #expect(replaceY == expected2)
         // swiftlint:disable:next force_unwrapping
         let comment = AsynchronousStatement.comment(value: Comment(rawValue: "-- A Comment!")!)
         let replaceComment = AsynchronousStatement(statement: comment, replacing: .x, with: .xs)
-        XCTAssertEqual(replaceComment, comment)
-        XCTAssertEqual(
-            original,
-            AsynchronousStatement(statement: original, replacing: .checkTransition, with: .g)
+        #expect(replaceComment == comment)
+        #expect(
+            original == AsynchronousStatement(statement: original, replacing: .checkTransition, with: .g)
         )
     }
 

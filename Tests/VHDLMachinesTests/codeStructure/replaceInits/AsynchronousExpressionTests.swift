@@ -56,14 +56,16 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `AsynchronousExpression` extensions.
-final class AsynchronousExpressionTests: XCTestCase {
+@Suite
+struct AsynchronousExpressionTests {
 
     // swiftlint:disable function_body_length
 
     /// Test replace init.
+    @Test
     func testReplaceInit() {
         let original = AsynchronousExpression.whenBlock(
             value: WhenBlock.whenElse(
@@ -102,7 +104,7 @@ final class AsynchronousExpressionTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(replaceX, expected)
+        #expect(replaceX == expected)
         let replaceY = AsynchronousExpression(expression: original, replacing: .y, with: .clk)
         let expected2 = AsynchronousExpression.whenBlock(
             value: WhenBlock.whenElse(
@@ -122,7 +124,7 @@ final class AsynchronousExpressionTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(replaceY, expected2)
+        #expect(replaceY == expected2)
         let replaceZ = AsynchronousExpression(expression: original, replacing: .z, with: .clk2)
         let expected3 = AsynchronousExpression.whenBlock(
             value: WhenBlock.whenElse(
@@ -142,7 +144,7 @@ final class AsynchronousExpressionTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(replaceZ, expected3)
+        #expect(replaceZ == expected3)
         let replaceA = AsynchronousExpression(expression: original, replacing: .a, with: .g)
         let expected4 = AsynchronousExpression.whenBlock(
             value: WhenBlock.whenElse(
@@ -162,10 +164,9 @@ final class AsynchronousExpressionTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(replaceA, expected4)
-        XCTAssertEqual(
-            original,
-            AsynchronousExpression(expression: original, replacing: .checkTransition, with: .x)
+        #expect(replaceA == expected4)
+        #expect(
+            original == AsynchronousExpression(expression: original, replacing: .checkTransition, with: .x)
         )
     }
 

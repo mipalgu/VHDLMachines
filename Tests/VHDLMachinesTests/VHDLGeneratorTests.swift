@@ -54,13 +54,15 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
+import Foundation
 import SwiftUtils
 import TestUtils
 @testable import VHDLMachines
-import XCTest
+import Testing
 
 /// A test case for the ``VHDLGenerator``.
-final class VHDLGeneratorTests: XCTestCase {
+@Suite
+final class VHDLGeneratorTests {
 
     /// The ``VHDLGenerator`` to test.
     let generator = VHDLGenerator()
@@ -75,48 +77,50 @@ final class VHDLGeneratorTests: XCTestCase {
     let manager = FileManager.default
 
     /// Remove ping machine after every test.
-    override func tearDown() {
+    deinit {
         if manager.fileExists(atPath: factory.pingMachinePath.path) {
             _ = try? manager.removeItem(at: factory.pingMachinePath)
         }
     }
 
     /// Test Generate creates correct file structure.
+    @Test
     func testGenerate() {
         guard let wrapper = generator.generate(machine: factory.pingMachine, with: .pingMachine) else {
-            XCTFail("Failed to create wrapper!")
+            Issue.record("Failed to create wrapper!")
             return
         }
-        XCTAssertTrue(wrapper.isDirectory)
-        XCTAssertEqual(wrapper.preferredFilename, "PingMachine.machine")
+        #expect(wrapper.isDirectory)
+        #expect(wrapper.preferredFilename == "PingMachine.machine")
         guard let files = wrapper.fileWrappers, let (name, machineFile) = files.first else {
-            XCTFail("No nested files!")
+            Issue.record("No nested files!")
             return
         }
-        XCTAssertEqual(files.count, 1)
-        XCTAssertEqual(name, "machine.json")
-        XCTAssertFalse(machineFile.isDirectory)
-        XCTAssertEqual(machineFile.preferredFilename, "machine.json")
+        #expect(files.count == 1)
+        #expect(name == "machine.json")
+        #expect(!machineFile.isDirectory)
+        #expect(machineFile.preferredFilename == "machine.json")
         guard let data = machineFile.regularFileContents else {
-            XCTFail("File is empty")
+            Issue.record("File is empty")
             return
         }
         guard let machine = try? decoder.decode(Machine.self, from: data) else {
-            XCTFail("Failed to decode machine!")
+            Issue.record("Failed to decode machine!")
             return
         }
-        XCTAssertEqual(machine, factory.pingMachine)
+        #expect(machine == factory.pingMachine)
     }
 
     /// Test write creates correct file structure.
+    @Test
     func testWrite() throws {
         let machine = factory.pingMachine
         guard let wrapper = generator.generate(machine: machine, with: .pingMachine) else {
-            XCTFail("Failed to create wrapper!")
+            Issue.record("Failed to create wrapper!")
             return
         }
-        XCTAssertTrue(wrapper.isDirectory)
-        XCTAssertEqual(wrapper.preferredFilename, "PingMachine.machine")
+        #expect(wrapper.isDirectory)
+        #expect(wrapper.preferredFilename == "PingMachine.machine")
         let path = factory.machinePath.appendingPathComponent("PingMachine.machine", isDirectory: true)
         if manager.fileExists(atPath: path.path) {
             try manager.removeItem(at: path)
@@ -128,36 +132,37 @@ final class VHDLGeneratorTests: XCTestCase {
             }
         }
         var isDirectory: ObjCBool = false
-        XCTAssertTrue(manager.fileExists(atPath: path.path, isDirectory: &isDirectory))
-        XCTAssertTrue(isDirectory.boolValue)
+        #expect(manager.fileExists(atPath: path.path, isDirectory: &isDirectory))
+        #expect(isDirectory.boolValue)
         let data = try Data(contentsOf: factory.pingPath)
         let newMachine = try decoder.decode(Machine.self, from: data)
-        XCTAssertEqual(factory.pingMachine, newMachine)
+        #expect(factory.pingMachine == newMachine)
     }
 
     /// Test that an arrangement is generated correctly.
+    @Test
     func testGenerateArrangement() throws {
         let arrangement = Arrangement.testArrangement
         guard let wrapper = generator.generate(arrangement: arrangement, name: .arrangement1) else {
-            XCTFail("Failed to create wrapper!")
+            Issue.record("Failed to create wrapper!")
             return
         }
-        XCTAssertTrue(wrapper.isDirectory)
-        XCTAssertEqual(wrapper.fileWrappers?.count, 1)
-        XCTAssertEqual(wrapper.preferredFilename, "Arrangement1.arrangement")
-        XCTAssertNil(wrapper.filename)
+        #expect(wrapper.isDirectory)
+        #expect(wrapper.fileWrappers?.count == 1)
+        #expect(wrapper.preferredFilename == "Arrangement1.arrangement")
+        #expect(wrapper.filename == nil)
         guard
             let file = wrapper.fileWrappers?.first?.value,
             file.isRegularFile,
             let fileData = file.regularFileContents
         else {
-            XCTFail("File is empty")
+            Issue.record("File is empty")
             return
         }
-        XCTAssertEqual(file.preferredFilename, "arrangement.json")
-        XCTAssertNil(file.filename)
+        #expect(file.preferredFilename == "arrangement.json")
+        #expect(file.filename == nil)
         let newArrangement = try decoder.decode(Arrangement.self, from: fileData)
-        XCTAssertEqual(arrangement, newArrangement)
+        #expect(arrangement == newArrangement)
     }
 
 }

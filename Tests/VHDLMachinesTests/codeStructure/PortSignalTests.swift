@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Tests for the ``PortSignal`` type.
-final class PortSignalTests: XCTestCase {
+@Suite
+struct PortSignalTests {
 
     /// The signal under test.
     let signal = PortSignal(
@@ -71,37 +72,38 @@ final class PortSignalTests: XCTestCase {
     )
 
     /// Test the computed properties function correctly.
+    @Test
     func testComputedProperties() {
-        XCTAssertEqual(signal.externalName, VariableName(rawValue: "EXTERNAL_x"))
-        XCTAssertEqual(
-            signal.snapshot,
-            LocalSignal(type: .stdLogic, name: .x, defaultValue: nil, comment: nil)
+        #expect(signal.externalName == VariableName(rawValue: "EXTERNAL_x"))
+        #expect(
+            signal.snapshot == LocalSignal(type: .stdLogic, name: .x, defaultValue: nil, comment: nil)
         )
-        XCTAssertEqual(
-            signal.read,
-            .assignment(
-                name: .variable(reference: .variable(name: .x)),
-                value: .reference(variable: .variable(reference: .variable(name: signal.externalName)))
-            )
+        #expect(
+            signal.read
+                == .assignment(
+                    name: .variable(reference: .variable(name: .x)),
+                    value: .reference(variable: .variable(reference: .variable(name: signal.externalName)))
+                )
         )
-        XCTAssertEqual(
-            signal.write,
-            .assignment(
-                name: .variable(reference: .variable(name: signal.externalName)),
-                value: .reference(variable: .variable(reference: .variable(name: .x)))
-            )
+        #expect(
+            signal.write
+                == .assignment(
+                    name: .variable(reference: .variable(name: signal.externalName)),
+                    value: .reference(variable: .variable(reference: .variable(name: .x)))
+                )
         )
     }
 
     /// Test the ``PortSignal.init(clock:)`` function.
+    @Test
     func testClockInit() {
         let clock = Clock(name: .clk, frequency: 50, unit: .MHz)
         let signal = PortSignal(clock: clock)
-        XCTAssertEqual(signal.name, .clk)
-        XCTAssertEqual(signal.mode, .input)
-        XCTAssertEqual(signal.type, .signal(type: .stdLogic))
-        XCTAssertNil(signal.defaultValue)
-        XCTAssertNil(signal.comment)
+        #expect(signal.name == .clk)
+        #expect(signal.mode == .input)
+        #expect(signal.type == .signal(type: .stdLogic))
+        #expect(signal.defaultValue == nil)
+        #expect(signal.comment == nil)
     }
 
 }

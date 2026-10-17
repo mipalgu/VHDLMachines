@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``TransitionCondition`` replace initialiser.
-final class TransitionConditionInitTests: XCTestCase {
+@Suite
+struct TransitionConditionInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -91,142 +92,142 @@ final class TransitionConditionInitTests: XCTestCase {
     }
 
     /// Test the `after` case.
+    @Test
     func testAfter() {
         let original = TransitionCondition.after(statement: AfterStatement(amount: x, period: .ns))
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.after(statement: AfterStatement(amount: expNewX, period: .ns))
+        #expect(
+            result == TransitionCondition.after(statement: AfterStatement(amount: expNewX, period: .ns))
         )
     }
 
     /// Test the `and` case.
+    @Test
     func testAnd() {
         let original = TransitionCondition.and(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.and(lhs: tcNewX, rhs: yC)
+        #expect(
+            result == TransitionCondition.and(lhs: tcNewX, rhs: yC)
         )
     }
 
     /// Test the `boolean` case.
+    @Test
     func testBoolean() {
         let original = TransitionCondition.boolean(expression: BooleanExpression.not(value: x))
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.boolean(expression: .not(value: expNewX))
+        #expect(
+            result == TransitionCondition.boolean(expression: .not(value: expNewX))
         )
     }
 
     /// Test the `conditional` case.
+    @Test
     func testConditional() {
         let original = TransitionCondition.conditional(condition: .edge(value: .rising(expression: x)))
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.conditional(condition: .edge(value: .rising(expression: expNewX)))
+        #expect(
+            result == TransitionCondition.conditional(condition: .edge(value: .rising(expression: expNewX)))
         )
     }
 
     /// Test the `equals` case.
+    @Test
     func testEquals() {
         let original = TransitionCondition.equals(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.equals(lhs: tcNewX, rhs: yC)
+        #expect(
+            result == TransitionCondition.equals(lhs: tcNewX, rhs: yC)
         )
     }
 
     /// Test the `nand` case.
+    @Test
     func testNand() {
         let original = TransitionCondition.nand(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.nand(lhs: tcNewX, rhs: yC)
+        #expect(
+            result == TransitionCondition.nand(lhs: tcNewX, rhs: yC)
         )
     }
 
     /// Test the `nor` case.
+    @Test
     func testNor() {
         let original = TransitionCondition.nor(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.nor(lhs: tcNewX, rhs: yC)
+        #expect(
+            result == TransitionCondition.nor(lhs: tcNewX, rhs: yC)
         )
     }
 
     /// Test the `not` case.
+    @Test
     func testNot() {
         let original = TransitionCondition.not(value: xC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.not(value: tcNewX)
+        #expect(
+            result == TransitionCondition.not(value: tcNewX)
         )
     }
 
     /// Test the `notEquals` case.
+    @Test
     func testNotEquals() {
         let original = TransitionCondition.notEquals(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.notEquals(lhs: tcNewX, rhs: yC)
+        #expect(
+            result == TransitionCondition.notEquals(lhs: tcNewX, rhs: yC)
         )
     }
 
     /// Test the `or` case.
+    @Test
     func testOr() {
         let original = TransitionCondition.or(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.or(lhs: tcNewX, rhs: yC)
+        #expect(
+            result == TransitionCondition.or(lhs: tcNewX, rhs: yC)
         )
     }
 
     /// Test the `precedence` case.
+    @Test
     func testPrecedence() {
         let original = TransitionCondition.precedence(condition: xC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.precedence(condition: tcNewX)
+        #expect(
+            result == TransitionCondition.precedence(condition: tcNewX)
         )
     }
 
     /// Test the `variable` case.
+    @Test
     func testVariable() {
         let original = TransitionCondition.variable(name: .x)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.variable(name: newX)
+        #expect(
+            result == TransitionCondition.variable(name: newX)
         )
     }
 
     /// Test the `xnor` case.
+    @Test
     func testXnor() {
         let original = TransitionCondition.xnor(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.xnor(lhs: tcNewX, rhs: yC)
+        #expect(
+            result == TransitionCondition.xnor(lhs: tcNewX, rhs: yC)
         )
     }
 
     /// Test the `xor` case.
+    @Test
     func testXor() {
         let original = TransitionCondition.xor(lhs: xC, rhs: yC)
         let result = TransitionCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            TransitionCondition.xor(lhs: tcNewX, rhs: yC)
+        #expect(
+            result == TransitionCondition.xor(lhs: tcNewX, rhs: yC)
         )
     }
 

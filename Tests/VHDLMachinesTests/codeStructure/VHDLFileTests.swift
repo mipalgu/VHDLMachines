@@ -56,12 +56,14 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `VHDLFile` extensions.
-final class VHDLFileTests: XCTestCase {
+@Suite
+struct VHDLFileTests {
 
     /// Test representation initialiser.
+    @Test
     func testRepresentationInit() {
         guard
             let representation = MachineRepresentation(
@@ -69,13 +71,12 @@ final class VHDLFileTests: XCTestCase {
                 name: .testMachine
             )
         else {
-            XCTFail("Invalid data!")
+            Issue.record("Invalid data!")
             return
         }
         let result = VHDLFile(representation: representation)
-        XCTAssertEqual(
-            result.architectures,
-            [
+        #expect(
+            result.architectures == [
                 Architecture(
                     body: representation.architectureBody,
                     entity: representation.entity.name,
@@ -84,8 +85,8 @@ final class VHDLFileTests: XCTestCase {
                 )
             ]
         )
-        XCTAssertEqual(result.entities, [representation.entity])
-        XCTAssertEqual(result.includes, representation.includes)
+        #expect(result.entities == [representation.entity])
+        #expect(result.includes == representation.includes)
     }
 
 }

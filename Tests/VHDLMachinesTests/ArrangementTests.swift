@@ -54,13 +54,15 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
+import Foundation
 import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Tests the ``Arrangement`` type.
-final class ArrangementTests: XCTestCase {
+@Suite
+struct ArrangementTests {
 
     // swiftlint:disable force_unwrapping
 
@@ -128,15 +130,10 @@ final class ArrangementTests: XCTestCase {
     let path = URL(fileURLWithPath: "/path/to/arrangement")
 
     /// The arrangement to test.
-    lazy var arrangement = Arrangement(
-        machines: machines,
-        externalSignals: externalSignals,
-        signals: signals,
-        clocks: clocks
-    )
+    var arrangement: Arrangement
 
     /// Initialises the arrangement to test.
-    override func setUp() {
+    init() {
         self.arrangement = Arrangement(
             machines: machines,
             externalSignals: externalSignals,
@@ -146,27 +143,29 @@ final class ArrangementTests: XCTestCase {
     }
 
     /// Test init sets properties correctly.
-    func testInit() {
-        XCTAssertEqual(self.arrangement.machines, self.machines)
-        XCTAssertEqual(self.arrangement.externalSignals, self.externalSignals)
-        XCTAssertEqual(self.arrangement.signals, self.signals)
-        XCTAssertEqual(self.arrangement.clocks, self.clocks)
+    @Test
+    mutating func testInit() {
+        #expect(self.arrangement.machines == self.machines)
+        #expect(self.arrangement.externalSignals == self.externalSignals)
+        #expect(self.arrangement.signals == self.signals)
+        #expect(self.arrangement.clocks == self.clocks)
     }
 
     /// Test that the public init sets the stored properties for a valid arrangement.
+    @Test
     func testPublicInit() {
-        XCTAssertEqual(
+        #expect(
             Arrangement(
                 mappings: machines,
                 externalSignals: externalSignals,
                 signals: signals,
                 clocks: clocks
-            ),
-            arrangement
+            ) == arrangement
         )
     }
 
     /// Test that the public init returns nil for same-typed machines with different implementations.
+    @Test
     func testInvalidTypedMachinesInPublicInit() {
         let arrangement = Arrangement(
             mappings: [
@@ -183,10 +182,11 @@ final class ArrangementTests: XCTestCase {
             signals: signals,
             clocks: clocks
         )
-        XCTAssertNil(arrangement)
+        #expect(arrangement == nil)
     }
 
     /// Make sure instance names are also unique.
+    @Test
     func testPublicInitDetectsDuplicateInstances() {
         let arrangement = Arrangement(
             mappings: [
@@ -203,10 +203,11 @@ final class ArrangementTests: XCTestCase {
             signals: signals,
             clocks: clocks
         )
-        XCTAssertNil(arrangement)
+        #expect(arrangement == nil)
     }
 
     /// Test that instance names are unique.
+    @Test
     func testNonUniqueInstanceNamesReturnsNil() {
         let arrangement = Arrangement(
             mappings: [
@@ -219,7 +220,7 @@ final class ArrangementTests: XCTestCase {
             signals: signals,
             clocks: clocks
         )
-        XCTAssertNil(arrangement)
+        #expect(arrangement == nil)
     }
 
     // /// Tests getters and setters update properties correctly.

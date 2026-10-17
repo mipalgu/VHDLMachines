@@ -56,12 +56,14 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``MachineRepresentation``.
-final class MachineRepresentationTests: XCTestCase {
+@Suite
+struct MachineRepresentationTests {
 
     /// Test the machine initialiser creates the stored properties correctly.
+    @Test
     func testMachineInit() {
         let machine = Machine.testMachine()
         let representation = MachineRepresentation(machine: machine, name: .testMachine)
@@ -72,46 +74,48 @@ final class MachineRepresentationTests: XCTestCase {
             let head = ArchitectureHead(machine: newMachine),
             let body = AsynchronousBlock(machine: newMachine)
         else {
-            XCTFail("Invalid data.")
+            Issue.record("Invalid data.")
             return
         }
-        XCTAssertEqual(representation?.entity, entity)
-        XCTAssertEqual(representation?.architectureName, name)
-        XCTAssertEqual(representation?.architectureHead, head)
-        XCTAssertEqual(representation?.architectureBody, body)
-        XCTAssertEqual(representation?.machine, newMachine)
-        XCTAssertEqual(representation?.includes, newMachine.includes)
+        #expect(representation?.entity == entity)
+        #expect(representation?.architectureName == name)
+        #expect(representation?.architectureHead == head)
+        #expect(representation?.architectureBody == body)
+        #expect(representation?.machine == newMachine)
+        #expect(representation?.includes == newMachine.includes)
     }
 
     /// Test that duplicate variables in machine return nil.
+    @Test
     func testDuplicateVariablesReturnsNil() {
         var machine = Machine.testMachine()
         machine.externalSignals += [PortSignal(type: .stdLogic, name: .x, mode: .input)]
         machine.machineSignals += [LocalSignal(type: .stdLogic, name: .x)]
-        XCTAssertNil(MachineRepresentation(machine: machine, name: .testMachine))
+        #expect(MachineRepresentation(machine: machine, name: .testMachine) == nil)
         machine = Machine.testMachine()
         guard let var1 = VariableName(rawValue: "duplicateVar") else {
-            XCTFail("Failed to create test variables.")
+            Issue.record("Failed to create test variables.")
             return
         }
         machine.states[0].signals = [LocalSignal(type: .stdLogic, name: var1)]
         machine.states[1].signals = [LocalSignal(type: .stdLogic, name: var1)]
         let representation = MachineRepresentation(machine: machine, name: .testMachine)
-        XCTAssertNotNil(representation)
+        #expect(representation != nil)
         // representation?.architectureBody.rawValue.components(separatedBy: .newlines).forEach {
         //     print($0)
         // }
         machine.machineSignals += [LocalSignal(type: .stdLogic, name: var1)]
-        XCTAssertNil(MachineRepresentation(machine: machine, name: .testMachine))
+        #expect(MachineRepresentation(machine: machine, name: .testMachine) == nil)
     }
 
     /// Test that the stored-property initialiser works correctly.
+    @Test
     func testPropertyInit() {
         guard
             let port = PortBlock(signals: [PortSignal(type: .stdLogic, name: .clk, mode: .input)]),
             let comment = Comment(rawValue: "-- Test comment")
         else {
-            XCTFail("Failed to create VHDL blocks.")
+            Issue.record("Failed to create VHDL blocks.")
             return
         }
         let machine = Machine.testMachine()
@@ -127,21 +131,22 @@ final class MachineRepresentationTests: XCTestCase {
             entity: entity,
             machine: machine
         )
-        XCTAssertEqual(representation.architectureBody, body)
-        XCTAssertEqual(representation.architectureHead, head)
-        XCTAssertEqual(representation.architectureName, .y)
-        XCTAssertEqual(representation.entity, entity)
-        XCTAssertEqual(representation.machine, machine)
+        #expect(representation.architectureBody == body)
+        #expect(representation.architectureHead == head)
+        #expect(representation.architectureName == .y)
+        #expect(representation.entity == entity)
+        #expect(representation.machine == machine)
     }
 
     /// Test that a machine with 1 state still compiles correctly.
+    @Test
     func testSingleStateMachine() {
         var machine = Machine.testMachine()
         machine.states = [machine.states[0]]
         machine.transitions = []
         machine.suspendedState = nil
         let representation = MachineRepresentation(machine: machine, name: .testMachine)
-        XCTAssertNotNil(representation)
+        #expect(representation != nil)
     }
 
 }

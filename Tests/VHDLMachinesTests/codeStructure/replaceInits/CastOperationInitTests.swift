@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `CastOperation` replace initialiser.
-final class CastOperationInitTests: XCTestCase {
+@Suite
+struct CastOperationInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -77,94 +78,107 @@ final class CastOperationInitTests: XCTestCase {
     }
 
     /// Test `bit` cast.
+    @Test
     func testBit() {
         let original = CastOperation.bit(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .bit(expression: expNewX))
+        #expect(result == .bit(expression: expNewX))
     }
 
     /// Test `bitVector` cast.
+    @Test
     func testBitVector() {
         let original = CastOperation.bitVector(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .bitVector(expression: expNewX))
+        #expect(result == .bitVector(expression: expNewX))
     }
 
     /// Test `boolean` cast.
+    @Test
     func testBoolean() {
         let original = CastOperation.boolean(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .boolean(expression: expNewX))
+        #expect(result == .boolean(expression: expNewX))
     }
 
     /// Test `integer` cast.
+    @Test
     func testInteger() {
         let original = CastOperation.integer(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .integer(expression: expNewX))
+        #expect(result == .integer(expression: expNewX))
     }
 
     /// Test `natural` cast.
+    @Test
     func testNatural() {
         let original = CastOperation.natural(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .natural(expression: expNewX))
+        #expect(result == .natural(expression: expNewX))
     }
 
     /// Test `positive` cast.
+    @Test
     func testPositive() {
         let original = CastOperation.positive(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .positive(expression: expNewX))
+        #expect(result == .positive(expression: expNewX))
     }
 
     /// Test `real` cast.
+    @Test
     func testReal() {
         let original = CastOperation.real(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .real(expression: expNewX))
+        #expect(result == .real(expression: expNewX))
     }
 
     /// Test `signed` cast.
+    @Test
     func testSigned() {
         let original = CastOperation.signed(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .signed(expression: expNewX))
+        #expect(result == .signed(expression: expNewX))
     }
 
     /// Test `stdLogic` cast.
+    @Test
     func testStdLogic() {
         let original = CastOperation.stdLogic(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .stdLogic(expression: expNewX))
+        #expect(result == .stdLogic(expression: expNewX))
     }
 
     /// Test `stdLogicVector` cast.
+    @Test
     func testStdLogicVector() {
         let original = CastOperation.stdLogicVector(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .stdLogicVector(expression: expNewX))
+        #expect(result == .stdLogicVector(expression: expNewX))
     }
 
     /// Test `stdULogic` cast.
+    @Test
     func testStdULogic() {
         let original = CastOperation.stdULogic(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .stdULogic(expression: expNewX))
+        #expect(result == .stdULogic(expression: expNewX))
     }
 
     /// Test `stdULogicVector` cast.
+    @Test
     func testStdULogicVector() {
         let original = CastOperation.stdULogicVector(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .stdULogicVector(expression: expNewX))
+        #expect(result == .stdULogicVector(expression: expNewX))
     }
 
     /// Test `unsigned` cast.
+    @Test
     func testUnsigned() {
         let original = CastOperation.unsigned(expression: x)
         let result = CastOperation(operation: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .unsigned(expression: expNewX))
+        #expect(result == .unsigned(expression: expNewX))
     }
 
 }

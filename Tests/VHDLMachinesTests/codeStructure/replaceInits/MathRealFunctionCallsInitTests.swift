@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `MathRealFunctionCalls` replace initialiser.
-final class MathRealFunctionCallsInitTests: XCTestCase {
+@Suite
+struct MathRealFunctionCallsInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,52 +81,59 @@ final class MathRealFunctionCallsInitTests: XCTestCase {
     }
 
     /// Test `ceil` function.
+    @Test
     func testCeil() {
         let function = MathRealFunctionCalls.ceil(expression: x)
         let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
-        XCTAssertEqual(result, MathRealFunctionCalls.ceil(expression: expNewX))
+        #expect(result == MathRealFunctionCalls.ceil(expression: expNewX))
     }
 
     /// Test `floor` function.
+    @Test
     func testFloor() {
         let function = MathRealFunctionCalls.floor(expression: x)
         let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
-        XCTAssertEqual(result, MathRealFunctionCalls.floor(expression: expNewX))
+        #expect(result == MathRealFunctionCalls.floor(expression: expNewX))
     }
 
     /// Test `fmax` function.
+    @Test
     func testFMax() {
         let function = MathRealFunctionCalls.fmax(arg0: x, arg1: y)
         let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
-        XCTAssertEqual(result, MathRealFunctionCalls.fmax(arg0: expNewX, arg1: y))
+        #expect(result == MathRealFunctionCalls.fmax(arg0: expNewX, arg1: y))
     }
 
     /// Test `fmin` function.
+    @Test
     func testFMin() {
         let function = MathRealFunctionCalls.fmin(arg0: x, arg1: y)
         let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
-        XCTAssertEqual(result, MathRealFunctionCalls.fmin(arg0: expNewX, arg1: y))
+        #expect(result == MathRealFunctionCalls.fmin(arg0: expNewX, arg1: y))
     }
 
     /// Test `round` function.
+    @Test
     func testRound() {
         let function = MathRealFunctionCalls.round(expression: x)
         let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
-        XCTAssertEqual(result, MathRealFunctionCalls.round(expression: expNewX))
+        #expect(result == MathRealFunctionCalls.round(expression: expNewX))
     }
 
     /// Test `sign` function.
+    @Test
     func testSign() {
         let function = MathRealFunctionCalls.sign(expression: x)
         let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
-        XCTAssertEqual(result, MathRealFunctionCalls.sign(expression: expNewX))
+        #expect(result == MathRealFunctionCalls.sign(expression: expNewX))
     }
 
     /// Test `sqrt` function.
+    @Test
     func testSqrt() {
         let function = MathRealFunctionCalls.sqrt(expression: x)
         let result = MathRealFunctionCalls(function: function, replacing: .x, with: newX)
-        XCTAssertEqual(result, MathRealFunctionCalls.sqrt(expression: expNewX))
+        #expect(result == MathRealFunctionCalls.sqrt(expression: expNewX))
     }
 
 }

@@ -56,14 +56,16 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Tests the `LocalSignal` extensions.
-final class LocalSignalTests: XCTestCase {
+@Suite
+struct LocalSignalTests {
 
     // swiftlint:disable function_body_length
 
     /// Test the state trackers are generated correctly for a machine.
+    @Test
     func testStateTrackers() {
         let machine = Machine.testMachine()
         let trackers = LocalSignal.stateTrackers(machine: machine)
@@ -76,7 +78,7 @@ final class LocalSignalTests: XCTestCase {
             machine.initialState >= 0,
             machine.initialState < 3
         else {
-            XCTFail("Failed to create trackers.")
+            Issue.record("Failed to create trackers.")
             return
         }
         let initialState = states[machine.initialState]
@@ -89,9 +91,8 @@ final class LocalSignalTests: XCTestCase {
                 )
             )
         )
-        XCTAssertEqual(
-            trackers,
-            [
+        #expect(
+            trackers == [
                 LocalSignal(
                     type: type,
                     name: .currentState,
@@ -135,14 +136,15 @@ final class LocalSignalTests: XCTestCase {
     // swiftlint:enable function_body_length
 
     /// Test snapshot is created correctly.
+    @Test
     func testPortInit() {
         let external = PortSignal(type: .stdLogic, name: .x, mode: .input)
         let parameter = Parameter(type: .stdLogic, name: .x)
         let output = ReturnableVariable(type: .stdLogic, name: .x)
         let expected = LocalSignal(type: .stdLogic, name: .x, defaultValue: nil, comment: nil)
-        XCTAssertEqual(LocalSignal(snapshot: external), expected)
-        XCTAssertEqual(LocalSignal(snapshot: parameter), expected)
-        XCTAssertEqual(LocalSignal(snapshot: output), expected)
+        #expect(LocalSignal(snapshot: external) == expected)
+        #expect(LocalSignal(snapshot: parameter) == expected)
+        #expect(LocalSignal(snapshot: output) == expected)
     }
 
 }

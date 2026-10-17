@@ -55,33 +55,36 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``MachineInstance``.
-final class MachineInstanceTests: XCTestCase {
+@Suite
+struct MachineInstanceTests {
 
     /// The instance to test.
     var instance = MachineInstance(name: .testMachine, type: .pongMachine)
 
     /// Initialise the instance before every test.
-    override func setUp() {
+    init() {
         instance = MachineInstance(name: .testMachine, type: .pongMachine)
     }
 
     /// Test init sets properties correctly.
+    @Test
     func testInit() {
-        XCTAssertEqual(instance.name, .testMachine)
-        XCTAssertEqual(instance.type, .pongMachine)
+        #expect(instance.name == .testMachine)
+        #expect(instance.type == .pongMachine)
     }
 
     /// Test the setters mutate the properties correctly.
-    func testSetters() {
+    @Test
+    mutating func testSetters() {
         instance.name = .machineSignal1
-        XCTAssertEqual(instance.name, .machineSignal1)
-        XCTAssertEqual(instance.type, .pongMachine)
+        #expect(instance.name == .machineSignal1)
+        #expect(instance.type == .pongMachine)
         instance.type = .pingMachine
-        XCTAssertEqual(instance.name, .machineSignal1)
-        XCTAssertEqual(instance.type, .pingMachine)
+        #expect(instance.name == .machineSignal1)
+        #expect(instance.type == .pingMachine)
     }
 
 }

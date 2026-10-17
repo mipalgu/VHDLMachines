@@ -56,10 +56,11 @@
 import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``MachineMapping``.
-final class MachineMappingTests: XCTestCase {
+@Suite
+struct MachineMappingTests {
 
     /// A machine to use as test data.
     let machine = Machine.testMachine()
@@ -68,35 +69,39 @@ final class MachineMappingTests: XCTestCase {
     let mappings = [VariableMapping(source: .g, destination: .x)]
 
     /// The unit under test.
-    lazy var machineMapping = MachineMapping(machine: machine, mappings: mappings)
+    let machineMapping: MachineMapping
 
     /// Initialise the uut before every run.
-    override func setUp() {
+    init() {
         machineMapping = MachineMapping(machine: machine, mappings: mappings)
     }
 
     /// Test init sets stored properties correctly.
+    @Test
     func testDefaultInit() {
-        XCTAssertEqual(machineMapping.machine, machine)
-        XCTAssertEqual(machineMapping.mappings, mappings)
+        #expect(machineMapping.machine == machine)
+        #expect(machineMapping.mappings == mappings)
     }
 
     /// Test the public init stores the properties correctly.
+    @Test
     func testPublicInit() {
         let newMapping = MachineMapping(machine: machine, with: mappings)
-        XCTAssertEqual(newMapping?.machine, machine)
-        XCTAssertEqual(newMapping?.mappings, mappings)
+        #expect(newMapping?.machine == machine)
+        #expect(newMapping?.mappings == mappings)
     }
 
     /// Test public init returns nil for invalid mappings.
+    @Test
     func testPublicInitDetectsInvalidMapping() {
-        XCTAssertNil(MachineMapping(machine: Machine.initial, with: mappings))
+        #expect(MachineMapping(machine: Machine.initial, with: mappings) == nil)
     }
 
     /// Test the port variable names are correct.
+    @Test
     func testPortVariableNames() {
         let expected: Set<VariableName> = [.x, .xx, .clk, .clk2, .parX, .parXs, .retX, .retXs]
-        XCTAssertEqual(machine.portVariableNames, expected)
+        #expect(machine.portVariableNames == expected)
     }
 
 }

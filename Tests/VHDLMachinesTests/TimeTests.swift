@@ -53,11 +53,13 @@
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
+import Foundation
 @testable import VHDLMachines
-import XCTest
+import Testing
 
 /// Test class for ``Time``.
-final class TimeTests: XCTestCase {
+@Suite
+struct TimeTests {
 
     /// The seconds to test.
     let seconds = Time.seconds(1000)
@@ -75,67 +77,74 @@ final class TimeTests: XCTestCase {
     let picoseconds = Time.picoseconds(1000)
 
     /// Test `seconds` conversion.
+    @Test
     func testSeconds() {
-        XCTAssertEqual(seconds.seconds, 1000)
-        XCTAssertEqual(milliseconds.seconds, 1)
-        XCTAssertEqual(microseconds.seconds, 0.001)
-        XCTAssertEqual(nanoseconds.seconds, 0.000_001)
-        XCTAssertEqual(picoseconds.seconds, 0.000_000_001)
+        #expect(seconds.seconds == 1000)
+        #expect(milliseconds.seconds == 1)
+        #expect(microseconds.seconds == 0.001)
+        #expect(nanoseconds.seconds == 0.000_001)
+        #expect(picoseconds.seconds == 0.000_000_001)
     }
 
     /// Test `milliseconds` conversion.
+    @Test
     func testMilliseconds() {
-        XCTAssertEqual(seconds.milliseconds, 1_000_000)
-        XCTAssertEqual(milliseconds.milliseconds, 1000)
-        XCTAssertEqual(microseconds.milliseconds, 1)
-        XCTAssertEqual(nanoseconds.milliseconds, 0.001)
-        XCTAssertEqual(picoseconds.milliseconds, 0.000_001)
+        #expect(seconds.milliseconds == 1_000_000)
+        #expect(milliseconds.milliseconds == 1000)
+        #expect(microseconds.milliseconds == 1)
+        #expect(nanoseconds.milliseconds == 0.001)
+        #expect(picoseconds.milliseconds == 0.000_001)
     }
 
     /// Test `microseconds` conversion.
+    @Test
     func testMicroseconds() {
-        XCTAssertEqual(seconds.microseconds, 1_000_000_000)
-        XCTAssertEqual(milliseconds.microseconds, 1_000_000)
-        XCTAssertEqual(microseconds.microseconds, 1_000)
-        XCTAssertEqual(nanoseconds.microseconds, 1)
-        XCTAssertEqual(picoseconds.microseconds, 0.001)
+        #expect(seconds.microseconds == 1_000_000_000)
+        #expect(milliseconds.microseconds == 1_000_000)
+        #expect(microseconds.microseconds == 1_000)
+        #expect(nanoseconds.microseconds == 1)
+        #expect(picoseconds.microseconds == 0.001)
     }
 
     /// Test `nanoseconds` conversion.
+    @Test
     func testNanoseconds() {
-        XCTAssertEqual(seconds.nanoseconds, 1_000_000_000_000)
-        XCTAssertEqual(milliseconds.nanoseconds, 1_000_000_000)
-        XCTAssertEqual(microseconds.nanoseconds, 1_000_000)
-        XCTAssertEqual(nanoseconds.nanoseconds, 1_000)
-        XCTAssertEqual(picoseconds.nanoseconds, 1)
+        #expect(seconds.nanoseconds == 1_000_000_000_000)
+        #expect(milliseconds.nanoseconds == 1_000_000_000)
+        #expect(microseconds.nanoseconds == 1_000_000)
+        #expect(nanoseconds.nanoseconds == 1_000)
+        #expect(picoseconds.nanoseconds == 1)
     }
 
     /// Test `picoseconds` conversion.
+    @Test
     func testPicoseconds() {
-        XCTAssertEqual(seconds.picoseconds, 1_000_000_000_000_000)
-        XCTAssertEqual(milliseconds.picoseconds, 1_000_000_000_000)
-        XCTAssertEqual(microseconds.picoseconds, 1_000_000_000)
-        XCTAssertEqual(nanoseconds.picoseconds, 1_000_000)
-        XCTAssertEqual(picoseconds.picoseconds, 1_000)
+        #expect(seconds.picoseconds == 1_000_000_000_000_000)
+        #expect(milliseconds.picoseconds == 1_000_000_000_000)
+        #expect(microseconds.picoseconds == 1_000_000_000)
+        #expect(nanoseconds.picoseconds == 1_000_000)
+        #expect(picoseconds.picoseconds == 1_000)
     }
 
     /// Test `Time` is `Comparable`.
+    @Test
     func testComparableConformance() {
-        XCTAssertLessThan(picoseconds, nanoseconds)
-        XCTAssertLessThan(nanoseconds, microseconds)
-        XCTAssertLessThan(microseconds, milliseconds)
-        XCTAssertLessThan(milliseconds, seconds)
+        #expect(picoseconds < nanoseconds)
+        #expect(nanoseconds < microseconds)
+        #expect(microseconds < milliseconds)
+        #expect(milliseconds < seconds)
     }
 
     /// Test `Time` is `Codable`.
+    @Test
     func testCodableConformance() throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
-        XCTAssertEqual(seconds, try decoder.decode(Time.self, from: try encoder.encode(seconds)))
-        XCTAssertEqual(milliseconds, try decoder.decode(Time.self, from: try encoder.encode(milliseconds)))
-        XCTAssertEqual(microseconds, try decoder.decode(Time.self, from: try encoder.encode(microseconds)))
-        XCTAssertEqual(nanoseconds, try decoder.decode(Time.self, from: try encoder.encode(nanoseconds)))
-        XCTAssertEqual(picoseconds, try decoder.decode(Time.self, from: try encoder.encode(picoseconds)))
+        #expect(seconds == (try decoder.decode(Time.self, from: try encoder.encode(seconds))))
+        #expect(milliseconds == (try decoder.decode(Time.self, from: try encoder.encode(milliseconds))))
+        #expect(microseconds == (try decoder.decode(Time.self, from: try encoder.encode(microseconds))))
+        #expect(nanoseconds == (try decoder.decode(Time.self, from: try encoder.encode(nanoseconds))))
+        #expect(picoseconds == (try decoder.decode(Time.self, from: try encoder.encode(picoseconds))))
     }
 
 }

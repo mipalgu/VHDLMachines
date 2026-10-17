@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `ConditionalExpression` replace initialiser.
-final class ConditionalExpressionInitTests: XCTestCase {
+@Suite
+struct ConditionalExpressionInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,26 +81,29 @@ final class ConditionalExpressionInitTests: XCTestCase {
     }
 
     /// Test comparisons.
+    @Test
     func testComparison() {
         let original = ConditionalExpression.comparison(value: .equality(lhs: x, rhs: y))
         let result = ConditionalExpression(expression: original, replacing: .x, with: newX)
         let expected = ConditionalExpression.comparison(value: .equality(lhs: expNewX, rhs: y))
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test edges.
+    @Test
     func testEdge() {
         let original = ConditionalExpression.edge(value: .rising(expression: x))
         let result = ConditionalExpression(expression: original, replacing: .x, with: newX)
         let expected = ConditionalExpression.edge(value: .rising(expression: expNewX))
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test literal does nothing.
+    @Test
     func testLiteral() {
         let original = ConditionalExpression.literal(value: true)
         let result = ConditionalExpression(expression: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, original)
+        #expect(result == original)
     }
 
 }

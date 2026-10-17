@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `FunctionCall` replace initialiser.
-final class FunctionCallsInitTests: XCTestCase {
+@Suite
+struct FunctionCallsInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,20 +81,23 @@ final class FunctionCallsInitTests: XCTestCase {
     }
 
     /// Test `mathReal` case.
+    @Test
     func testMathReal() {
         let original = FunctionCall.mathReal(function: .ceil(expression: x))
         let result = FunctionCall(call: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .mathReal(function: .ceil(expression: expNewX)))
+        #expect(result == .mathReal(function: .ceil(expression: expNewX)))
     }
 
     /// Test `mathReal` case does nothing for invalid variable.
+    @Test
     func testMathRealDoesNothing() {
         let original = FunctionCall.mathReal(function: .ceil(expression: x))
         let result = FunctionCall(call: original, replacing: .y, with: newX)
-        XCTAssertEqual(result, original)
+        #expect(result == original)
     }
 
     /// Test `custom` case.
+    @Test
     func testCustom() {
         let original = FunctionCall.custom(
             function: CustomFunctionCall(
@@ -102,18 +106,19 @@ final class FunctionCallsInitTests: XCTestCase {
             )
         )
         let result = FunctionCall(call: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            .custom(
-                function: CustomFunctionCall(
-                    name: .y,
-                    parameters: [Argument(argument: expNewX)]
+        #expect(
+            result
+                == .custom(
+                    function: CustomFunctionCall(
+                        name: .y,
+                        parameters: [Argument(argument: expNewX)]
+                    )
                 )
-            )
         )
     }
 
     /// Test `custom` does nothing for invalid variable.
+    @Test
     func testCustomDoesNothing() {
         let original = FunctionCall.custom(
             function: CustomFunctionCall(
@@ -122,7 +127,7 @@ final class FunctionCallsInitTests: XCTestCase {
             )
         )
         let result = FunctionCall(call: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, original)
+        #expect(result == original)
     }
 
 }

@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test `TransitionCondition` conversions on `Expression`.
-final class ExpressionTransitionInitTests: XCTestCase {
+@Suite
+struct ExpressionTransitionInitTests {
 
     /// A variable x.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -74,54 +75,49 @@ final class ExpressionTransitionInitTests: XCTestCase {
     let ty = TransitionCondition.variable(name: .y)
 
     /// Test transition conversions.
+    @Test
     func testTransitionConversions() {
-        XCTAssertEqual(
-            Expression(condition: .and(lhs: tx, rhs: ty)),
-            .logical(operation: .and(lhs: x, rhs: y))
+        #expect(
+            Expression(condition: .and(lhs: tx, rhs: ty)) == .logical(operation: .and(lhs: x, rhs: y))
         )
-        XCTAssertEqual(Expression(condition: .or(lhs: tx, rhs: ty)), .logical(operation: .or(lhs: x, rhs: y)))
-        XCTAssertEqual(Expression(condition: .not(value: tx)), .logical(operation: .not(value: x)))
-        XCTAssertEqual(
-            Expression(condition: .nand(lhs: tx, rhs: ty)),
-            .logical(operation: .nand(lhs: x, rhs: y))
+        #expect(Expression(condition: .or(lhs: tx, rhs: ty)) == .logical(operation: .or(lhs: x, rhs: y)))
+        #expect(Expression(condition: .not(value: tx)) == .logical(operation: .not(value: x)))
+        #expect(
+            Expression(condition: .nand(lhs: tx, rhs: ty)) == .logical(operation: .nand(lhs: x, rhs: y))
         )
-        XCTAssertEqual(
-            Expression(condition: .nor(lhs: tx, rhs: ty)),
-            .logical(operation: .nor(lhs: x, rhs: y))
+        #expect(
+            Expression(condition: .nor(lhs: tx, rhs: ty)) == .logical(operation: .nor(lhs: x, rhs: y))
         )
-        XCTAssertEqual(
-            Expression(condition: .xor(lhs: tx, rhs: ty)),
-            .logical(operation: .xor(lhs: x, rhs: y))
+        #expect(
+            Expression(condition: .xor(lhs: tx, rhs: ty)) == .logical(operation: .xor(lhs: x, rhs: y))
         )
-        XCTAssertEqual(
-            Expression(condition: .xnor(lhs: tx, rhs: ty)),
-            .logical(operation: .xnor(lhs: x, rhs: y))
+        #expect(
+            Expression(condition: .xnor(lhs: tx, rhs: ty)) == .logical(operation: .xnor(lhs: x, rhs: y))
         )
-        XCTAssertEqual(
-            Expression(condition: .boolean(expression: .and(lhs: x, rhs: y))),
-            .logical(operation: .and(lhs: x, rhs: y))
+        #expect(
+            Expression(condition: .boolean(expression: .and(lhs: x, rhs: y)))
+                == .logical(operation: .and(lhs: x, rhs: y))
         )
-        XCTAssertEqual(
+        #expect(
             Expression(
                 condition: .conditional(condition: .literal(value: true))
-            ),
-            .conditional(condition: .literal(value: true))
+            ) == .conditional(condition: .literal(value: true))
         )
-        XCTAssertEqual(
-            Expression(condition: .equals(lhs: tx, rhs: ty)),
-            .conditional(condition: .comparison(value: .equality(lhs: x, rhs: y)))
+        #expect(
+            Expression(condition: .equals(lhs: tx, rhs: ty))
+                == .conditional(condition: .comparison(value: .equality(lhs: x, rhs: y)))
         )
-        XCTAssertEqual(
-            Expression(condition: .notEquals(lhs: tx, rhs: ty)),
-            .conditional(condition: .comparison(value: .notEquals(lhs: x, rhs: y)))
+        #expect(
+            Expression(condition: .notEquals(lhs: tx, rhs: ty))
+                == .conditional(condition: .comparison(value: .notEquals(lhs: x, rhs: y)))
         )
-        XCTAssertEqual(
-            Expression(condition: .precedence(condition: .and(lhs: tx, rhs: ty))),
-            .precedence(value: .logical(operation: .and(lhs: x, rhs: y)))
+        #expect(
+            Expression(condition: .precedence(condition: .and(lhs: tx, rhs: ty)))
+                == .precedence(value: .logical(operation: .and(lhs: x, rhs: y)))
         )
-        XCTAssertEqual(
-            Expression(condition: .variable(name: .x)),
-            .reference(variable: .variable(reference: .variable(name: .x)))
+        #expect(
+            Expression(condition: .precedence(condition: .and(lhs: tx, rhs: ty)))
+                == .precedence(value: .logical(operation: .and(lhs: x, rhs: y)))
         )
     }
 

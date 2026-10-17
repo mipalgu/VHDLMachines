@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``AfterStatement`` replace initialiser.
-final class AfterStatementInitTests: XCTestCase {
+@Suite
+struct AfterStatementInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -77,10 +78,11 @@ final class AfterStatementInitTests: XCTestCase {
     }
 
     /// Test init replaces expression correctly.
+    @Test
     func testReplaceInit() {
         let original = AfterStatement(amount: x, period: .ns)
         let result = AfterStatement(statement: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, AfterStatement(amount: expNewX, period: .ns))
+        #expect(result == AfterStatement(amount: expNewX, period: .ns))
     }
 
 }

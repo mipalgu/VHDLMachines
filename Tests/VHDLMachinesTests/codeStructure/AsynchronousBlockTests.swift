@@ -56,26 +56,28 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `AsynchronousBlock` extensions.
-final class AsynchronousBlockTests: XCTestCase {
+@Suite
+struct AsynchronousBlockTests {
 
     /// Test machine initialiser.
+    @Test
     func testMachineInit() {
         let machine = Machine.testMachine()
         let result = AsynchronousBlock(machine: machine)
         guard let code = SynchronousBlock(machine: machine) else {
-            XCTFail("invalid data.")
+            Issue.record("invalid data.")
             return
         }
-        XCTAssertEqual(
-            result,
-            .process(block: ProcessBlock(sensitivityList: [.clk], code: code))
+        #expect(
+            result == .process(block: ProcessBlock(sensitivityList: [.clk], code: code))
         )
     }
 
     /// Test format with user code.
+    @Test
     func testMachineInitWithUserCode() {
         var machine = Machine.testMachine()
         let xAssignment = AsynchronousBlock.statement(
@@ -90,19 +92,19 @@ final class AsynchronousBlockTests: XCTestCase {
             let code = SynchronousBlock(machine: machine),
             let comment = Comment(rawValue: "-- User-Specific Code for Architecture Body")
         else {
-            XCTFail("invalid data.")
+            Issue.record("invalid data.")
             return
         }
-        XCTAssertEqual(
-            result,
-            .blocks(blocks: [
-                .statement(statement: .comment(value: comment)),
-                xAssignment,
-                .process(block: ProcessBlock(sensitivityList: [.clk], code: code)),
-            ])
+        #expect(
+            result
+                == .blocks(blocks: [
+                    .statement(statement: .comment(value: comment)),
+                    xAssignment,
+                    .process(block: ProcessBlock(sensitivityList: [.clk], code: code)),
+                ])
         )
         machine.drivingClock = -1
-        XCTAssertNil(AsynchronousBlock(machine: machine))
+        #expect(AsynchronousBlock(machine: machine) == nil)
     }
 
 }

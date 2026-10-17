@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `Statement` replace initialiser.
-final class StatementInitTests: XCTestCase {
+@Suite
+struct StatementInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,38 +81,40 @@ final class StatementInitTests: XCTestCase {
     }
 
     /// Test `assignment` name is replaced.
+    @Test
     func testAssignmentName() {
         let original = Statement.assignment(name: .variable(reference: .variable(name: .x)), value: y)
         let result = Statement(statement: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            Statement.assignment(name: .variable(reference: .variable(name: newX)), value: y)
+        #expect(
+            result == Statement.assignment(name: .variable(reference: .variable(name: newX)), value: y)
         )
     }
 
     /// Test `assignment` value is replaced.
+    @Test
     func testAssignmentValue() {
         let original = Statement.assignment(name: .variable(reference: .variable(name: .y)), value: x)
         let result = Statement(statement: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            Statement.assignment(name: .variable(reference: .variable(name: .y)), value: expNewX)
+        #expect(
+            result == Statement.assignment(name: .variable(reference: .variable(name: .y)), value: expNewX)
         )
     }
 
     /// Test `comment` does nothing.
+    @Test
     func testComment() {
         // swiftlint:disable:next force_unwrapping
         let original = Statement.comment(value: Comment(rawValue: "-- Hello World!")!)
         let result = Statement(statement: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, original)
+        #expect(result == original)
     }
 
     /// Test `null` does nothing.
+    @Test
     func testNull() {
         let original = Statement.null
         let result = Statement(statement: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, original)
+        #expect(result == original)
     }
 
 }

@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `EdgeCondition` replace initialiser.
-final class EdgeConditionInitTests: XCTestCase {
+@Suite
+struct EdgeConditionInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -77,19 +78,21 @@ final class EdgeConditionInitTests: XCTestCase {
     }
 
     /// Test the `rising` case.
+    @Test
     func testRising() {
         let rising = EdgeCondition.rising(expression: x)
         let result = EdgeCondition(condition: rising, replacing: .x, with: newX)
         let expected = EdgeCondition.rising(expression: expNewX)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test the `falling` case.
+    @Test
     func testFalling() {
         let falling = EdgeCondition.falling(expression: x)
         let result = EdgeCondition(condition: falling, replacing: .x, with: newX)
         let expected = EdgeCondition.falling(expression: expNewX)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
 }

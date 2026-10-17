@@ -58,24 +58,26 @@ import Foundation
 import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
 /// Test class for `ArchitectureHead` extensions.
-final class ArchitectureHeadTests: XCTestCase {
+@Suite
+struct ArchitectureHeadTests {
 
     // swiftlint:disable function_body_length
     // swiftlint:disable force_unwrapping
 
     /// Test the machine init creates the correct variables.
+    @Test
     func testMachineInit() {
         let machine = Machine.testMachine(
             directory: URL(fileURLWithPath: PingPongArrangement().machinesFolder, isDirectory: true)
         )
         guard machine.states.count == 3 else {
-            XCTFail("Found incorrect number of states.")
+            Issue.record("Found incorrect number of states.")
             return
         }
         let result = ArchitectureHead(machine: machine)
@@ -683,7 +685,7 @@ final class ArchitectureHeadTests: XCTestCase {
                 )
             ),
         ])
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     // swiftlint:enable force_unwrapping

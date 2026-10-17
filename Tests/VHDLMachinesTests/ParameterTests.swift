@@ -56,21 +56,17 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Tests the ``Parameter`` type.
-final class ParameterTests: XCTestCase {
+@Suite
+struct ParameterTests {
 
     /// The parameter to test.
-    var parameter = Parameter(
-        type: .integer,
-        name: VariableName.x,
-        defaultValue: .literal(value: .integer(value: 255)),
-        comment: Comment.signalX
-    )
+    var parameter: Parameter
 
     /// Initialise the parameter to test.
-    override func setUp() {
+    init() {
         self.parameter = Parameter(
             type: .integer,
             name: VariableName.x,
@@ -80,24 +76,26 @@ final class ParameterTests: XCTestCase {
     }
 
     /// Test the init sets the stored properties correctly.
+    @Test
     func testInit() {
-        XCTAssertEqual(self.parameter.type, .integer)
-        XCTAssertEqual(self.parameter.name, VariableName.x)
-        XCTAssertEqual(self.parameter.defaultValue, .literal(value: .integer(value: 255)))
-        XCTAssertEqual(self.parameter.comment, Comment.signalX)
-        XCTAssertEqual(self.parameter.mode, .input)
+        #expect(self.parameter.type == .integer)
+        #expect(self.parameter.name == VariableName.x)
+        #expect(self.parameter.defaultValue == .literal(value: .integer(value: 255)))
+        #expect(self.parameter.comment == Comment.signalX)
+        #expect(self.parameter.mode == .input)
     }
 
     /// Test Getters and Setters work correctly.
-    func testGettersAndSetters() {
+    @Test
+    mutating func testGettersAndSetters() {
         self.parameter.type = .boolean
         self.parameter.name = VariableName.y
         self.parameter.defaultValue = .literal(value: .boolean(value: true))
         self.parameter.comment = Comment.signalY
-        XCTAssertEqual(self.parameter.type, .boolean)
-        XCTAssertEqual(self.parameter.name, VariableName.y)
-        XCTAssertEqual(self.parameter.defaultValue, .literal(value: .boolean(value: true)))
-        XCTAssertEqual(self.parameter.comment, Comment.signalY)
+        #expect(self.parameter.type == .boolean)
+        #expect(self.parameter.name == VariableName.y)
+        #expect(self.parameter.defaultValue == .literal(value: .boolean(value: true)))
+        #expect(self.parameter.comment == Comment.signalY)
     }
 
 }
