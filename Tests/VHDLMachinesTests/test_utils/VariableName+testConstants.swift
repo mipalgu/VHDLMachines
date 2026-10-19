@@ -65,63 +65,63 @@ import VHDLParsing
 /// Add test constants.
 extension VariableName {
 
-    public static var a: VariableName { VariableName(rawValue: "A")! }
+    static var a: VariableName { VariableName(rawValue: "A")! }
 
-    public static let arrangement1 = VariableName(rawValue: "Arrangement1")!
+    static let arrangement1 = VariableName(rawValue: "Arrangement1")!
 
-    public static var clk2: VariableName { VariableName(rawValue: "clk2")! }
+    static var clk2: VariableName { VariableName(rawValue: "clk2")! }
 
-    public static let externalPing = VariableName(rawValue: "EXTERNAL_ping")!
+    static let externalPing = VariableName(rawValue: "EXTERNAL_ping")!
 
-    public static let externalPong = VariableName(rawValue: "EXTERNAL_pong")!
+    static let externalPong = VariableName(rawValue: "EXTERNAL_pong")!
 
-    public static var g: VariableName { VariableName(rawValue: "g")! }
+    static var g: VariableName { VariableName(rawValue: "g")! }
 
-    public static var initialX: VariableName { VariableName(rawValue: "initialX")! }
+    static var initialX: VariableName { VariableName(rawValue: "initialX")! }
 
-    public static var p: VariableName { VariableName(rawValue: "p")! }
+    static var p: VariableName { VariableName(rawValue: "p")! }
 
-    public static var r: VariableName { VariableName(rawValue: "r")! }
+    static var r: VariableName { VariableName(rawValue: "r")! }
 
-    public static var s: VariableName { VariableName(rawValue: "s")! }
+    static var s: VariableName { VariableName(rawValue: "s")! }
 
-    public static var x: VariableName { VariableName(rawValue: "x")! }
+    static var x: VariableName { VariableName(rawValue: "x")! }
 
-    public static var xx: VariableName { VariableName(rawValue: "xx")! }
+    static var xx: VariableName { VariableName(rawValue: "xx")! }
 
-    public static var xs: VariableName { VariableName(rawValue: "xs")! }
+    static var xs: VariableName { VariableName(rawValue: "xs")! }
 
-    public static var y: VariableName { VariableName(rawValue: "y")! }
+    static var y: VariableName { VariableName(rawValue: "y")! }
 
-    public static var z: VariableName { VariableName(rawValue: "z")! }
+    static var z: VariableName { VariableName(rawValue: "z")! }
 
-    public static var s0: VariableName { VariableName(rawValue: "S0")! }
+    static var s0: VariableName { VariableName(rawValue: "S0")! }
 
-    public static var s1: VariableName { VariableName(rawValue: "S1")! }
+    static var s1: VariableName { VariableName(rawValue: "S1")! }
 
-    public static var state0: VariableName { VariableName(rawValue: "State0")! }
+    static var state0: VariableName { VariableName(rawValue: "State0")! }
 
-    public static var parX: VariableName { VariableName(rawValue: "parX")! }
+    static var parX: VariableName { VariableName(rawValue: "parX")! }
 
-    public static var ping: VariableName { VariableName(rawValue: "ping")! }
+    static var ping: VariableName { VariableName(rawValue: "ping")! }
 
-    public static var pong: VariableName { VariableName(rawValue: "pong")! }
+    static var pong: VariableName { VariableName(rawValue: "pong")! }
 
-    public static let pingMachine = VariableName(rawValue: "PingMachine")!
+    static let pingMachine = VariableName(rawValue: "PingMachine")!
 
-    public static let pongMachine = VariableName(rawValue: "PongMachine")!
+    static let pongMachine = VariableName(rawValue: "PongMachine")!
 
-    public static var parXs: VariableName { VariableName(rawValue: "parXs")! }
+    static var parXs: VariableName { VariableName(rawValue: "parXs")! }
 
-    public static var retX: VariableName { VariableName(rawValue: "retX")! }
+    static var retX: VariableName { VariableName(rawValue: "retX")! }
 
-    public static var retXs: VariableName { VariableName(rawValue: "retXs")! }
+    static var retXs: VariableName { VariableName(rawValue: "retXs")! }
 
-    public static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
+    static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
 
-    public static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
+    static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
 
-    public static let testMachine = VariableName(rawValue: "TestMachine")!
+    static let testMachine = VariableName(rawValue: "TestMachine")!
 
 }
 
