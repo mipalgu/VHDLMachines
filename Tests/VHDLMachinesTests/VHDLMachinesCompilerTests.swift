@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUtils
-import TestUtils
+
 @testable import VHDLMachines
 import VHDLParsing
 import Testing

@@ -55,7 +55,7 @@
 //
 
 import Foundation
-import TestUtils
+
 @testable import VHDLMachines
 import VHDLParsing
 import Testing

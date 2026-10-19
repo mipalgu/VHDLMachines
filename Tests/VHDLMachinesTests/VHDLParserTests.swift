@@ -58,7 +58,7 @@
 import SwiftUtils
 #endif
 import Foundation
-import TestUtils
+
 @testable import VHDLMachines
 import Testing
 
