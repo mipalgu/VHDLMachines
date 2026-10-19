@@ -28,14 +28,19 @@ let package = Package(
                 .product(name: "StringHelpers", package: "VHDLParsing"),
             ]
         ),
-        .testTarget(name: "TestUtils", dependencies: ["VHDLParsing", "VHDLMachines"]),
+        .testTarget(
+            name: "TestUtils",
+            dependencies: [
+                .product(name: "VHDLParsing", package: "VHDLParsing"), .target(name: "VHDLMachines"),
+            ]
+        ),
         .testTarget(
             name: "VHDLMachinesTests",
             dependencies: [
-                "VHDLMachines",
+                .target(name: "VHDLMachines"),
                 .product(name: "SwiftUtils", package: "SwiftUtils"),
-                "VHDLParsing",
-                "TestUtils",
+                .product(name: "VHDLParsing", package: "VHDLParsing"),
+                .target(name: "TestUtils"),
             ]
         ),
     ]
