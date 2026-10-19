@@ -62,7 +62,7 @@ import VHDLParsing
 extension Arrangement {
 
     /// A test arrangement.
-    public static let testArrangement = Arrangement(
+    static let testArrangement = Arrangement(
         machines: [
             MachineInstance(name: .pingMachine, type: .pingMachine): MachineMapping(
                 machine: PingPongArrangement().pingMachine,

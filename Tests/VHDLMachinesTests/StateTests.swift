@@ -56,51 +56,43 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Tests the ``State`` type.
-final class StateTests: XCTestCase {
+@Suite
+struct StateTests {
 
     // swiftlint:disable force_unwrapping
 
     /// The state actions.
-    var actions: [ActionName: SynchronousBlock] {
-        [
-            VariableName.onEntry: SynchronousBlock(rawValue: "x <= x + 1;")!,
-            VariableName.onExit: SynchronousBlock(rawValue: "x <= 0;")!,
-        ]
-    }
+    let actions: [ActionName: SynchronousBlock] = [
+        VariableName.onEntry: SynchronousBlock(rawValue: "x <= x + 1;")!,
+        VariableName.onExit: SynchronousBlock(rawValue: "x <= 0;")!,
+    ]
 
     // swiftlint:enable force_unwrapping
 
     /// The signals.
-    var signals: [LocalSignal] {
-        [
-            LocalSignal(
-                type: .stdLogic,
-                name: VariableName.y,
-                defaultValue: .literal(value: .logic(value: .high)),
-                comment: Comment.signalY
-            )
-        ]
-    }
+    let signals: [LocalSignal] = [
+        LocalSignal(
+            type: .stdLogic,
+            name: VariableName.y,
+            defaultValue: .literal(value: .logic(value: .high)),
+            comment: Comment.signalY
+        )
+    ]
 
     /// The external variables.
-    var externalVariables: [VariableName] {
+    let externalVariables: [VariableName] = [
         // swiftlint:disable:next force_unwrapping
-        [VariableName(rawValue: "A")!]
-    }
+        VariableName(rawValue: "A")!
+    ]
 
     /// The state to test.
-    lazy var state = State(
-        name: VariableName.s0,
-        actions: actions,
-        signals: signals,
-        externalVariables: externalVariables
-    )
+    var state: State
 
     /// Initialises the state to test.
-    override func setUp() {
+    init() {
         self.state = State(
             name: VariableName.s0,
             actions: actions,
@@ -110,25 +102,27 @@ final class StateTests: XCTestCase {
     }
 
     /// Test init sets the properties correctly.
+    @Test
     func testInit() {
-        XCTAssertEqual(self.state.name, VariableName.s0)
-        XCTAssertEqual(self.state.actions, self.actions)
-        XCTAssertEqual(self.state.signals, self.signals)
-        XCTAssertEqual(self.state.externalVariables, self.externalVariables)
+        #expect(self.state.name == VariableName.s0)
+        #expect(self.state.actions == self.actions)
+        #expect(self.state.signals == self.signals)
+        #expect(self.state.externalVariables == self.externalVariables)
     }
 
     // swiftlint:disable function_body_length
 
     /// Test getters and setters work correctly.
-    func testGettersAndSetters() {
+    @Test
+    mutating func testGettersAndSetters() {
         self.state.name = VariableName.s1
-        XCTAssertEqual(self.state.name, VariableName.s1)
+        #expect(self.state.name == VariableName.s1)
         guard let newAssignment = SynchronousBlock(rawValue: "x <= 0;") else {
-            XCTFail("Failed to create new assignment!")
+            Issue.record("Failed to create new assignment!")
             return
         }
         self.state.actions = [VariableName.internal: newAssignment]
-        XCTAssertEqual(self.state.actions, [VariableName.internal: newAssignment])
+        #expect(self.state.actions == [VariableName.internal: newAssignment])
         self.state.signals = [
             LocalSignal(
                 type: .ranged(
@@ -148,9 +142,8 @@ final class StateTests: XCTestCase {
                 comment: Comment.signalXs
             )
         ]
-        XCTAssertEqual(
-            self.state.signals,
-            [
+        #expect(
+            self.state.signals == [
                 LocalSignal(
                     type: .ranged(
                         type: .stdLogicVector(
@@ -175,7 +168,7 @@ final class StateTests: XCTestCase {
         // swiftlint:disable:next force_unwrapping
         let b = VariableName(rawValue: "B")!
         self.state.externalVariables = [b]
-        XCTAssertEqual(self.state.externalVariables, [b])
+        #expect(self.state.externalVariables == [b])
     }
 
     // swiftlint:enable function_body_length

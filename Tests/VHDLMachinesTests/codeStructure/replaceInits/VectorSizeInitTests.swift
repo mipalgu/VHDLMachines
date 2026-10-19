@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `VectorSize` replace init.
-final class VectorSizeInitTests: XCTestCase {
+@Suite
+struct VectorSizeInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,19 +81,21 @@ final class VectorSizeInitTests: XCTestCase {
     }
 
     /// Test the `downto` case.
+    @Test
     func testDownto() {
         let range = VectorSize.downto(upper: y, lower: x)
         let result = VectorSize(size: range, replacing: .x, with: newX)
         let expected = VectorSize.downto(upper: y, lower: expNewX)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test the `to` case.
+    @Test
     func testTo() {
         let range = VectorSize.to(lower: x, upper: y)
         let result = VectorSize(size: range, replacing: .x, with: newX)
         let expected = VectorSize.to(lower: expNewX, upper: y)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
 }

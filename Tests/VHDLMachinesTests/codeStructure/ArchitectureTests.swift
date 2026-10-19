@@ -53,13 +53,13 @@
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
-import TestUtils
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `Architecture` extensions.
-final class ArchitectureTests: XCTestCase {
+@Suite
+struct ArchitectureTests {
 
     /// A `ping` component.
     let pingComponent = ComponentInstantiation(
@@ -133,7 +133,7 @@ final class ArchitectureTests: XCTestCase {
     )
 
     /// A test arrangement.
-    var arrangement = Arrangement.testArrangement
+    var arrangement: Arrangement
 
     /// The machine representations in `arrangement`.
     var machineRepresentations: [VariableName: MachineVHDLRepresentable] {
@@ -146,11 +146,12 @@ final class ArchitectureTests: XCTestCase {
     }
 
     /// Initialise test data before every test.
-    override func setUp() {
+    init() {
         arrangement = Arrangement.testArrangement
     }
 
     /// Test the architecture is created correctly in arrangement init.
+    @Test
     func testArrangementInit() {
         guard
             let architecture = Architecture(
@@ -161,7 +162,7 @@ final class ArchitectureTests: XCTestCase {
             let pingMachine = machineRepresentations[.pingMachine],
             let pongMachine = machineRepresentations[.pongMachine]
         else {
-            XCTFail("Architecture could not be created.")
+            Issue.record("Architecture could not be created.")
             return
         }
         let signalStatements = arrangement.signals.map { HeadStatement.definition(value: .signal(value: $0)) }
@@ -177,21 +178,19 @@ final class ArchitectureTests: XCTestCase {
                 )
             ),
         ]
-        XCTAssertEqual(
-            architecture.head,
-            ArchitectureHead(statements: signalStatements + machineDefinitions)
-        )
+        #expect(architecture.head == ArchitectureHead(statements: signalStatements + machineDefinitions))
         let mappings = AsynchronousBlock.blocks(blocks: [pingInstance, pongInstance])
-        XCTAssertEqual(architecture.body, mappings)
-        XCTAssertEqual(architecture.entity, .arrangement1)
-        XCTAssertEqual(architecture.name, .behavioral)
+        #expect(architecture.body == mappings)
+        #expect(architecture.entity == .arrangement1)
+        #expect(architecture.name == .behavioral)
     }
 
     /// Test that the architecture generates only unique components.
-    func testArrangementGeneratesUniqueComponents() {
+    @Test
+    mutating func testArrangementGeneratesUniqueComponents() {
         var mappings = arrangement.machines
         guard let pingMapping = mappings[MachineInstance(name: .pingMachine, type: .pingMachine)] else {
-            XCTFail("No ping machine!")
+            Issue.record("No ping machine!")
             return
         }
         mappings[MachineInstance(name: .pongMachine, type: .pongMachine)] = nil
@@ -210,7 +209,7 @@ final class ArchitectureTests: XCTestCase {
             ),
             let pingMachine = machineRepresentations[.pingMachine]
         else {
-            XCTFail("Failed to create architecture!")
+            Issue.record("Failed to create architecture!")
             return
         }
         let signalStatements = arrangement.signals.map {
@@ -225,7 +224,7 @@ final class ArchitectureTests: XCTestCase {
                 )
             ]
         )
-        XCTAssertEqual(architecture.head, expectedHead)
+        #expect(architecture.head == expectedHead)
         let ping2Instance = AsynchronousBlock.component(
             block: ComponentInstantiation(
                 label: .pongMachine,
@@ -234,17 +233,18 @@ final class ArchitectureTests: XCTestCase {
             )
         )
         let expectedBody = AsynchronousBlock.blocks(blocks: [pingInstance, ping2Instance])
-        XCTAssertEqual(architecture.body, expectedBody)
-        XCTAssertEqual(architecture.entity, .arrangement1)
-        XCTAssertEqual(architecture.name, .behavioral)
+        #expect(architecture.body == expectedBody)
+        #expect(architecture.entity == .arrangement1)
+        #expect(architecture.name == .behavioral)
     }
 
     /// Test the architecture generates the correct components with the correct labels.
-    func testArrangementGeneratesDifferentInstanceNames() {
+    @Test
+    mutating func testArrangementGeneratesDifferentInstanceNames() {
         guard
             let pingMapping = arrangement.machines[MachineInstance(name: .pingMachine, type: .pingMachine)]
         else {
-            XCTFail("Failed to find ping mapping!")
+            Issue.record("Failed to find ping mapping!")
             return
         }
         let mappings: [MachineInstance: MachineMapping] = [
@@ -264,7 +264,7 @@ final class ArchitectureTests: XCTestCase {
             ),
             let pingMachine = machineRepresentations[.testMachine]
         else {
-            XCTFail("Couldn't create architecture!")
+            Issue.record("Couldn't create architecture!")
             return
         }
         let signalStatements = arrangement.signals.map {
@@ -279,40 +279,43 @@ final class ArchitectureTests: XCTestCase {
                 )
             ]
         )
-        XCTAssertEqual(architecture.head, expectedHead)
+        #expect(architecture.head == expectedHead)
         let component = ComponentInstantiation(
             label: .testMachine,
             name: .pingMachine,
             port: pingComponent.port
         )
         let expectedBody = AsynchronousBlock.component(block: component)
-        XCTAssertEqual(architecture.body, expectedBody)
-        XCTAssertEqual(architecture.entity, .arrangement1)
-        XCTAssertEqual(architecture.name, .behavioral)
+        #expect(architecture.body == expectedBody)
+        #expect(architecture.entity == .arrangement1)
+        #expect(architecture.name == .behavioral)
     }
 
     /// Test that the arrangement returns `nil` when the machines don't match the arrangement passed.
+    @Test
     func testArrangementInitDetectsDifferentInstances() {
         var machines = machineRepresentations
         machines[.pingMachine] = MachineRepresentation(machine: .testMachine(), name: .testMachine)
-        XCTAssertNil(Architecture(arrangement: arrangement, machines: machines, name: .arrangement1))
+        #expect(Architecture(arrangement: arrangement, machines: machines, name: .arrangement1) == nil)
     }
 
     /// Test the machines must match the arrangement machines.
+    @Test
     func testArrangementInitChecksMachineCount() {
         var machines = machineRepresentations
         machines[.testMachine] = MachineRepresentation(machine: .testMachine(), name: .testMachine)
-        XCTAssertNil(Architecture(arrangement: arrangement, machines: machines, name: .arrangement1))
+        #expect(Architecture(arrangement: arrangement, machines: machines, name: .arrangement1) == nil)
         machines[.pingMachine] = nil
         machines[.testMachine] = nil
-        XCTAssertNil(Architecture(arrangement: arrangement, machines: machines, name: .arrangement1))
-        XCTAssertNil(Architecture(arrangement: arrangement, machines: [:], name: .arrangement1))
+        #expect(Architecture(arrangement: arrangement, machines: machines, name: .arrangement1) == nil)
+        #expect(Architecture(arrangement: arrangement, machines: [:], name: .arrangement1) == nil)
     }
 
     // swiftlint:disable function_body_length
 
     /// Test arrangement init makes signals open when not mapped.
-    func testArrangementHandlesSignalsNotMapped() {
+    @Test
+    mutating func testArrangementHandlesSignalsNotMapped() {
         var mappings = arrangement.machines
         mappings[MachineInstance(name: .pingMachine, type: .pingMachine)] = MachineMapping(
             machine: PingPongArrangement().pingMachine,
@@ -333,7 +336,7 @@ final class ArchitectureTests: XCTestCase {
             let pingMachine = machineRepresentations[.pingMachine],
             let pongMachine = machineRepresentations[.pongMachine]
         else {
-            XCTFail("Failed to create architecture!")
+            Issue.record("Failed to create architecture!")
             return
         }
         let signalStatements = arrangement.signals.map {
@@ -353,7 +356,7 @@ final class ArchitectureTests: XCTestCase {
                 ),
             ]
         )
-        XCTAssertEqual(architecture.head, expectedHead)
+        #expect(architecture.head == expectedHead)
         let ping2Instance = AsynchronousBlock.component(
             block: ComponentInstantiation(
                 label: .pingMachine,
@@ -375,21 +378,22 @@ final class ArchitectureTests: XCTestCase {
             )
         )
         let expectedBody = AsynchronousBlock.blocks(blocks: [ping2Instance, pongInstance])
-        XCTAssertEqual(architecture.body, expectedBody)
-        XCTAssertEqual(architecture.entity, .arrangement1)
-        XCTAssertEqual(architecture.name, .behavioral)
+        #expect(architecture.body == expectedBody)
+        #expect(architecture.entity == .arrangement1)
+        #expect(architecture.name == .behavioral)
     }
 
     // swiftlint:enable function_body_length
 
     /// Test the arrangement init detects invalid additional mappings.
+    @Test
     func testArrangementInitWithAdditionalMappings() {
         var representations = machineRepresentations
         representations[.pongMachine] = nil
-        XCTAssertNil(Architecture(arrangement: arrangement, machines: representations, name: .arrangement1))
+        #expect(Architecture(arrangement: arrangement, machines: representations, name: .arrangement1) == nil)
         representations[.testMachine] = MachineRepresentation(machine: .testMachine(), name: .testMachine)
-        XCTAssertNotNil(representations[.testMachine])
-        XCTAssertNil(Architecture(arrangement: arrangement, machines: representations, name: .arrangement1))
+        #expect(representations[.testMachine] != nil)
+        #expect(Architecture(arrangement: arrangement, machines: representations, name: .arrangement1) == nil)
     }
 
 }

@@ -1,4 +1,4 @@
-// Variable+testConstants.swift
+// State+testState.swift
 // Machines
 //
 // Created by Morgan McColl.
@@ -54,77 +54,32 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
+@testable import VHDLMachines
 import VHDLParsing
 
-// swiftlint:disable force_unwrapping
+/// Add default state test data.
+extension State {
 
-// swiftlint:disable missing_docs
+    // swiftlint:disable force_unwrapping
 
-// swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    /// Test state.
+    static func defaultState(name: VariableName) -> State {
+        VHDLMachines.State(
+            name: name,
+            actions: [
+                VariableName.onEntry: SynchronousBlock(
+                    rawValue: "x <= '1';\nxx <= \"00\"; -- \(name) onEntry"
+                )!,
+                VariableName.onExit: SynchronousBlock(rawValue: "x <= '0'; -- \(name) OnExit")!,
+                VariableName.onResume: SynchronousBlock(rawValue: "x <= '0'; -- \(name) OnResume")!,
+                VariableName.onSuspend: SynchronousBlock(rawValue: "xx <= \"11\"; -- \(name) onSuspend")!,
+                VariableName.internal: SynchronousBlock(rawValue: "x <= '1'; -- \(name) Internal")!,
+            ],
+            signals: [],
+            externalVariables: [.x, .xx]
+        )
+    }
 
-/// Add test constants.
-extension VariableName {
-
-    public static var a: VariableName { VariableName(rawValue: "A")! }
-
-    public static let arrangement1 = VariableName(rawValue: "Arrangement1")!
-
-    public static var clk2: VariableName { VariableName(rawValue: "clk2")! }
-
-    public static let externalPing = VariableName(rawValue: "EXTERNAL_ping")!
-
-    public static let externalPong = VariableName(rawValue: "EXTERNAL_pong")!
-
-    public static var g: VariableName { VariableName(rawValue: "g")! }
-
-    public static var initialX: VariableName { VariableName(rawValue: "initialX")! }
-
-    public static var p: VariableName { VariableName(rawValue: "p")! }
-
-    public static var r: VariableName { VariableName(rawValue: "r")! }
-
-    public static var s: VariableName { VariableName(rawValue: "s")! }
-
-    public static var x: VariableName { VariableName(rawValue: "x")! }
-
-    public static var xx: VariableName { VariableName(rawValue: "xx")! }
-
-    public static var xs: VariableName { VariableName(rawValue: "xs")! }
-
-    public static var y: VariableName { VariableName(rawValue: "y")! }
-
-    public static var z: VariableName { VariableName(rawValue: "z")! }
-
-    public static var s0: VariableName { VariableName(rawValue: "S0")! }
-
-    public static var s1: VariableName { VariableName(rawValue: "S1")! }
-
-    public static var state0: VariableName { VariableName(rawValue: "State0")! }
-
-    public static var parX: VariableName { VariableName(rawValue: "parX")! }
-
-    public static var ping: VariableName { VariableName(rawValue: "ping")! }
-
-    public static var pong: VariableName { VariableName(rawValue: "pong")! }
-
-    public static let pingMachine = VariableName(rawValue: "PingMachine")!
-
-    public static let pongMachine = VariableName(rawValue: "PongMachine")!
-
-    public static var parXs: VariableName { VariableName(rawValue: "parXs")! }
-
-    public static var retX: VariableName { VariableName(rawValue: "retX")! }
-
-    public static var retXs: VariableName { VariableName(rawValue: "retXs")! }
-
-    public static var machineSignal1: VariableName { VariableName(rawValue: "machineSignal1")! }
-
-    public static var machineSignal2: VariableName { VariableName(rawValue: "machineSignal2")! }
-
-    public static let testMachine = VariableName(rawValue: "TestMachine")!
+    // swiftlint:enable force_unwrapping
 
 }
-
-// swiftlint:enable missing_docs
-
-// swiftlint:enable force_unwrapping

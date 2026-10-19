@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `CaseStatement` replace initialiser.
-final class CaseStatementInitTests: XCTestCase {
+@Suite
+struct CaseStatementInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,14 +81,16 @@ final class CaseStatementInitTests: XCTestCase {
     }
 
     /// Test that the condition is replaced correctly.
+    @Test
     func testCondition() {
         let cases = [WhenCase(condition: .expression(expression: y), code: .statement(statement: .null))]
         let original = CaseStatement(condition: x, cases: cases)
         let result = CaseStatement(statement: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, CaseStatement(condition: expNewX, cases: cases))
+        #expect(result == CaseStatement(condition: expNewX, cases: cases))
     }
 
     /// Test the cases are replaced correctly.
+    @Test
     func testCases() {
         let cases = [
             WhenCase(condition: .expression(expression: x), code: .statement(statement: .null)),
@@ -103,23 +106,26 @@ final class CaseStatementInitTests: XCTestCase {
         ]
         let original = CaseStatement(condition: y, cases: cases)
         let result = CaseStatement(statement: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            CaseStatement(
-                condition: y,
-                cases: [
-                    WhenCase(condition: .expression(expression: expNewX), code: .statement(statement: .null)),
-                    WhenCase(
-                        condition: .expression(expression: y),
-                        code: .statement(
-                            statement: .assignment(
-                                name: .variable(reference: .variable(name: .y)),
-                                value: expNewX
+        #expect(
+            result
+                == CaseStatement(
+                    condition: y,
+                    cases: [
+                        WhenCase(
+                            condition: .expression(expression: expNewX),
+                            code: .statement(statement: .null)
+                        ),
+                        WhenCase(
+                            condition: .expression(expression: y),
+                            code: .statement(
+                                statement: .assignment(
+                                    name: .variable(reference: .variable(name: .y)),
+                                    value: expNewX
+                                )
                             )
-                        )
-                    ),
-                ]
-            )
+                        ),
+                    ]
+                )
         )
     }
 

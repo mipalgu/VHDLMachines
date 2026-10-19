@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `WhenCase` replace initialiser.
-final class WhenCaseInitTests: XCTestCase {
+@Suite
+struct WhenCaseInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,33 +81,35 @@ final class WhenCaseInitTests: XCTestCase {
     }
 
     /// Test that the condition gets changed.
+    @Test
     func testCondition() {
         let code = SynchronousBlock.statement(
             statement: .assignment(name: .variable(reference: .variable(name: .z)), value: y)
         )
         let original = WhenCase(condition: .expression(expression: x), code: code)
         let result = WhenCase(whenCase: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, WhenCase(condition: .expression(expression: expNewX), code: code))
+        #expect(result == WhenCase(condition: .expression(expression: expNewX), code: code))
     }
 
     /// Test that the code gets changed.
+    @Test
     func testCode() {
         let code = SynchronousBlock.statement(
             statement: .assignment(name: .variable(reference: .variable(name: .x)), value: y)
         )
         let original = WhenCase(condition: .expression(expression: y), code: code)
         let result = WhenCase(whenCase: original, replacing: .x, with: newX)
-        XCTAssertEqual(
-            result,
-            WhenCase(
-                condition: .expression(expression: y),
-                code: SynchronousBlock.statement(
-                    statement: .assignment(
-                        name: .variable(reference: .variable(name: newX)),
-                        value: y
+        #expect(
+            result
+                == WhenCase(
+                    condition: .expression(expression: y),
+                    code: SynchronousBlock.statement(
+                        statement: .assignment(
+                            name: .variable(reference: .variable(name: newX)),
+                            value: y
+                        )
                     )
                 )
-            )
         )
     }
 

@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `VariableReferece` replace initialiser.
-final class VariableReferenceInitTests: XCTestCase {
+@Suite
+struct VariableReferenceInitTests {
 
     // swiftlint:disable force_unwrapping
 
@@ -69,21 +70,24 @@ final class VariableReferenceInitTests: XCTestCase {
     // swiftlint:enable force_unwrapping
 
     /// Test `variable` case.
+    @Test
     func testVariable() {
         let x = VariableReference.variable(reference: .variable(name: .x))
         let result = VariableReference(reference: x, replacing: .x, with: newX)
         let expected = VariableReference.variable(reference: .variable(name: newX))
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test `variable` case when variable doesn't match.
+    @Test
     func testInvalidVariable() {
         let x = VariableReference.variable(reference: .variable(name: .x))
         let result = VariableReference(reference: x, replacing: .y, with: newX)
-        XCTAssertEqual(result, x)
+        #expect(result == x)
     }
 
     /// Test `indexed` case.
+    @Test
     func testIndexed() {
         let range = VectorIndex.range(
             value: .downto(
@@ -100,10 +104,11 @@ final class VariableReferenceInitTests: XCTestCase {
             name: .reference(variable: .variable(reference: .variable(name: newX))),
             index: range
         )
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
     /// Test `indexed` case when variable doesn't match.
+    @Test
     func testInvalidIndexed() {
         let range = VectorIndex.range(
             value: .downto(
@@ -116,7 +121,7 @@ final class VariableReferenceInitTests: XCTestCase {
             index: range
         )
         let result = VariableReference(reference: x, replacing: .y, with: newX)
-        XCTAssertEqual(result, x)
+        #expect(result == x)
     }
 
 }

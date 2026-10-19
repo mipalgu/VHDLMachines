@@ -54,16 +54,17 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
 import Foundation
-import TestUtils
+
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``ArrangementRepresentation``.
-final class ArrangementRepresentationTests: XCTestCase {
+@Suite
+struct ArrangementRepresentationTests {
 
     /// A test arrangement.
-    var arrangement = Arrangement.testArrangement
+    var arrangement: Arrangement
 
     /// The architecture of `arrangement`.
     var architecture: Architecture {
@@ -131,39 +132,42 @@ final class ArrangementRepresentationTests: XCTestCase {
     }
 
     /// Initialise the arrangement before every test.
-    override func setUp() {
-        arrangement = .testArrangement
+    init() {
+        self.arrangement = .testArrangement
     }
 
     /// Test arrangement.
+    @Test
     func testArrangement() {
-        XCTAssertEqual(representation.architecture, expected.architecture)
-        XCTAssertEqual(representation.entity, expected.entity)
-        XCTAssertEqual(representation.includes, expected.includes)
-        XCTAssertEqual(representation.machines as? [MachineRepresentation], machines)
-        XCTAssertEqual(representation.name, expected.name)
-        XCTAssertEqual(representation.arrangement, expected.arrangement)
-        XCTAssertEqual(
-            representation.file,
-            VHDLFile(
-                architectures: [expected.architecture],
-                entities: [expected.entity],
-                includes: expected.includes
-            )
+        #expect(representation.architecture == expected.architecture)
+        #expect(representation.entity == expected.entity)
+        #expect(representation.includes == expected.includes)
+        #expect(representation.machines as? [MachineRepresentation] == machines)
+        #expect(representation.name == expected.name)
+        #expect(representation.arrangement == expected.arrangement)
+        #expect(
+            representation.file
+                == VHDLFile(
+                    architectures: [expected.architecture],
+                    entities: [expected.entity],
+                    includes: expected.includes
+                )
         )
     }
 
     /// Test property init sets stored-properties correctly.
+    @Test
     func testPropertyInit() {
-        XCTAssertEqual(expected.name, .arrangement1)
-        XCTAssertEqual(expected.arrangement, arrangement)
-        XCTAssertEqual(expected.machines as? [MachineRepresentation], machines)
-        XCTAssertEqual(expected.architecture, architecture)
-        XCTAssertEqual(expected.entity, entity)
-        XCTAssertEqual(expected.includes, includes)
+        #expect(expected.name == .arrangement1)
+        #expect(expected.arrangement == arrangement)
+        #expect(expected.machines as? [MachineRepresentation] == machines)
+        #expect(expected.architecture == architecture)
+        #expect(expected.entity == entity)
+        #expect(expected.includes == includes)
     }
 
     /// Test the public init detects invalid variable mappings in arrangement.
+    @Test
     func testInvalidVariableMappingsReturnsNil() {
         let arrangement2 = Arrangement(
             machines: arrangement.machines,
@@ -171,7 +175,7 @@ final class ArrangementRepresentationTests: XCTestCase {
             signals: arrangement.signals + [LocalSignal(type: .stdLogic, name: .clk)],
             clocks: arrangement.clocks
         )
-        XCTAssertNil(ArrangementRepresentation(arrangement: arrangement2, name: .arrangement1))
+        #expect(ArrangementRepresentation(arrangement: arrangement2, name: .arrangement1) == nil)
         var mappings = arrangement.machines
         mappings[MachineInstance(name: .pingMachine, type: .pingMachine)] = MachineMapping(
             machine: PingPongArrangement().pingMachine,
@@ -187,10 +191,11 @@ final class ArrangementRepresentationTests: XCTestCase {
             signals: arrangement.signals,
             clocks: arrangement.clocks
         )
-        XCTAssertNil(ArrangementRepresentation(arrangement: arrangement3, name: .arrangement1))
+        #expect(ArrangementRepresentation(arrangement: arrangement3, name: .arrangement1) == nil)
     }
 
     /// Test the public init detects invalid machine creation.
+    @Test
     func testPublicInitReturnsNilWhenMachinesAreNotCreated() {
         let arrangement2 = Arrangement(
             machines: arrangement.machines,
@@ -198,17 +203,18 @@ final class ArrangementRepresentationTests: XCTestCase {
             signals: arrangement.signals,
             clocks: arrangement.clocks
         )
-        XCTAssertNil(
-            ArrangementRepresentation(arrangement: arrangement2, name: .arrangement1) { _, _ in nil }
+        #expect(
+            ArrangementRepresentation(arrangement: arrangement2, name: .arrangement1) { _, _ in nil } == nil
         )
     }
 
     /// Test that the representation returns nil when the architecture isn't created.
+    @Test
     func testInvalidArchitectureReturnsNil() {
-        XCTAssertNil(
+        #expect(
             ArrangementRepresentation(arrangement: arrangement, name: .arrangement1) { machine, _ in
                 MachineRepresentation(machine: machine, name: .pingMachine)
-            }
+            } == nil
         )
     }
 

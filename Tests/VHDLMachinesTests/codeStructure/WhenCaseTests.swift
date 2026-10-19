@@ -56,16 +56,17 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
 /// Test the `WhenCase` extensions.
-final class WhenCaseTests: XCTestCase {
+@Suite
+struct WhenCaseTests {
 
     /// A test machine.
-    var machine = Machine.testMachine()
+    var machine: Machine
 
     // swiftlint:disable line_length
 
@@ -300,174 +301,184 @@ final class WhenCaseTests: XCTestCase {
     // swiftlint:enable line_length
 
     /// Create test data before every test.
-    override func setUp() {
-        machine = Machine.testMachine()
+    init() {
+        self.machine = Machine.testMachine()
     }
 
     /// Test the checkTransition generation.
+    @Test
     func testCheckTransitionCode() {
         let checkTransition = WhenCase(machine: machine, action: .checkTransition)
-        XCTAssertEqual(checkTransition?.rawValue, checkTransitionCode)
+        #expect(checkTransition?.rawValue == checkTransitionCode)
     }
 
     /// Test the noOnEntry generation.
+    @Test
     func testNoOnEntryCode() {
         let noOnEntry = WhenCase(machine: machine, action: .noOnEntry)
-        XCTAssertEqual(noOnEntry?.rawValue, noOnEntryCode)
+        #expect(noOnEntry?.rawValue == noOnEntryCode)
     }
 
     /// Test onEntry generation.
+    @Test
     func testOnEntryCode() {
         let onEntry = WhenCase(machine: machine, action: .onEntry)
-        XCTAssertEqual(onEntry?.rawValue, onEntryCode)
+        #expect(onEntry?.rawValue == onEntryCode)
     }
 
     /// Test onExit generation.
+    @Test
     func testOnExitCode() {
         let onExit = WhenCase(machine: machine, action: .onExit)
-        XCTAssertEqual(onExit?.rawValue, onExitCode)
+        #expect(onExit?.rawValue == onExitCode)
     }
 
     /// Test onResume generation.
+    @Test
     func testOnResumeCode() {
         let onResume = WhenCase(machine: machine, action: .onResume)
-        XCTAssertEqual(onResume?.rawValue, onResumeCode)
+        #expect(onResume?.rawValue == onResumeCode)
     }
 
     /// Test onResume for non-suspensible machine.
-    func testOnResumeNotSuspensible() {
+    @Test
+    mutating func testOnResumeNotSuspensible() {
         machine.suspendedState = nil
         let onResume = WhenCase(machine: machine, action: .onResume)
-        XCTAssertNil(onResume)
+        #expect(onResume == nil)
     }
 
     /// Test onSuspend generation.
+    @Test
     func testOnSuspendCode() {
         let onSuspend = WhenCase(machine: machine, action: .onSuspend)
-        XCTAssertEqual(onSuspend?.rawValue, onSuspendCode)
+        #expect(onSuspend?.rawValue == onSuspendCode)
     }
 
     /// Test onSuspend for non-suspensible machine.
-    func testOnSuspendedNotSuspensible() {
+    @Test
+    mutating func testOnSuspendedNotSuspensible() {
         machine.suspendedState = nil
         let onSuspend = WhenCase(machine: machine, action: .onSuspend)
-        XCTAssertNil(onSuspend)
+        #expect(onSuspend == nil)
     }
 
     /// Test internal code generation.
+    @Test
     func testInternalCode() {
         let internalCase = WhenCase(machine: machine, action: .internal)
-        XCTAssertEqual(internalCase?.rawValue, internalCode)
+        #expect(internalCase?.rawValue == internalCode)
     }
 
     /// Test read snapshot generation is correct.
+    @Test
     func testReadSnapshotCode() {
         let readSnapshot = WhenCase(machine: machine, action: .readSnapshot)
-        XCTAssertEqual(readSnapshot?.rawValue, readSnapshotExpected)
+        #expect(readSnapshot?.rawValue == readSnapshotExpected)
     }
 
     /// Test read snapshot for a machine that is not suspensible.
-    func testReadSnapshotNotSuspensible() {
+    @Test
+    mutating func testReadSnapshotNotSuspensible() {
         machine.suspendedState = nil
         let readSnapshot = WhenCase(machine: machine, action: .readSnapshot)
-        XCTAssertEqual(
-            readSnapshot?.rawValue,
-            """
-            when ReadSnapshot =>
-                case currentState is
-                    when STATE_Initial =>
-                        x <= EXTERNAL_x;
-                    when STATE_Suspended =>
-                        x <= EXTERNAL_x;
-                    when STATE_State0 =>
-                        x <= EXTERNAL_x;
-                    when others =>
-                        null;
-                end case;
-                if (previousRinglet /= currentState) then
-                    internalState <= OnEntry;
-                else
-                    internalState <= NoOnEntry;
-                end if;
-            """
+        #expect(
+            readSnapshot?.rawValue == """
+                when ReadSnapshot =>
+                    case currentState is
+                        when STATE_Initial =>
+                            x <= EXTERNAL_x;
+                        when STATE_Suspended =>
+                            x <= EXTERNAL_x;
+                        when STATE_State0 =>
+                            x <= EXTERNAL_x;
+                        when others =>
+                            null;
+                    end case;
+                    if (previousRinglet /= currentState) then
+                        internalState <= OnEntry;
+                    else
+                        internalState <= NoOnEntry;
+                    end if;
+                """
         )
         machine.initialState = -1
-        XCTAssertNil(WhenCase(machine: machine, action: .readSnapshot))
+        #expect(WhenCase(machine: machine, action: .readSnapshot) == nil)
     }
 
     // swiftlint:disable function_body_length
     // swiftlint:disable line_length
 
     /// Test read snapshot for a machine that is not parameterised.
-    func testReadSnapshotNotParameterised() {
+    @Test
+    mutating func testReadSnapshotNotParameterised() {
         machine.isParameterised = false
         let readSnapshot = WhenCase(machine: machine, action: .readSnapshot)
-        XCTAssertEqual(
-            readSnapshot?.rawValue,
-            """
-            when ReadSnapshot =>
-                case currentState is
-                    when STATE_Initial =>
-                        x <= EXTERNAL_x;
-                    when STATE_Suspended =>
-                        x <= EXTERNAL_x;
-                    when STATE_State0 =>
-                        x <= EXTERNAL_x;
-                    when others =>
-                        null;
-                end case;
-                if ((command = COMMAND_RESTART) and (currentState /= STATE_Initial)) then
-                    currentState <= STATE_Initial;
-                    suspended <= '0';
-                    suspendedFrom <= STATE_Initial;
-                    targetState <= STATE_Initial;
-                    if (previousRinglet = STATE_Suspended) then
+        #expect(
+            readSnapshot?.rawValue == """
+                when ReadSnapshot =>
+                    case currentState is
+                        when STATE_Initial =>
+                            x <= EXTERNAL_x;
+                        when STATE_Suspended =>
+                            x <= EXTERNAL_x;
+                        when STATE_State0 =>
+                            x <= EXTERNAL_x;
+                        when others =>
+                            null;
+                    end case;
+                    if ((command = COMMAND_RESTART) and (currentState /= STATE_Initial)) then
+                        currentState <= STATE_Initial;
+                        suspended <= '0';
+                        suspendedFrom <= STATE_Initial;
+                        targetState <= STATE_Initial;
+                        if (previousRinglet = STATE_Suspended) then
+                            internalState <= OnResume;
+                        elsif (previousRinglet = STATE_Initial) then
+                            internalState <= NoOnEntry;
+                        else
+                            internalState <= OnEntry;
+                        end if;
+                    elsif ((command = COMMAND_RESUME) and ((currentState = STATE_Suspended) and (suspendedFrom /= STATE_Suspended))) then
+                        suspended <= '0';
+                        currentState <= suspendedFrom;
+                        targetState <= suspendedFrom;
+                        if (previousRinglet = suspendedFrom) then
+                            internalState <= NoOnEntry;
+                        else
+                            internalState <= OnResume;
+                        end if;
+                    elsif ((command = COMMAND_SUSPEND) and (currentState /= STATE_Suspended)) then
+                        suspendedFrom <= currentState;
+                        suspended <= '1';
+                        currentState <= STATE_Suspended;
+                        targetState <= STATE_Suspended;
+                        if (previousRinglet = STATE_Suspended) then
+                            internalState <= NoOnEntry;
+                        else
+                            internalState <= OnSuspend;
+                        end if;
+                    elsif (currentState = STATE_Suspended) then
+                        suspended <= '1';
+                        if (previousRinglet /= STATE_Suspended) then
+                            internalState <= OnSuspend;
+                        else
+                            internalState <= NoOnEntry;
+                        end if;
+                    elsif (previousRinglet = STATE_Suspended) then
                         internalState <= OnResume;
-                    elsif (previousRinglet = STATE_Initial) then
-                        internalState <= NoOnEntry;
+                        suspended <= '0';
+                        suspendedFrom <= currentState;
                     else
-                        internalState <= OnEntry;
+                        suspended <= '0';
+                        suspendedFrom <= currentState;
+                        if (previousRinglet /= currentState) then
+                            internalState <= OnEntry;
+                        else
+                            internalState <= NoOnEntry;
+                        end if;
                     end if;
-                elsif ((command = COMMAND_RESUME) and ((currentState = STATE_Suspended) and (suspendedFrom /= STATE_Suspended))) then
-                    suspended <= '0';
-                    currentState <= suspendedFrom;
-                    targetState <= suspendedFrom;
-                    if (previousRinglet = suspendedFrom) then
-                        internalState <= NoOnEntry;
-                    else
-                        internalState <= OnResume;
-                    end if;
-                elsif ((command = COMMAND_SUSPEND) and (currentState /= STATE_Suspended)) then
-                    suspendedFrom <= currentState;
-                    suspended <= '1';
-                    currentState <= STATE_Suspended;
-                    targetState <= STATE_Suspended;
-                    if (previousRinglet = STATE_Suspended) then
-                        internalState <= NoOnEntry;
-                    else
-                        internalState <= OnSuspend;
-                    end if;
-                elsif (currentState = STATE_Suspended) then
-                    suspended <= '1';
-                    if (previousRinglet /= STATE_Suspended) then
-                        internalState <= OnSuspend;
-                    else
-                        internalState <= NoOnEntry;
-                    end if;
-                elsif (previousRinglet = STATE_Suspended) then
-                    internalState <= OnResume;
-                    suspended <= '0';
-                    suspendedFrom <= currentState;
-                else
-                    suspended <= '0';
-                    suspendedFrom <= currentState;
-                    if (previousRinglet /= currentState) then
-                        internalState <= OnEntry;
-                    else
-                        internalState <= NoOnEntry;
-                    end if;
-                end if;
-            """
+                """
         )
     }
 
@@ -475,33 +486,34 @@ final class WhenCaseTests: XCTestCase {
     // swiftlint:enable line_length
 
     /// Test write snapshot generation is correct.
+    @Test
     func testWriteSnapshotCode() {
         let writeSnapshot = WhenCase(machine: machine, action: .writeSnapshot)
-        XCTAssertEqual(writeSnapshot?.rawValue, writeSnapshotCode)
+        #expect(writeSnapshot?.rawValue == writeSnapshotCode)
     }
 
     /// Test write snapshot when machine isn't parameterised.
-    func testWriteSnapshotNotParameterised() {
+    @Test
+    mutating func testWriteSnapshotNotParameterised() {
         machine.isParameterised = false
         let writeSnapshot = WhenCase(machine: machine, action: .writeSnapshot)
-        XCTAssertEqual(
-            writeSnapshot?.rawValue,
-            """
-            when WriteSnapshot =>
-                case currentState is
-                    when STATE_Initial =>
-                        EXTERNAL_xx <= xx;
-                    when STATE_Suspended =>
-                        EXTERNAL_xx <= xx;
-                    when STATE_State0 =>
-                        EXTERNAL_xx <= xx;
-                    when others =>
-                        null;
-                end case;
-                internalState <= ReadSnapshot;
-                previousRinglet <= currentState;
-                currentState <= targetState;
-            """
+        #expect(
+            writeSnapshot?.rawValue == """
+                when WriteSnapshot =>
+                    case currentState is
+                        when STATE_Initial =>
+                            EXTERNAL_xx <= xx;
+                        when STATE_Suspended =>
+                            EXTERNAL_xx <= xx;
+                        when STATE_State0 =>
+                            EXTERNAL_xx <= xx;
+                        when others =>
+                            null;
+                    end case;
+                    internalState <= ReadSnapshot;
+                    previousRinglet <= currentState;
+                    currentState <= targetState;
+                """
         )
     }
 

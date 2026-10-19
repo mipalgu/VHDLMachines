@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``Machine`` replace initialiser.
-final class MachineInitTests: XCTestCase {
+@Suite
+struct MachineInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -88,6 +89,7 @@ final class MachineInitTests: XCTestCase {
     }
 
     /// Test that all states are replaced correctly.
+    @Test
     func testStatesReplacedCorrectly() {
         var machine = Machine.testMachine()
         machine.transitions = [Transition(condition: .variable(name: .x), source: 0, target: 1)]
@@ -111,7 +113,7 @@ final class MachineInitTests: XCTestCase {
             statement: .assignment(name: .variable(reference: .variable(name: .x)), value: expNewY)
         )
         expected.transitions = [Transition(condition: .variable(name: newX), source: 0, target: 1)]
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
 }

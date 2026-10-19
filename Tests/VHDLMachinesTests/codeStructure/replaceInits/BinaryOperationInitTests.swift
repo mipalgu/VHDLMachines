@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `BinaryOperation` replace initialiser.
-final class BinaryOperationInitTests: XCTestCase {
+@Suite
+struct BinaryOperationInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,38 +81,43 @@ final class BinaryOperationInitTests: XCTestCase {
     }
 
     /// Test `addition` operation.
+    @Test
     func testAddition() {
         let operation = BinaryOperation.addition(lhs: x, rhs: y)
         let result = BinaryOperation(operation: operation, replacing: .x, with: newX)
-        XCTAssertEqual(result, .addition(lhs: expNewX, rhs: y))
+        #expect(result == .addition(lhs: expNewX, rhs: y))
     }
 
     /// Test `division` operation.
+    @Test
     func testDivision() {
         let operation = BinaryOperation.division(lhs: x, rhs: y)
         let result = BinaryOperation(operation: operation, replacing: .x, with: newX)
-        XCTAssertEqual(result, .division(lhs: expNewX, rhs: y))
+        #expect(result == .division(lhs: expNewX, rhs: y))
     }
 
     /// Test `subtraction` operation.
+    @Test
     func testSubtraction() {
         let operation = BinaryOperation.subtraction(lhs: x, rhs: y)
         let result = BinaryOperation(operation: operation, replacing: .x, with: newX)
-        XCTAssertEqual(result, .subtraction(lhs: expNewX, rhs: y))
+        #expect(result == .subtraction(lhs: expNewX, rhs: y))
     }
 
     /// Test `multiplication` operation.
+    @Test
     func testMultiplication() {
         let operation = BinaryOperation.multiplication(lhs: x, rhs: y)
         let result = BinaryOperation(operation: operation, replacing: .x, with: newX)
-        XCTAssertEqual(result, .multiplication(lhs: expNewX, rhs: y))
+        #expect(result == .multiplication(lhs: expNewX, rhs: y))
     }
 
     /// Test `concatenation` operation.
+    @Test
     func testConcat() {
         let operation = BinaryOperation.concatenate(lhs: x, rhs: y)
         let result = BinaryOperation(operation: operation, replacing: .x, with: newX)
-        XCTAssertEqual(result, .concatenate(lhs: expNewX, rhs: y))
+        #expect(result == .concatenate(lhs: expNewX, rhs: y))
     }
 
 }

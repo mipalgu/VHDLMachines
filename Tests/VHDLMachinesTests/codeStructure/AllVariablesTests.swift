@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `allVariables` property on multiple types.
-final class AllVariablesTests: XCTestCase {
+@Suite
+struct AllVariablesTests {
 
     /// An expression `x`.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -68,109 +69,114 @@ final class AllVariablesTests: XCTestCase {
     let y = Expression.reference(variable: .variable(reference: .variable(name: .y)))
 
     /// Test all variables.
+    @Test
     func testAllVariables() {
-        XCTAssertEqual(MemberAccess(record: .x, member: .variable(name: .y)).allVariables, [.x, .y])
-        XCTAssertEqual(DirectReference.variable(name: .x).allVariables, [.x])
-        XCTAssertEqual(
+        #expect(MemberAccess(record: .x, member: .variable(name: .y)).allVariables == [.x, .y])
+        #expect(DirectReference.variable(name: .x).allVariables == [.x])
+        #expect(
             DirectReference.member(
                 access: MemberAccess(
                     record: .x,
                     member: .variable(name: .y)
                 )
             )
-            .allVariables,
-            [.x, .y]
+            .allVariables == [.x, .y]
         )
-        XCTAssertEqual(VectorSize.downto(upper: x, lower: y).allVariables, [.x, .y])
-        XCTAssertEqual(VariableReference.variable(reference: .variable(name: .x)).allVariables, [.x])
-        XCTAssertEqual(VariableReference.indexed(name: x, index: .index(value: y)).allVariables, [.x, .y])
-        XCTAssertEqual(EdgeCondition.falling(expression: x).allVariables, [.x])
-        XCTAssertEqual(EdgeCondition.rising(expression: x).allVariables, [.x])
+        #expect(VectorSize.downto(upper: x, lower: y).allVariables == [.x, .y])
+        #expect(VariableReference.variable(reference: .variable(name: .x)).allVariables == [.x])
+        #expect(VariableReference.indexed(name: x, index: .index(value: y)).allVariables == [.x, .y])
+        #expect(EdgeCondition.falling(expression: x).allVariables == [.x])
+        #expect(EdgeCondition.rising(expression: x).allVariables == [.x])
     }
 
     /// Test comparison operations.
+    @Test
     func testComparisonAllVariables() {
-        XCTAssertEqual(ComparisonOperation.equality(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(ComparisonOperation.greaterThan(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(ComparisonOperation.greaterThanOrEqual(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(ComparisonOperation.lessThan(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(ComparisonOperation.lessThanOrEqual(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(ComparisonOperation.notEquals(lhs: x, rhs: y).allVariables, [.x, .y])
+        #expect(ComparisonOperation.equality(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(ComparisonOperation.greaterThan(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(ComparisonOperation.greaterThanOrEqual(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(ComparisonOperation.lessThan(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(ComparisonOperation.lessThanOrEqual(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(ComparisonOperation.notEquals(lhs: x, rhs: y).allVariables == [.x, .y])
     }
 
     /// test conditional operation.
+    @Test
     func testConditional() {
-        XCTAssertEqual(
-            ConditionalExpression.comparison(value: .equality(lhs: x, rhs: y)).allVariables,
-            [.x, .y]
+        #expect(
+            ConditionalExpression.comparison(value: .equality(lhs: x, rhs: y)).allVariables == [.x, .y]
         )
-        XCTAssertEqual(ConditionalExpression.edge(value: .rising(expression: x)).allVariables, [.x])
-        XCTAssertTrue(ConditionalExpression.literal(value: true).allVariables.isEmpty)
+        #expect(ConditionalExpression.edge(value: .rising(expression: x)).allVariables == [.x])
+        #expect(ConditionalExpression.literal(value: true).allVariables.isEmpty)
     }
 
     /// Test cast operations.
+    @Test
     func testCast() {
-        XCTAssertEqual(CastOperation.bit(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.signed(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.unsigned(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.bitVector(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.boolean(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.integer(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.real(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.natural(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.positive(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.stdLogic(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.stdLogicVector(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.stdULogic(expression: x).allVariables, [.x])
-        XCTAssertEqual(CastOperation.stdULogicVector(expression: x).allVariables, [.x])
+        #expect(CastOperation.bit(expression: x).allVariables == [.x])
+        #expect(CastOperation.signed(expression: x).allVariables == [.x])
+        #expect(CastOperation.unsigned(expression: x).allVariables == [.x])
+        #expect(CastOperation.bitVector(expression: x).allVariables == [.x])
+        #expect(CastOperation.boolean(expression: x).allVariables == [.x])
+        #expect(CastOperation.integer(expression: x).allVariables == [.x])
+        #expect(CastOperation.real(expression: x).allVariables == [.x])
+        #expect(CastOperation.natural(expression: x).allVariables == [.x])
+        #expect(CastOperation.positive(expression: x).allVariables == [.x])
+        #expect(CastOperation.stdLogic(expression: x).allVariables == [.x])
+        #expect(CastOperation.stdLogicVector(expression: x).allVariables == [.x])
+        #expect(CastOperation.stdULogic(expression: x).allVariables == [.x])
+        #expect(CastOperation.stdULogicVector(expression: x).allVariables == [.x])
     }
 
     /// Test binary operations.
+    @Test
     func testBinary() {
-        XCTAssertEqual(BinaryOperation.addition(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BinaryOperation.subtraction(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BinaryOperation.multiplication(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BinaryOperation.division(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BinaryOperation.concatenate(lhs: x, rhs: y).allVariables, [.x, .y])
+        #expect(BinaryOperation.addition(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BinaryOperation.subtraction(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BinaryOperation.multiplication(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BinaryOperation.division(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BinaryOperation.concatenate(lhs: x, rhs: y).allVariables == [.x, .y])
     }
 
     /// Test boolean operations.
+    @Test
     func testBoolean() {
-        XCTAssertEqual(BooleanExpression.and(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BooleanExpression.nand(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BooleanExpression.nor(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BooleanExpression.or(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BooleanExpression.xnor(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BooleanExpression.xor(lhs: x, rhs: y).allVariables, [.x, .y])
-        XCTAssertEqual(BooleanExpression.not(value: x).allVariables, [.x])
+        #expect(BooleanExpression.and(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BooleanExpression.nand(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BooleanExpression.nor(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BooleanExpression.or(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BooleanExpression.xnor(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BooleanExpression.xor(lhs: x, rhs: y).allVariables == [.x, .y])
+        #expect(BooleanExpression.not(value: x).allVariables == [.x])
     }
 
     /// Test index.
+    @Test
     func testVectorIndex() {
-        XCTAssertEqual(VectorIndex.index(value: x).allVariables, [.x])
-        XCTAssertEqual(VectorIndex.range(value: .downto(upper: x, lower: y)).allVariables, [.x, .y])
-        XCTAssertTrue(VectorIndex.others.allVariables.isEmpty)
+        #expect(VectorIndex.index(value: x).allVariables == [.x])
+        #expect(VectorIndex.range(value: .downto(upper: x, lower: y)).allVariables == [.x, .y])
+        #expect(VectorIndex.others.allVariables.isEmpty)
     }
 
     /// Test function calls.
+    @Test
     func testFunctions() {
-        XCTAssertEqual(
+        #expect(
             FunctionCall.custom(
                 function: CustomFunctionCall(
                     name: .y,
                     parameters: [Argument(argument: x)]
                 )
             )
-            .allVariables,
-            [.y, .x]
+            .allVariables == [.y, .x]
         )
-        XCTAssertEqual(FunctionCall.mathReal(function: .ceil(expression: x)).allVariables, [.x])
-        XCTAssertEqual(FunctionCall.mathReal(function: .floor(expression: x)).allVariables, [.x])
-        XCTAssertEqual(FunctionCall.mathReal(function: .round(expression: x)).allVariables, [.x])
-        XCTAssertEqual(FunctionCall.mathReal(function: .sign(expression: x)).allVariables, [.x])
-        XCTAssertEqual(FunctionCall.mathReal(function: .sqrt(expression: x)).allVariables, [.x])
-        XCTAssertEqual(FunctionCall.mathReal(function: .fmax(arg0: x, arg1: y)).allVariables, [.x, .y])
-        XCTAssertEqual(FunctionCall.mathReal(function: .fmin(arg0: x, arg1: y)).allVariables, [.x, .y])
+        #expect(FunctionCall.mathReal(function: .ceil(expression: x)).allVariables == [.x])
+        #expect(FunctionCall.mathReal(function: .floor(expression: x)).allVariables == [.x])
+        #expect(FunctionCall.mathReal(function: .round(expression: x)).allVariables == [.x])
+        #expect(FunctionCall.mathReal(function: .sign(expression: x)).allVariables == [.x])
+        #expect(FunctionCall.mathReal(function: .sqrt(expression: x)).allVariables == [.x])
+        #expect(FunctionCall.mathReal(function: .fmax(arg0: x, arg1: y)).allVariables == [.x, .y])
+        #expect(FunctionCall.mathReal(function: .fmin(arg0: x, arg1: y)).allVariables == [.x, .y])
     }
 
 }

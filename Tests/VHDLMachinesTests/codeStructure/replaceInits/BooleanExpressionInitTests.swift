@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for the `BooleanExpression` replace initialiser.
-final class BooleanExpressionInitTests: XCTestCase {
+@Suite
+struct BooleanExpressionInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,59 +81,66 @@ final class BooleanExpressionInitTests: XCTestCase {
     }
 
     /// Test `and` operation.
+    @Test
     func testAnd() {
         let and = BooleanExpression.and(lhs: x, rhs: y)
         let newAnd = BooleanExpression(expression: and, replacing: .x, with: newX)
         let expected = BooleanExpression.and(lhs: expNewX, rhs: y)
-        XCTAssertEqual(newAnd, expected)
+        #expect(newAnd == expected)
     }
 
     /// Test `nand` operation.
+    @Test
     func testNand() {
         let nand = BooleanExpression.nand(lhs: x, rhs: y)
         let newNand = BooleanExpression(expression: nand, replacing: .x, with: newX)
         let expected = BooleanExpression.nand(lhs: expNewX, rhs: y)
-        XCTAssertEqual(newNand, expected)
+        #expect(newNand == expected)
     }
 
     /// Test `nor` operation.
+    @Test
     func testNor() {
         let nor = BooleanExpression.nor(lhs: x, rhs: y)
         let newNor = BooleanExpression(expression: nor, replacing: .x, with: newX)
         let expected = BooleanExpression.nor(lhs: expNewX, rhs: y)
-        XCTAssertEqual(newNor, expected)
+        #expect(newNor == expected)
     }
 
     /// Test `or` operation.
+    @Test
     func testOr() {
         let or = BooleanExpression.or(lhs: x, rhs: y)
         let newOr = BooleanExpression(expression: or, replacing: .x, with: newX)
         let expected = BooleanExpression.or(lhs: expNewX, rhs: y)
-        XCTAssertEqual(newOr, expected)
+        #expect(newOr == expected)
     }
 
     /// Test `xnor` operation.
+    @Test
     func testXNor() {
         let xnor = BooleanExpression.xnor(lhs: x, rhs: y)
         let newXnor = BooleanExpression(expression: xnor, replacing: .x, with: newX)
         let expected = BooleanExpression.xnor(lhs: expNewX, rhs: y)
-        XCTAssertEqual(newXnor, expected)
+        #expect(newXnor == expected)
     }
 
     /// Test `xor` operation.
+    @Test
     func testXOr() {
         let xor = BooleanExpression.xor(lhs: x, rhs: y)
         let newXor = BooleanExpression(expression: xor, replacing: .x, with: newX)
         let expected = BooleanExpression.xor(lhs: expNewX, rhs: y)
-        XCTAssertEqual(newXor, expected)
+        #expect(newXor == expected)
     }
 
     /// Test `not` operation.
+    @Test
     func testNot() {
         let not = BooleanExpression.not(value: x)
         let newNot = BooleanExpression(expression: not, replacing: .x, with: newX)
         let expected = BooleanExpression.not(value: expNewX)
-        XCTAssertEqual(newNot, expected)
+        #expect(newNot == expected)
     }
 
 }

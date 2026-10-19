@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``Transition`` replace initialiser.
-final class TransitionInitTests: XCTestCase {
+@Suite
+struct TransitionInitTests {
 
     /// An `x` variable.
     let x = TransitionCondition.variable(name: .x)
@@ -78,6 +79,7 @@ final class TransitionInitTests: XCTestCase {
     // swiftlint:enable force_unwrapping
 
     /// Test init replaces variables correctly.
+    @Test
     func testReplaceInit() {
         let original = Transition(condition: .and(lhs: x, rhs: y), source: 0, target: 1)
         var machine = Machine.testMachine()
@@ -85,13 +87,13 @@ final class TransitionInitTests: XCTestCase {
             LocalSignal(type: .stdLogic, name: .x), LocalSignal(type: .stdLogic, name: .y),
         ]
         let result = Transition(replacingStateRefsIn: original, in: machine)
-        XCTAssertEqual(
-            result,
-            Transition(
-                condition: .and(lhs: .variable(name: newX), rhs: .variable(name: newY)),
-                source: 0,
-                target: 1
-            )
+        #expect(
+            result
+                == Transition(
+                    condition: .and(lhs: .variable(name: newX), rhs: .variable(name: newY)),
+                    source: 0,
+                    target: 1
+                )
         )
     }
 

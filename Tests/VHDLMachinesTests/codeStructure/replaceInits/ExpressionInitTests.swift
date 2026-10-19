@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `Expression` replace initialiser.
-final class ExpressionInitTests: XCTestCase {
+@Suite
+struct ExpressionInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,58 +81,66 @@ final class ExpressionInitTests: XCTestCase {
     }
 
     /// Test `binary` case.
+    @Test
     func testBinary() {
         let original = Expression.binary(operation: .addition(lhs: x, rhs: y))
         let result = Expression(expression: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .binary(operation: .addition(lhs: expNewX, rhs: y)))
+        #expect(result == .binary(operation: .addition(lhs: expNewX, rhs: y)))
     }
 
     /// Test `cast` case.
+    @Test
     func testCast() {
         let original = Expression.cast(operation: .bit(expression: x))
         let result = Expression(expression: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .cast(operation: .bit(expression: expNewX)))
+        #expect(result == .cast(operation: .bit(expression: expNewX)))
     }
 
     /// Test `conditional` case.
+    @Test
     func testConditional() {
         let original = Expression.conditional(condition: .comparison(value: .equality(lhs: x, rhs: y)))
         let result = Expression(expression: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .conditional(condition: .comparison(value: .equality(lhs: expNewX, rhs: y))))
+        #expect(result == .conditional(condition: .comparison(value: .equality(lhs: expNewX, rhs: y))))
     }
 
     /// Test `functionCall` case.
+    @Test
     func testFunctionCall() {
         let original = Expression.functionCall(call: .mathReal(function: .ceil(expression: x)))
         let result = Expression(expression: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .functionCall(call: .mathReal(function: .ceil(expression: expNewX))))
+        #expect(result == .functionCall(call: .mathReal(function: .ceil(expression: expNewX))))
     }
 
     /// Test `literal` does nothing.
+    @Test
     func testLiteral() {
         let original = Expression.literal(value: .integer(value: 1))
         let result = Expression(expression: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, original)
+        #expect(result == original)
     }
 
     /// Test `logical` case.
+    @Test
     func testLogical() {
         let original = Expression.logical(operation: .and(lhs: x, rhs: y))
         let result = Expression(expression: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .logical(operation: .and(lhs: expNewX, rhs: y)))
+        #expect(result == .logical(operation: .and(lhs: expNewX, rhs: y)))
     }
 
     /// Test `precedence` case.
+    @Test
     func testPrecedence() {
         let original = Expression.precedence(value: x)
         let result = Expression(expression: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .precedence(value: expNewX))
+        #expect(result == .precedence(value: expNewX))
     }
 
     /// Test `reference case`.
+    @Test
     func testReference() {
         let result = Expression(expression: x, replacing: .x, with: newX)
-        XCTAssertEqual(result, expNewX)
+        #expect(result == expNewX)
     }
 
 }

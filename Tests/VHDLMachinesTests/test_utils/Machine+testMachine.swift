@@ -65,7 +65,7 @@ extension Machine {
     // swiftlint:disable force_unwrapping
 
     /// A default test machine.
-    public static func testMachine(directory: URL = PingPongArrangement().machinePath) -> Machine {
+    static func testMachine(directory: URL = PingPongArrangement().machinePath) -> Machine {
         var initialState = State.defaultState(name: .initial)
         initialState.actions[.onEntry] = .statement(
             statement: .assignment(

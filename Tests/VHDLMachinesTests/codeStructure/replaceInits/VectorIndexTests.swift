@@ -56,12 +56,14 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `VectorIndex` extensions.
-final class VectorIndexTests: XCTestCase {
+@Suite
+struct VectorIndexTests {
 
     /// Test replace init.
+    @Test
     func testReplaceInit() {
         let original = VectorIndex.index(
             value: .reference(variable: .variable(reference: .variable(name: .x)))
@@ -70,9 +72,9 @@ final class VectorIndexTests: XCTestCase {
         let expected = VectorIndex.index(
             value: .reference(variable: .variable(reference: .variable(name: .xs)))
         )
-        XCTAssertEqual(replaceX, expected)
-        XCTAssertEqual(original, VectorIndex(index: original, replacing: .y, with: .clk))
-        XCTAssertEqual(VectorIndex.others, VectorIndex(index: .others, replacing: .y, with: .clk))
+        #expect(replaceX == expected)
+        #expect(original == VectorIndex(index: original, replacing: .y, with: .clk))
+        #expect(VectorIndex.others == VectorIndex(index: .others, replacing: .y, with: .clk))
     }
 
 }

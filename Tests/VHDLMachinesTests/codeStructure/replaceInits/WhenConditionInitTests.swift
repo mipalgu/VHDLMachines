@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `WhenCondition` replace initialiser.
-final class WhenConditionInitTests: XCTestCase {
+@Suite
+struct WhenConditionInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -80,31 +81,35 @@ final class WhenConditionInitTests: XCTestCase {
     }
 
     /// Test `expression` case.
+    @Test
     func testExpression() {
         let original = WhenCondition.expression(expression: x)
         let result = WhenCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .expression(expression: expNewX))
+        #expect(result == .expression(expression: expNewX))
     }
 
     /// Test `range` case.
+    @Test
     func testRange() {
         let original = WhenCondition.range(range: .downto(upper: y, lower: x))
         let result = WhenCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .range(range: .downto(upper: y, lower: expNewX)))
+        #expect(result == .range(range: .downto(upper: y, lower: expNewX)))
     }
 
     /// Test `others` case does nothing.
+    @Test
     func testOthers() {
         let original = WhenCondition.others
         let result = WhenCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, original)
+        #expect(result == original)
     }
 
     /// Test `selection` case.
+    @Test
     func testSelection() {
         let original = WhenCondition.selection(expressions: [x, y])
         let result = WhenCondition(condition: original, replacing: .x, with: newX)
-        XCTAssertEqual(result, .selection(expressions: [expNewX, y]))
+        #expect(result == .selection(expressions: [expNewX, y]))
     }
 
 }

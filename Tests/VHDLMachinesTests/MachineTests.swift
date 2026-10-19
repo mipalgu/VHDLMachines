@@ -54,190 +54,144 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
+import Foundation
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 // swiftlint:disable type_body_length
 
 /// Tests the ``Machine`` type.
-final class MachineTests: XCTestCase {
+@Suite
+struct MachineTests {
 
     // swiftlint:disable force_unwrapping
 
     /// The machines name.
-    var machineName: VariableName {
-        VariableName(rawValue: "M0")!
-    }
+    let machineName = VariableName(rawValue: "M0")!
 
     /// The path to the machine.
-    var path: URL {
-        URL(fileURLWithPath: "/path/to/M0")
-    }
+    let path = URL(fileURLWithPath: "/path/to/M0")
 
     /// The includes for the machine.
-    var includes: [Include] {
-        [
-            .include(statement: UseStatement(rawValue: "use IEEE.STD_LOGIC_1164.ALL;")!),
-            .include(statement: UseStatement(rawValue: "use IEEE.NUMERIC_STD.ALL;")!),
-        ]
-    }
+    let includes: [Include] = [
+        .include(statement: UseStatement(rawValue: "use IEEE.STD_LOGIC_1164.ALL;")!),
+        .include(statement: UseStatement(rawValue: "use IEEE.NUMERIC_STD.ALL;")!),
+    ]
 
     // swiftlint:enable force_unwrapping
 
     /// The external signals for the machine.
-    var externalSignals: [PortSignal] {
-        [
-            PortSignal(
-                type: .stdLogic,
-                name: VariableName.a,
-                mode: .input,
-                defaultValue: .literal(value: .logic(value: .low)),
-                comment: Comment.comment
-            )
-        ]
-    }
+    let externalSignals = [
+        PortSignal(
+            type: .stdLogic,
+            name: VariableName.a,
+            mode: .input,
+            defaultValue: .literal(value: .logic(value: .low)),
+            comment: Comment.comment
+        )
+    ]
 
     /// The clocks for the machine.
-    var clocks: [Clock] {
-        [
-            Clock(name: VariableName.clk, frequency: 50, unit: .MHz)
-        ]
-    }
+    let clocks = [
+        Clock(name: VariableName.clk, frequency: 50, unit: .MHz)
+    ]
 
     /// The driving clock for the machine.
-    var drivingClock: Int {
-        0
-    }
+    let drivingClock = 0
 
     // swiftlint:disable force_unwrapping
 
     /// The paths to the dependent machines.
-    var dependentMachines: [VariableName: URL] {
-        [
-            VariableName(rawValue: "M1")!: URL(fileURLWithPath: "/path/to/M1"),
-            VariableName(rawValue: "M2")!: URL(fileURLWithPath: "/path/to/M2"),
-        ]
-    }
+    let dependentMachines: [VariableName: URL] = [
+        VariableName(rawValue: "M1")!: URL(fileURLWithPath: "/path/to/M1"),
+        VariableName(rawValue: "M2")!: URL(fileURLWithPath: "/path/to/M2"),
+    ]
 
     // swiftlint:enable force_unwrapping
 
     /// The signals for the machine.
-    var machineSignals: [LocalSignal] {
-        [
-            LocalSignal(
-                type: .stdLogic,
-                name: VariableName.s,
-                defaultValue: .literal(value: .logic(value: .low)),
-                comment: Comment.signalS
-            )
-        ]
-    }
+    let machineSignals: [LocalSignal] = [
+        LocalSignal(
+            type: .stdLogic,
+            name: VariableName.s,
+            defaultValue: .literal(value: .logic(value: .low)),
+            comment: Comment.signalS
+        )
+    ]
 
     /// The parameters for the machine.
-    var parameterSignals: [Parameter] {
-        [
-            Parameter(
-                type: .stdLogic,
-                name: VariableName.p,
-                defaultValue: .literal(value: .logic(value: .low)),
-                comment: Comment.parameterP
-            )
-        ]
-    }
+    let parameterSignals: [Parameter] = [
+        Parameter(
+            type: .stdLogic,
+            name: VariableName.p,
+            defaultValue: .literal(value: .logic(value: .low)),
+            comment: Comment.parameterP
+        )
+    ]
 
     /// The returnable signals for the machine.
-    var returnableSignals: [ReturnableVariable] {
-        [
-            ReturnableVariable(
-                type: .stdLogic,
-                name: VariableName.r,
-                comment: Comment.returnableR
-            )
-        ]
-    }
+    let returnableSignals: [ReturnableVariable] = [
+        ReturnableVariable(
+            type: .stdLogic,
+            name: VariableName.r,
+            comment: Comment.returnableR
+        )
+    ]
 
     /// The states in the machine.
-    var states: [State] {
-        [
-            State(
-                name: VariableName.s0,
-                actions: [:],
-                signals: [],
-                externalVariables: []
-            ),
-            State(
-                name: VariableName.s1,
-                actions: [:],
-                signals: [],
-                externalVariables: []
-            ),
-        ]
-    }
+    let states: [State] = [
+        State(
+            name: VariableName.s0,
+            actions: [:],
+            signals: [],
+            externalVariables: []
+        ),
+        State(
+            name: VariableName.s1,
+            actions: [:],
+            signals: [],
+            externalVariables: []
+        ),
+    ]
 
     /// The transitions in the machine.
-    var transitions: [Transition] {
-        [
-            Transition(condition: .conditional(condition: .literal(value: true)), source: 0, target: 1),
-            Transition(condition: .conditional(condition: .literal(value: true)), source: 1, target: 0),
-        ]
-    }
+    let transitions: [Transition] = [
+        Transition(condition: .conditional(condition: .literal(value: true)), source: 0, target: 1),
+        Transition(condition: .conditional(condition: .literal(value: true)), source: 1, target: 0),
+    ]
 
     /// The index of the initial state.
-    var initialState: Int {
-        0
-    }
+    let initialState = 0
 
     /// The index of the suspended state.
-    var suspendedState: Int {
-        1
-    }
+    let suspendedState = 1
 
     /// The architecture head for the machine.
-    var architectureHead: [HeadStatement] {
-        [
-            .definition(
-                value: .signal(value: LocalSignal(type: .stdLogic, name: .s, defaultValue: nil, comment: nil))
-            )
-        ]
-    }
+    let architectureHead: [HeadStatement] = [
+        .definition(
+            value: .signal(value: LocalSignal(type: .stdLogic, name: .s, defaultValue: nil, comment: nil))
+        )
+    ]
 
     /// The architecture body for the machine.
-    var architectureBody: AsynchronousBlock {
-        .statement(
-            statement: .assignment(
-                name: .variable(reference: .variable(name: .s)),
-                value: .expression(value: .literal(value: .bit(value: .high)))
-            )
+    let architectureBody: AsynchronousBlock = .statement(
+        statement: .assignment(
+            name: .variable(reference: .variable(name: .s)),
+            value: .expression(value: .literal(value: .bit(value: .high)))
         )
-    }
-
-    /// The default actions in a state.
-    var actions: [VariableName] {
-        [.onEntry, .onExit, .internal, .onResume, .onSuspend]
-    }
-
-    /// The machine to test.
-    lazy var machine = Machine(
-        actions: actions,
-        includes: includes,
-        externalSignals: externalSignals,
-        clocks: clocks,
-        drivingClock: drivingClock,
-        machineSignals: machineSignals,
-        isParameterised: true,
-        parameterSignals: parameterSignals,
-        returnableSignals: returnableSignals,
-        states: states,
-        transitions: transitions,
-        initialState: initialState,
-        suspendedState: suspendedState,
-        architectureHead: architectureHead,
-        architectureBody: architectureBody
     )
 
+    /// The default actions in a state.
+    let actions: [VariableName] = [
+        .onEntry, .onExit, .internal, .onResume, .onSuspend,
+    ]
+
+    /// The machine to test.
+    var machine: Machine
+
     /// Initialises the test.
-    override func setUp() {
+    init() {
         self.machine = Machine(
             actions: actions,
             includes: includes,
@@ -258,29 +212,31 @@ final class MachineTests: XCTestCase {
     }
 
     /// Test init sets the correct values.
+    @Test
     func testInit() {
-        XCTAssertEqual(machine.includes, includes)
-        XCTAssertEqual(machine.externalSignals, externalSignals)
-        XCTAssertEqual(machine.clocks, clocks)
-        XCTAssertEqual(machine.drivingClock, drivingClock)
-        XCTAssertEqual(machine.machineSignals, machineSignals)
-        XCTAssertTrue(machine.isParameterised)
-        XCTAssertTrue(machine.isSuspensible)
-        XCTAssertEqual(machine.parameterSignals, parameterSignals)
-        XCTAssertEqual(machine.returnableSignals, returnableSignals)
-        XCTAssertEqual(machine.states, states)
-        XCTAssertEqual(machine.transitions, transitions)
-        XCTAssertEqual(machine.initialState, initialState)
-        XCTAssertEqual(machine.suspendedState, suspendedState)
-        XCTAssertEqual(machine.architectureHead, architectureHead)
-        XCTAssertEqual(machine.architectureBody, architectureBody)
+        #expect(machine.includes == includes)
+        #expect(machine.externalSignals == externalSignals)
+        #expect(machine.clocks == clocks)
+        #expect(machine.drivingClock == drivingClock)
+        #expect(machine.machineSignals == machineSignals)
+        #expect(machine.isParameterised)
+        #expect(machine.isSuspensible)
+        #expect(machine.parameterSignals == parameterSignals)
+        #expect(machine.returnableSignals == returnableSignals)
+        #expect(machine.states == states)
+        #expect(machine.transitions == transitions)
+        #expect(machine.initialState == initialState)
+        #expect(machine.suspendedState == suspendedState)
+        #expect(machine.architectureHead == architectureHead)
+        #expect(machine.architectureBody == architectureBody)
     }
 
     // swiftlint:disable function_body_length
     // swiftlint:disable force_unwrapping
 
     /// Test getters and setters work.
-    func testGettersAndSetters() {
+    @Test
+    mutating func testGettersAndSetters() {
         let newIncludes = [
             Include.include(statement: UseStatement(rawValue: "use IEEE.STD_LOGIC_1164.ALL;")!)
         ]
@@ -360,22 +316,23 @@ final class MachineTests: XCTestCase {
         machine.suspendedState = newSuspendedState
         machine.architectureHead = newArchitectureHead
         machine.architectureBody = newArchitectureBody
-        XCTAssertEqual(machine.includes, newIncludes)
-        XCTAssertEqual(machine.externalSignals, newExternalSignals)
-        XCTAssertEqual(machine.clocks, newClocks)
-        XCTAssertEqual(machine.drivingClock, newDrivingClock)
-        XCTAssertEqual(machine.machineSignals, newMachineSignals)
-        XCTAssertEqual(machine.parameterSignals, newParameterSignals)
-        XCTAssertEqual(machine.returnableSignals, newReturnableSignals)
-        XCTAssertEqual(machine.states, newStates)
-        XCTAssertEqual(machine.transitions, newTransitions)
-        XCTAssertEqual(machine.initialState, newInitialState)
-        XCTAssertEqual(machine.suspendedState, newSuspendedState)
-        XCTAssertEqual(machine.architectureHead, newArchitectureHead)
-        XCTAssertEqual(machine.architectureBody, newArchitectureBody)
+        #expect(machine.includes == newIncludes)
+        #expect(machine.externalSignals == newExternalSignals)
+        #expect(machine.clocks == newClocks)
+        #expect(machine.drivingClock == newDrivingClock)
+        #expect(machine.machineSignals == newMachineSignals)
+        #expect(machine.parameterSignals == newParameterSignals)
+        #expect(machine.returnableSignals == newReturnableSignals)
+        #expect(machine.states == newStates)
+        #expect(machine.transitions == newTransitions)
+        #expect(machine.initialState == newInitialState)
+        #expect(machine.suspendedState == newSuspendedState)
+        #expect(machine.architectureHead == newArchitectureHead)
+        #expect(machine.architectureBody == newArchitectureBody)
     }
 
     /// Test initial machine is setup correctly.
+    @Test
     func testInitialSuspensible() {
         let machine = Machine.initialSuspensible
         let expected = Machine(
@@ -410,28 +367,29 @@ final class MachineTests: XCTestCase {
             initialState: 0,
             suspendedState: 1
         )
-        XCTAssertEqual(machine, expected)
+        #expect(machine == expected)
     }
 
     /// Test `isParameterised` setter.
-    func testIsParameterisedSetter() {
-        XCTAssertTrue(machine.isParameterised)
-        XCTAssertEqual(machine.suspendedState, 1)
+    @Test
+    mutating func testIsParameterisedSetter() {
+        #expect(machine.isParameterised)
+        #expect(machine.suspendedState == 1)
         machine.isParameterised = false
-        XCTAssertFalse(machine.isParameterised)
-        XCTAssertEqual(machine.suspendedState, 1)
+        #expect(!machine.isParameterised)
+        #expect(machine.suspendedState == 1)
         machine.suspendedState = nil
-        XCTAssertNil(machine.suspendedState)
-        XCTAssertFalse(machine.isParameterised)
+        #expect(machine.suspendedState == nil)
+        #expect(!machine.isParameterised)
         machine.isParameterised = true
-        XCTAssertFalse(machine.isParameterised)
-        XCTAssertNil(machine.suspendedState)
+        #expect(!machine.isParameterised)
+        #expect(machine.suspendedState == nil)
         machine.suspendedState = 1
-        XCTAssertEqual(machine.suspendedState, 1)
-        XCTAssertFalse(machine.isParameterised)
+        #expect(machine.suspendedState == 1)
+        #expect(!machine.isParameterised)
         machine.isParameterised = true
-        XCTAssertTrue(machine.isParameterised)
-        XCTAssertEqual(machine.suspendedState, 1)
+        #expect(machine.isParameterised)
+        #expect(machine.suspendedState == 1)
     }
 
     // swiftlint:enable force_unwrapping

@@ -56,10 +56,11 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for ``State`` replace initialiser.
-final class StateInitTests: XCTestCase {
+@Suite
+struct StateInitTests {
 
     /// An `x` variable.
     let x = Expression.reference(variable: .variable(reference: .variable(name: .x)))
@@ -88,6 +89,7 @@ final class StateInitTests: XCTestCase {
     }
 
     /// Test init replaces variables correctly.
+    @Test
     func testReplaceVariablesCorrectly() {
         var state = State.defaultState(name: .initial)
         state.actions = [:]
@@ -129,7 +131,7 @@ final class StateInitTests: XCTestCase {
             ),
         ])
         let result = State(replacingStateVariablesIn: state)
-        XCTAssertEqual(result, expected)
+        #expect(result == expected)
     }
 
 }

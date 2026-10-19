@@ -55,20 +55,17 @@
 //
 
 @testable import VHDLMachines
-import XCTest
+import Testing
 
 /// Tests the ``Transition`` type.
-final class TransitionTests: XCTestCase {
+@Suite
+struct TransitionTests {
 
     /// The transition to test.
-    var transition = Transition(
-        condition: .conditional(condition: .literal(value: true)),
-        source: 0,
-        target: 1
-    )
+    var transition: Transition
 
     /// Initialises a ``Transition`` before every test.
-    override func setUp() {
+    init() {
         self.transition = Transition(
             condition: .conditional(condition: .literal(value: true)),
             source: 0,
@@ -77,20 +74,22 @@ final class TransitionTests: XCTestCase {
     }
 
     /// Test initialiser sets stored properties correctly.
+    @Test
     func testInit() {
-        XCTAssertEqual(self.transition.condition, .conditional(condition: .literal(value: true)))
-        XCTAssertEqual(self.transition.source, 0)
-        XCTAssertEqual(self.transition.target, 1)
+        #expect(self.transition.condition == .conditional(condition: .literal(value: true)))
+        #expect(self.transition.source == 0)
+        #expect(self.transition.target == 1)
     }
 
     /// Test getters and setters work correctly.
-    func testGettersAndSetters() {
+    @Test
+    mutating func testGettersAndSetters() {
         self.transition.condition = .conditional(condition: .literal(value: false))
         self.transition.source = 1
         self.transition.target = 0
-        XCTAssertEqual(self.transition.condition, .conditional(condition: .literal(value: false)))
-        XCTAssertEqual(self.transition.source, 1)
-        XCTAssertEqual(self.transition.target, 0)
+        #expect(self.transition.condition == .conditional(condition: .literal(value: false)))
+        #expect(self.transition.source == 1)
+        #expect(self.transition.target == 0)
     }
 
 }

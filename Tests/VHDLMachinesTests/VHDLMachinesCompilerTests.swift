@@ -7,15 +7,16 @@
 
 import Foundation
 import SwiftUtils
-import TestUtils
+
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 // swiftlint:disable type_body_length
 
 /// Test class for ``VHDLCompiler``.
-class VHDLMachinesCompilerTests: XCTestCase {
+@Suite
+struct VHDLMachinesCompilerTests {
 
     /// The compiler under test.
     let compiler = VHDLCompiler()
@@ -27,7 +28,7 @@ class VHDLMachinesCompilerTests: XCTestCase {
 
     /// A test machine.
     var machine: VHDLMachines.Machine {
-        Machine.testMachine(directory: testMachinePath)
+        VHDLMachines.Machine.testMachine(directory: testMachinePath)
     }
 
     /// The representation of the machine.
@@ -70,40 +71,42 @@ class VHDLMachinesCompilerTests: XCTestCase {
     }
 
     /// Test can compile initial machine.
+    @Test
     func testInitialMachine() {
         guard let wrapper = compiler.compile(machine: machine, name: .testMachine) else {
-            XCTFail("Failed to create wrapper!")
+            Issue.record("Failed to create wrapper!")
             return
         }
-        XCTAssertNil(wrapper.preferredFilename)
-        XCTAssertNil(wrapper.filename)
-        XCTAssertEqual(wrapper.fileWrappers?.count, 1)
+        #expect(wrapper.preferredFilename == nil)
+        #expect(wrapper.filename == nil)
+        #expect(wrapper.fileWrappers?.count == 1)
         let file = wrapper.fileWrappers?.first
-        XCTAssertEqual(file?.key, "TestMachine.vhd")
-        XCTAssertEqual(file?.value.preferredFilename, "TestMachine.vhd")
+        #expect(file?.key == "TestMachine.vhd")
+        #expect(file?.value.preferredFilename == "TestMachine.vhd")
         guard let data = file?.value.regularFileContents else {
-            XCTFail("File is empty!")
+            Issue.record("File is empty!")
             return
         }
         let rawValue = String(data: data, encoding: .utf8)
-        XCTAssertEqual(rawValue, VHDLFile(representation: representation).rawValue)
+        #expect(rawValue == VHDLFile(representation: representation).rawValue)
         let f: (Machine, VariableName) -> MachineRepresentation? = { _, _ in nil }
-        XCTAssertNil(compiler.compile(machine: machine, name: .testMachine, createRepresentation: f))
+        #expect(compiler.compile(machine: machine, name: .testMachine, createRepresentation: f) == nil)
     }
 
     /// Test that an arrangement is generated correctly.
+    @Test
     func testArrangementGeneration() {
         let arrangement = Arrangement.testArrangement
         guard let wrapper = compiler.compile(arrangement: arrangement, name: .arrangement1) else {
-            XCTFail("Failed to create arrangement wrapper!")
+            Issue.record("Failed to create arrangement wrapper!")
             return
         }
-        XCTAssertNil(wrapper.preferredFilename)
-        XCTAssertNil(wrapper.filename)
-        XCTAssertEqual(wrapper.fileWrappers?.count, 1)
+        #expect(wrapper.preferredFilename == nil)
+        #expect(wrapper.filename == nil)
+        #expect(wrapper.fileWrappers?.count == 1)
         let file = wrapper.fileWrappers?.first
-        XCTAssertEqual(file?.key, "Arrangement1.vhd")
-        XCTAssertEqual(file?.value.preferredFilename, "Arrangement1.vhd")
+        #expect(file?.key == "Arrangement1.vhd")
+        #expect(file?.value.preferredFilename == "Arrangement1.vhd")
         let data = file?.value.regularFileContents
         guard
             let rawValue = data.flatMap({ String(data: $0, encoding: .utf8) }),
@@ -113,12 +116,14 @@ class VHDLMachinesCompilerTests: XCTestCase {
             )?
             .file.rawValue
         else {
-            XCTFail("File is empty!")
+            Issue.record("File is empty!")
             return
         }
-        XCTAssertEqual(rawValue, expected)
+        #expect(rawValue == expected)
         let f: (Arrangement, VariableName) -> ArrangementRepresentation? = { _, _ in nil }
-        XCTAssertNil(compiler.compile(arrangement: arrangement, name: .arrangement1, createRepresentation: f))
+        #expect(
+            compiler.compile(arrangement: arrangement, name: .arrangement1, createRepresentation: f) == nil
+        )
     }
 
     // swiftlint:disable line_length

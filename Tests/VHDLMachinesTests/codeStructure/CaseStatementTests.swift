@@ -56,20 +56,22 @@
 
 @testable import VHDLMachines
 import VHDLParsing
-import XCTest
+import Testing
 
 /// Test class for `CaseStatement` extensions.
-final class CaseStatementTests: XCTestCase {
+@Suite
+struct CaseStatementTests {
 
     /// Some test data.
-    var machine = Machine.testMachine()
+    var machine: Machine
 
     /// Initialise the test data before every test.
-    override func setUp() {
+    init() {
         self.machine = Machine.testMachine()
     }
 
     /// Test machine initialiser.
+    @Test
     func testMachineInit() {
         let statement = CaseStatement(machine: machine)
         guard
@@ -83,41 +85,43 @@ final class CaseStatementTests: XCTestCase {
             let readSnapshot = WhenCase(machine: machine, action: .readSnapshot),
             let writeSnapshot = WhenCase(machine: machine, action: .writeSnapshot)
         else {
-            XCTFail("Could not create when cases.")
+            Issue.record("Could not create when cases.")
             return
         }
-        XCTAssertEqual(
-            statement,
-            CaseStatement(
-                condition: .reference(variable: .variable(reference: .variable(name: .internalState))),
-                cases: [
-                    checkTransition,
-                    `internal`,
-                    noOnEntry,
-                    onEntry,
-                    onExit,
-                    onResume,
-                    onSuspend,
-                    readSnapshot,
-                    writeSnapshot,
-                    .othersNull,
-                ]
-            )
+        #expect(
+            statement
+                == CaseStatement(
+                    condition: .reference(variable: .variable(reference: .variable(name: .internalState))),
+                    cases: [
+                        checkTransition,
+                        `internal`,
+                        noOnEntry,
+                        onEntry,
+                        onExit,
+                        onResume,
+                        onSuspend,
+                        readSnapshot,
+                        writeSnapshot,
+                        .othersNull,
+                    ]
+                )
         )
     }
 
     /// Test machine initialiser for a machine with invalid actions.
-    func testMachineInitWithInvalidActions() {
+    @Test
+    mutating func testMachineInitWithInvalidActions() {
         guard let name = VariableName(rawValue: "InvalidAction") else {
-            XCTFail("Invalid action name.")
+            Issue.record("Invalid action name.")
             return
         }
         machine.actions.append(name)
-        XCTAssertNil(CaseStatement(machine: machine))
+        #expect(CaseStatement(machine: machine) == nil)
     }
 
     /// Test machine initialiser for a non-suspensible machine.
-    func testMachineInitNotSuspensible() {
+    @Test
+    mutating func testMachineInitNotSuspensible() {
         machine.suspendedState = nil
         let statement = CaseStatement(machine: machine)
         guard
@@ -129,29 +133,30 @@ final class CaseStatementTests: XCTestCase {
             let readSnapshot = WhenCase(machine: machine, action: .readSnapshot),
             let writeSnapshot = WhenCase(machine: machine, action: .writeSnapshot)
         else {
-            XCTFail("Could not create when cases.")
+            Issue.record("Could not create when cases.")
             return
         }
-        XCTAssertEqual(
-            statement,
-            CaseStatement(
-                condition: .reference(variable: .variable(reference: .variable(name: .internalState))),
-                cases: [
-                    checkTransition,
-                    `internal`,
-                    noOnEntry,
-                    onEntry,
-                    onExit,
-                    readSnapshot,
-                    writeSnapshot,
-                    .othersNull,
-                ]
-            )
+        #expect(
+            statement
+                == CaseStatement(
+                    condition: .reference(variable: .variable(reference: .variable(name: .internalState))),
+                    cases: [
+                        checkTransition,
+                        `internal`,
+                        noOnEntry,
+                        onEntry,
+                        onExit,
+                        readSnapshot,
+                        writeSnapshot,
+                        .othersNull,
+                    ]
+                )
         )
     }
 
     /// Test machine initialiser when machine isn't parameterised.
-    func testMachineInitNotParameterised() {
+    @Test
+    mutating func testMachineInitNotParameterised() {
         machine.isParameterised = false
         let statement = CaseStatement(machine: machine)
         guard
@@ -165,26 +170,26 @@ final class CaseStatementTests: XCTestCase {
             let readSnapshot = WhenCase(machine: machine, action: .readSnapshot),
             let writeSnapshot = WhenCase(machine: machine, action: .writeSnapshot)
         else {
-            XCTFail("Could not create when cases.")
+            Issue.record("Could not create when cases.")
             return
         }
-        XCTAssertEqual(
-            statement,
-            CaseStatement(
-                condition: .reference(variable: .variable(reference: .variable(name: .internalState))),
-                cases: [
-                    checkTransition,
-                    `internal`,
-                    noOnEntry,
-                    onEntry,
-                    onExit,
-                    onResume,
-                    onSuspend,
-                    readSnapshot,
-                    writeSnapshot,
-                    .othersNull,
-                ]
-            )
+        #expect(
+            statement
+                == CaseStatement(
+                    condition: .reference(variable: .variable(reference: .variable(name: .internalState))),
+                    cases: [
+                        checkTransition,
+                        `internal`,
+                        noOnEntry,
+                        onEntry,
+                        onExit,
+                        onResume,
+                        onSuspend,
+                        readSnapshot,
+                        writeSnapshot,
+                        .othersNull,
+                    ]
+                )
         )
     }
 
