@@ -59,8 +59,8 @@ import SwiftUtils
 #endif
 import Foundation
 
-@testable import VHDLMachines
 import Testing
+@testable import VHDLMachines
 
 /// Tests the ``VHDLParser``.
 @Suite

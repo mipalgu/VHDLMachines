@@ -54,8 +54,8 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
 import Foundation
-@testable import VHDLMachines
 import Testing
+@testable import VHDLMachines
 
 /// Test class for ``Time``.
 @Suite

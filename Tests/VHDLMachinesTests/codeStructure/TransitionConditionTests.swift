@@ -54,9 +54,9 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
+import Testing
 @testable import VHDLMachines
 import VHDLParsing
-import Testing
 
 // swiftlint:disable type_body_length
 

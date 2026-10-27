@@ -56,9 +56,9 @@
 
 import Foundation
 
+import Testing
 @testable import VHDLMachines
 import VHDLParsing
-import Testing
 
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length

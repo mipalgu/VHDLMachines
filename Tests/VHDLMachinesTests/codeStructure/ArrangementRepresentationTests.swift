@@ -55,9 +55,9 @@
 
 import Foundation
 
+import Testing
 @testable import VHDLMachines
 import VHDLParsing
-import Testing
 
 /// Test class for ``ArrangementRepresentation``.
 @Suite

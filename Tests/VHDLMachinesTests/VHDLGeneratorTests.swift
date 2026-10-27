@@ -57,8 +57,8 @@
 import Foundation
 import SwiftUtils
 
-@testable import VHDLMachines
 import Testing
+@testable import VHDLMachines
 
 /// A test case for the ``VHDLGenerator``.
 @Suite(.serialized)
@@ -75,13 +75,6 @@ final class VHDLGeneratorTests {
 
     /// IO helper.
     let manager = FileManager.default
-
-    /// Remove ping machine after every test.
-    deinit {
-        if manager.fileExists(atPath: factory.pingMachinePath.path) {
-            _ = try? manager.removeItem(at: factory.pingMachinePath)
-        }
-    }
 
     /// Test Generate creates correct file structure.
     @Test
@@ -163,6 +156,13 @@ final class VHDLGeneratorTests {
         #expect(file.filename == nil)
         let newArrangement = try decoder.decode(Arrangement.self, from: fileData)
         #expect(arrangement == newArrangement)
+    }
+
+    /// Remove ping machine after every test.
+    deinit {
+        if manager.fileExists(atPath: factory.pingMachinePath.path) {
+            _ = try? manager.removeItem(at: factory.pingMachinePath)
+        }
     }
 
 }

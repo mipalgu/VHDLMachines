@@ -8,9 +8,9 @@
 import Foundation
 import SwiftUtils
 
+import Testing
 @testable import VHDLMachines
 import VHDLParsing
-import Testing
 
 // swiftlint:disable type_body_length
 

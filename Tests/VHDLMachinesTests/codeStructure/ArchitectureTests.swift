@@ -53,9 +53,11 @@
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
+import Testing
 @testable import VHDLMachines
 import VHDLParsing
-import Testing
+
+// swiftlint:disable type_body_length
 
 /// Test class for `Architecture` extensions.
 @Suite
@@ -397,3 +399,5 @@ struct ArchitectureTests {
     }
 
 }
+
+// swiftlint:enable type_body_length

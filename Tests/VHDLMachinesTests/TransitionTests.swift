@@ -54,8 +54,8 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-@testable import VHDLMachines
 import Testing
+@testable import VHDLMachines
 
 /// Tests the ``Transition`` type.
 @Suite

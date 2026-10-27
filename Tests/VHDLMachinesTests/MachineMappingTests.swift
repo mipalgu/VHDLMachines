@@ -53,9 +53,9 @@
 // or write to the Free Software Foundation, Inc., 51 Franklin Street,
 // Fifth Floor, Boston, MA  02110-1301, USA.
 
+import Testing
 @testable import VHDLMachines
 import VHDLParsing
-import Testing
 
 /// Test class for ``MachineMapping``.
 @Suite
