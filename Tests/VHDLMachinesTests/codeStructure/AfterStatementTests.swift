@@ -136,6 +136,7 @@ struct AfterStatementTests {
     func testRawValue() {
         #expect(
             statement.rawValue
+                // swiftlint:disable:next line_length
                 == "(\(VariableName.ringletCounter) >= integer(ceil(real(10) * \(VariableName.ringletPerUs))))"
         )
         #expect(

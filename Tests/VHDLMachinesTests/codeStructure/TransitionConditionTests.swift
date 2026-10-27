@@ -328,6 +328,8 @@ struct TransitionConditionTests {
         #expect(TransitionCondition(rawValue: "after_ms(x) ors x") == nil)
     }
 
+    // swiftlint:disable function_body_length
+
     /// Test after boolean expressions.
     @Test
     func testAfterBooleanInit() {
@@ -400,8 +402,6 @@ struct TransitionConditionTests {
                 )
         )
     }
-
-    // swiftlint:disable function_body_length
 
     /// Test `hasAfter` computed property.
     @Test
