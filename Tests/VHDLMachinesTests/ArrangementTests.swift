@@ -164,9 +164,9 @@ struct ArrangementTests {
         )
     }
 
-    /// Test that the public init returns nil for same-typed machines with different implementations.
+    /// Test that the public init creates arrangement for same-typed machines.
     @Test
-    func testInvalidTypedMachinesInPublicInit() {
+    func testDuplicateMachinesInPublicInit() {
         let arrangement = Arrangement(
             mappings: [
                 MachineInstance(name: .machineSignal1, type: .pingMachine): MachineMapping(
@@ -182,7 +182,7 @@ struct ArrangementTests {
             signals: signals,
             clocks: clocks
         )
-        #expect(arrangement == nil)
+        #expect(arrangement != nil)
     }
 
     /// Make sure instance names are also unique.
