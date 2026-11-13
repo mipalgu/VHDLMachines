@@ -71,9 +71,6 @@ public struct Arrangement: Equatable, Hashable, Codable, Sendable {
             }
             mappingsDictionary[instance.type] = oldMappings + [mapping]
         }
-        guard mappingsDictionary.allSatisfy({ Set($1).count == 1 }) else {
-            return nil
-        }
         self.init(
             machines: mappings,
             externalSignals: externalSignals,
